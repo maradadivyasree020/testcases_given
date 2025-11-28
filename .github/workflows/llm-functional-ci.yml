@@ -2,9 +2,9 @@ name: LLM Functional CI
 
 on:
   push:
-    branches: [ "main", "master" ]    # change if your default branch is different
+    branches: [ "Main","main", "master" ]    # change if your default branch is different
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "Main","main", "master" ]
 
 jobs:
   llm-functional-tests:
