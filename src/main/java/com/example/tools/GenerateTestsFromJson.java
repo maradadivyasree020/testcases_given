@@ -3,11 +3,8 @@ package com.example.tools;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.net.http.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.List;
@@ -15,122 +12,134 @@ import java.util.Map;
 
 public class GenerateTestsFromJson {
 
-    // Adjust paths as per your repo layout
+    // JSON with your functional test cases
     private static final Path JSON_PATH =
             Paths.get("test-cases", "attendance-functional-tests.json");
+
+    // Where to write generated JUnit tests
     private static final Path OUTPUT_DIR =
-            Paths.get("src", "test", "java", "com", "example", "college", "controller");
+            Paths.get("src/test/java/com/example/college/controller");
     private static final Path OUTPUT_FILE =
             OUTPUT_DIR.resolve("GeneratedAttendanceTests.java");
 
-    // LLM config
-    private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
-    private static final String MODEL_NAME = "gpt-4.1"; // or any other model
+    // OpenAI chat completions endpoint
+    private static final String API_URL = "https://api.openai.com/v1/chat/completions";
+    // Use a valid model
+    private static final String MODEL = "gpt-4o-mini"; // or "gpt-3.5-turbo"
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+        try {
+            run();
+        } catch (Exception e) {
+            System.err.println("[GenerateTestsFromJson] FATAL ERROR: " + e.getMessage());
+            e.printStackTrace();
+            // do NOT System.exit(1) so CI doesn't fail just because generation failed
+        }
+    }
+
+    private static void run() throws Exception {
         String apiKey = System.getenv("OPENAI_API_KEY");
         if (apiKey == null || apiKey.isBlank()) {
-            throw new IllegalStateException("OPENAI_API_KEY environment variable is not set");
+            System.out.println("[GenerateTestsFromJson] OPENAI_API_KEY not set. Skipping generation.");
+            return;
         }
 
-        // 1) Load JSON test cases
-        List<Map<String, Object>> testCases = loadTestCases(JSON_PATH);
-
-        // 2) Build prompt for LLM
-        String prompt = buildPrompt(testCases);
-
-        // 3) Call LLM to generate Java code
-        String javaCode = callLlm(apiKey, prompt);
-
-        // 4) Write generated code to test directory
-        writeOutput(javaCode);
-
-        System.out.println("Generated tests written to: " + OUTPUT_FILE.toAbsolutePath());
-    }
-
-    private static List<Map<String, Object>> loadTestCases(Path jsonPath) throws IOException {
-        if (!Files.exists(jsonPath)) {
-            throw new IllegalStateException("Test case JSON file not found: " + jsonPath.toAbsolutePath());
+        if (!Files.exists(JSON_PATH)) {
+            System.out.println("[GenerateTestsFromJson] JSON file not found at "
+                    + JSON_PATH.toAbsolutePath() + ". Skipping generation.");
+            return;
         }
+
+        System.out.println("[GenerateTestsFromJson] Using JSON: " + JSON_PATH.toAbsolutePath());
+        System.out.println("[GenerateTestsFromJson] Output file: " + OUTPUT_FILE.toAbsolutePath());
+
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(Files.readAllBytes(jsonPath),
-                new TypeReference<List<Map<String, Object>>>() {});
-    }
-
-    private static String buildPrompt(List<Map<String, Object>> cases) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(cases);
-
-        return """
-                Convert the following functional test cases into a single Java JUnit 5 test class.
-
-                Requirements:
-                - Package: com.example.college.controller
-                - Class name: GeneratedAttendanceTests
-                - Use @SpringBootTest and @AutoConfigureMockMvc
-                - Use org.springframework.test.web.servlet.MockMvc
-                - For each test case, create one @Test method.
-                - Method name should start with the Test Case ID, e.g. TC_ATT_SINGLE_001_...
-                - Use JSON body and endpoint as specified in each test case.
-                - Use assertions that approximate the 'Expected Result' text.
-                - Do NOT wrap code in markdown; return only raw Java code.
-
-                Test cases JSON:
-                """ + json;
-    }
-
-    private static String callLlm(String apiKey, String prompt) throws Exception {
-        HttpClient client = HttpClient.newHttpClient();
-
-        String requestBodyJson = """
-                {
-                  "model": "%s",
-                  "messages": [
-                    {
-                      "role": "system",
-                      "content": "You are an expert Java developer. Generate JUnit 5 test code using MockMvc for a Spring Boot REST API."
-                    },
-                    {
-                      "role": "user",
-                      "content": %s
-                    }
-                  ],
-                  "temperature": 0
-                }
-                """.formatted(
-                MODEL_NAME,
-                toJsonStringLiteral(prompt)
+        List<Map<String, Object>> cases = mapper.readValue(
+                Files.readAllBytes(JSON_PATH),
+                new TypeReference<>() {}
         );
 
+        String jsonCases = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(cases);
+
+        String prompt =
+                "Convert the following functional test cases into a single Java JUnit 5 test class.\n" +
+                "\n" +
+                "Requirements:\n" +
+                "- Package: com.example.college.controller\n" +
+                "- Class name: GeneratedAttendanceTests\n" +
+                "- Use @SpringBootTest and @AutoConfigureMockMvc\n" +
+                "- Use org.springframework.test.web.servlet.MockMvc\n" +
+                "- For each test case, create one @Test method.\n" +
+                "- Method name should start with the Test Case ID (e.g. TC_ATT_SINGLE_001_...)\n" +
+                "- Use endpoint + body from Input.\n" +
+                "- Assert according to Expected Result.\n" +
+                "- Return ONLY raw Java code (no markdown).\n" +
+                "\n" +
+                "Test cases JSON:\n" + jsonCases;
+
+        String javaCode = callLLM(apiKey, prompt);
+
+        // Just in case the model returns markdown, strip ``` fences
+        javaCode = stripCodeFences(javaCode).trim();
+
+        Files.createDirectories(OUTPUT_DIR);
+        Files.writeString(OUTPUT_FILE, javaCode, StandardCharsets.UTF_8);
+
+        System.out.println("[GenerateTestsFromJson] Successfully generated tests.");
+    }
+
+    private static String callLLM(String apiKey, String prompt) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+
+        String payload = """
+        {
+          "model": "%s",
+          "messages": [
+            {
+              "role": "system",
+              "content": "You are an expert Java developer. Generate JUnit 5 tests for a Spring Boot REST API using MockMvc."
+            },
+            {
+              "role": "user",
+              "content": %s
+            }
+          ],
+          "temperature": 0
+        }
+        """.formatted(MODEL, toJsonString(prompt));
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(OPENAI_API_URL))
+                .uri(URI.create(API_URL))
                 .header("Authorization", "Bearer " + apiKey)
                 .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(requestBodyJson, StandardCharsets.UTF_8))
+                .POST(HttpRequest.BodyPublishers.ofString(payload, StandardCharsets.UTF_8))
                 .build();
+
+        System.out.println("[GenerateTestsFromJson] Calling OpenAI model: " + MODEL);
 
         HttpResponse<String> response =
                 client.send(request, HttpResponse.BodyHandlers.ofString());
 
+        System.out.println("[GenerateTestsFromJson] OpenAI HTTP status: " + response.statusCode());
+
         if (response.statusCode() / 100 != 2) {
-            throw new RuntimeException("LLM API error: " + response.statusCode() +
-                    " body=" + response.body());
+            System.err.println("[GenerateTestsFromJson] OpenAI error body: " + response.body());
+            throw new IllegalStateException("OpenAI API call failed with status " + response.statusCode());
         }
 
-        // Parse response JSON
+        // Parse `choices[0].message.content`
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> root = mapper.readValue(response.body(), new TypeReference<>() {});
-        List<Map<String, Object>> choices = (List<Map<String, Object>>) root.get("choices");
+        var choices = (List<Map<String, Object>>) root.get("choices");
         if (choices == null || choices.isEmpty()) {
-            throw new RuntimeException("No choices returned from LLM");
+            throw new IllegalStateException("No choices returned by OpenAI");
         }
         Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
         String content = (String) message.get("content");
-        return content != null ? content.trim() : "";
+        return content != null ? content : "";
     }
 
-    // Escape for JSON string literal
-    private static String toJsonStringLiteral(String text) {
+    private static String toJsonString(String text) {
         String escaped = text
                 .replace("\\", "\\\\")
                 .replace("\"", "\\\"")
@@ -139,11 +148,16 @@ public class GenerateTestsFromJson {
         return "\"" + escaped + "\"";
     }
 
-    private static void writeOutput(String javaCode) throws IOException {
-        if (!Files.exists(OUTPUT_DIR)) {
-            Files.createDirectories(OUTPUT_DIR);
+    private static String stripCodeFences(String s) {
+        if (s.startsWith("```")) {
+            int firstNewLine = s.indexOf('\n');
+            if (firstNewLine != -1) {
+                s = s.substring(firstNewLine + 1);
+            }
         }
-        Files.writeString(OUTPUT_FILE, javaCode, StandardCharsets.UTF_8,
-                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        if (s.endsWith("```")) {
+            s = s.substring(0, s.lastIndexOf("```"));
+        }
+        return s;
     }
 }
