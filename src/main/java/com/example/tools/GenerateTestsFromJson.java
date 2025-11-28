@@ -69,6 +69,7 @@ public class GenerateTestsFromJson {
                 "- Class name: GeneratedAttendanceTests\n" +
                 "- Use @SpringBootTest and @AutoConfigureMockMvc\n" +
                 "- Use org.springframework.test.web.servlet.MockMvc\n" +
+                "- Use file test-cases/attendance-functional-tests.json to generate JUnit TestCaes. \n"+
                 "- For each test case, create one @Test method.\n" +
                 "- Method name should start with the Test Case ID (e.g. TC_ATT_SINGLE_001_...)\n" +
                 "- Use endpoint + body from Input.\n" +
