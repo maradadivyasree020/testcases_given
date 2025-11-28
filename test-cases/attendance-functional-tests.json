@@ -1,0 +1,213 @@
+[
+  {
+    "Test Case ID": "TC_ATT_SINGLE_001",
+    "Title": "Mark employee present for today without date field",
+    "Description": "Verify that attendance is marked as present for the current date when date is not provided",
+    "Pre-Conditions": "Employee with ID 1 exists in DB",
+    "Test Steps": [
+      "Send PUT request to /api/attendance/mark",
+      "Provide employeeId = 1 and absent = false in JSON body without date field"
+    ],
+    "Input": {
+      "endpoint": "PUT /api/attendance/mark",
+      "body": {
+        "employeeId": 1,
+        "absent": false
+      }
+    },
+    "Expected Result": "API returns 200 OK with AttendanceModel JSON for employeeId 1 and date = today, absent = false; employee totalPresent incremented by 1 and lastAttendanceDate set to today",
+    "Priority": "High",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "TC_ATT_SINGLE_002",
+    "Title": "Mark employee absent for a given date",
+    "Description": "Verify that attendance is marked as absent for a specified date",
+    "Pre-Conditions": "Employee with ID 2 exists in DB",
+    "Test Steps": [
+      "Send PUT request to /api/attendance/mark",
+      "Provide employeeId = 2, absent = true and a valid date in JSON body"
+    ],
+    "Input": {
+      "endpoint": "PUT /api/attendance/mark",
+      "body": {
+        "employeeId": 2,
+        "absent": true,
+        "date": "2025-11-27"
+      }
+    },
+    "Expected Result": "API returns 200 OK with AttendanceModel JSON for employeeId 2, date = 2025-11-27 and absent = true; employee totalAbsent incremented by 1 and lastAttendanceDate updated to 2025-11-27",
+    "Priority": "High",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "TC_ATT_SINGLE_003",
+    "Title": "Update existing attendance from absent to present",
+    "Description": "Verify that when an existing absent record is updated to present, employee counters are adjusted correctly",
+    "Pre-Conditions": "Attendance record exists for employeeId 3 and date 2025-11-26 with absent = true; employee totalAbsent and totalPresent reflect that record",
+    "Test Steps": [
+      "Send PUT request to /api/attendance/mark",
+      "Provide employeeId = 3, absent = false and date = 2025-11-26 in JSON body"
+    ],
+    "Input": {
+      "endpoint": "PUT /api/attendance/mark",
+      "body": {
+        "employeeId": 3,
+        "absent": false,
+        "date": "2025-11-26"
+      }
+    },
+    "Expected Result": "API returns 200 OK with AttendanceModel showing absent = false; employee totalAbsent decremented by 1, totalPresent incremented by 1 and lastAttendanceDate = 2025-11-26",
+    "Priority": "High",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "TC_ATT_SINGLE_004",
+    "Title": "Fail when employeeId is missing",
+    "Description": "Verify that API returns 400 when employeeId is not provided in request body",
+    "Pre-Conditions": "None",
+    "Test Steps": [
+      "Send PUT request to /api/attendance/mark",
+      "Provide only absent = true in JSON body without employeeId"
+    ],
+    "Input": {
+      "endpoint": "PUT /api/attendance/mark",
+      "body": {
+        "absent": true
+      }
+    },
+    "Expected Result": "API returns 400 Bad Request with message 'employeeId and absent required'",
+    "Priority": "Medium",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "TC_ATT_SINGLE_005",
+    "Title": "Fail when absent flag is missing",
+    "Description": "Verify that API returns 400 when absent field is not provided in request body",
+    "Pre-Conditions": "None",
+    "Test Steps": [
+      "Send PUT request to /api/attendance/mark",
+      "Provide employeeId = 4 in JSON body without absent field"
+    ],
+    "Input": {
+      "endpoint": "PUT /api/attendance/mark",
+      "body": {
+        "employeeId": 4
+      }
+    },
+    "Expected Result": "API returns 400 Bad Request with message 'employeeId and absent required'",
+    "Priority": "Medium",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "TC_ATT_SINGLE_006",
+    "Title": "Handle non-existing employee gracefully",
+    "Description": "Verify that attendance is saved even if employee record does not exist, and no employee counters are updated",
+    "Pre-Conditions": "No EmployeeModel exists with ID 999 in DB",
+    "Test Steps": [
+      "Send PUT request to /api/attendance/mark",
+      "Provide employeeId = 999 and absent = false with a valid date"
+    ],
+    "Input": {
+      "endpoint": "PUT /api/attendance/mark",
+      "body": {
+        "employeeId": 999,
+        "absent": false,
+        "date": "2025-11-27"
+      }
+    },
+    "Expected Result": "API returns 200 OK with AttendanceModel for employeeId 999; EmployeeRepo is not updated as employee does not exist",
+    "Priority": "Low",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "TC_ATT_BATCH_001",
+    "Title": "Mark batch attendance with multiple valid employees",
+    "Description": "Verify that batch API saves attendance for multiple employees and returns correct summary counts",
+    "Pre-Conditions": "Employees with IDs 1 and 2 exist in DB",
+    "Test Steps": [
+      "Send POST request to /api/attendance/mark-batch",
+      "Provide a list with two valid entries: employeeId 1 absent = false, employeeId 2 absent = true"
+    ],
+    "Input": {
+      "endpoint": "POST /api/attendance/mark-batch",
+      "body": [
+        {
+          "employeeId": 1,
+          "absent": false,
+          "date": "2025-11-27"
+        },
+        {
+          "employeeId": 2,
+          "absent": true,
+          "date": "2025-11-27"
+        }
+      ]
+    },
+    "Expected Result": "API returns 200 OK with savedCount = 2, presentCount = 1, absentCount = 1, invalidEntries = [] and savedRecords containing both attendance records",
+    "Priority": "High",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "TC_ATT_BATCH_002",
+    "Title": "Batch with mix of valid and invalid entries",
+    "Description": "Verify that valid attendance records are saved and invalid entries are reported in invalidEntries list",
+    "Pre-Conditions": "Employees with IDs 1 and 3 exist in DB",
+    "Test Steps": [
+      "Send POST request to /api/attendance/mark-batch",
+      "Provide a list with: valid entry for employeeId 1, entry with missing absent for employeeId 2, valid entry for employeeId 3"
+    ],
+    "Input": {
+      "endpoint": "POST /api/attendance/mark-batch",
+      "body": [
+        {
+          "employeeId": 1,
+          "absent": false
+        },
+        {
+          "employeeId": 2
+        },
+        {
+          "employeeId": 3,
+          "absent": true
+        }
+      ]
+    },
+    "Expected Result": "API returns 200 OK with savedCount = 2 for employeeIds 1 and 3, invalidEntries contains 2, presentCount and absentCount match the saved records, and savedRecords list only includes valid entries",
+    "Priority": "High",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "TC_ATT_BATCH_003",
+    "Title": "Batch call with empty payload",
+    "Description": "Verify that API returns 400 when batch payload is empty",
+    "Pre-Conditions": "None",
+    "Test Steps": [
+      "Send POST request to /api/attendance/mark-batch",
+      "Provide an empty JSON array as body"
+    ],
+    "Input": {
+      "endpoint": "POST /api/attendance/mark-batch",
+      "body": []
+    },
+    "Expected Result": "API returns 400 Bad Request with message 'payload is empty'",
+    "Priority": "Medium",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "TC_ATT_BATCH_004",
+    "Title": "Batch call with null payload",
+    "Description": "Verify that API returns 400 when payload is null or not provided",
+    "Pre-Conditions": "None",
+    "Test Steps": [
+      "Send POST request to /api/attendance/mark-batch without body or with null JSON body"
+    ],
+    "Input": {
+      "endpoint": "POST /api/attendance/mark-batch",
+      "body": null
+    },
+    "Expected Result": "API returns 400 Bad Request with message 'payload is empty'",
+    "Priority": "Medium",
+    "Type": "Functional"
+  }
+]
