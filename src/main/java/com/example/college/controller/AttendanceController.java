@@ -78,7 +78,7 @@ public class AttendanceController {
         result.put("savedRecords", saved);
         result.put("presentCount", presentCount);
         result.put("absentCount", absentCount);
-        result.put("invalidEntries", invalid);
+        result.put("invalidEntries:", invalid);
 
         return ResponseEntity.ok(result);
     }
