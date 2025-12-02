@@ -69,7 +69,7 @@ void setUp() {
                         .content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.employeeId", is(100)))
+                .andExpect(jsonPath("$.employeeId", is(1)))
                 .andExpect(jsonPath("$.absent", is(true)))
                 .andExpect(jsonPath("$.date", is(dto.getDate().toString())));
 

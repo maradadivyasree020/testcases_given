@@ -52,17 +52,23 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- Spring Boot Starter Test (JUnit, Mockito, ByteBuddy managed by Boot) -->
+    <!-- Spring Boot Starter Test -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
 
-    <!-- Jackson for JSON (used by tools like GenerateTestsFromJson / SummarizeResults) -->
+    <!-- Jackson -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
+    </dependency>
+
+    <!-- Apache HTTP Client -->
+    <dependency>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
     </dependency>
 
   </dependencies>
@@ -93,20 +99,19 @@
         <version>${surefire.plugin.version}</version>
         <configuration>
           <useModulePath>false</useModulePath>
-
-          <!-- Skip the broken spec-driven test for now so CI passes -->
           <excludes>
             <exclude>**/SpecDrivenAttendanceApiTest.java</exclude>
           </excludes>
         </configuration>
       </plugin>
 
-      <!-- exec-maven-plugin: run Java tools from CI (GenerateTestsFromJson, SummarizeResults) -->
+      <!-- ✅ Single exec-maven-plugin (correct) -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>${exec.plugin.version}</version>
         <configuration>
+          <mainClass>com.example.college.tools.GenerateTestsFromJson</mainClass>
           <includeProjectDependencies>true</includeProjectDependencies>
           <includePluginDependencies>true</includePluginDependencies>
           <classpathScope>test</classpathScope>
