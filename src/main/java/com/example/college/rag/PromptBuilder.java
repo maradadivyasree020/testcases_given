@@ -66,33 +66,58 @@ public class PromptBuilder {
         // """.formatted(ctx, question);
 
       //employee controller to eliminate repeat function
-      return """
-        You are a senior Java QA engineer.
+    //   return """
+    //     You are a senior Java QA engineer.
 
-        Based ONLY on the following Java code, generate high quality API test cases
-        for all Employee-related endpoints.
+    //     Based ONLY on the following Java code, generate high quality API test cases
+    //     for all Employee-related endpoints.
 
-        Requirements:
-        - Cover positive, negative, boundary, and error scenarios.
-        - Output a valid JSON ARRAY.
-        - VERY IMPORTANT: Return ONLY raw JSON.
-          No explanations, no comments, no markdown, no backticks.
-        - All values must be plain JSON values (string, number, boolean, null).
-          Do NOT use code-like expressions such as "A".repeat(255) or concatenation.
-        - If you need to mention long strings, just use a short placeholder like "MAX_LENGTH_NAME".
-        - Each element must contain:
-          "Test Case ID", "Title", "Description", "Pre-Conditions",
-          "Test Steps", "Input", "Expected Result", "Priority", "Type".
-        - "Input" must be an object including fields like:
-            endpoint, method, pathParams, queryParams, body.
-        - If something doesn’t apply, use null.
+    //     Requirements:
+    //     - Cover positive, negative, boundary, and error scenarios.
+    //     - Output a valid JSON ARRAY.
+    //     - VERY IMPORTANT: Return ONLY raw JSON.
+    //       No explanations, no comments, no markdown, no backticks.
+    //     - All values must be plain JSON values (string, number, boolean, null).
+    //       Do NOT use code-like expressions such as "A".repeat(255) or concatenation.
+    //     - If you need to mention long strings, just use a short placeholder like "MAX_LENGTH_NAME".
+    //     - Each element must contain:
+    //       "Test Case ID", "Title", "Description", "Pre-Conditions",
+    //       "Test Steps", "Input", "Expected Result", "Priority", "Type".
+    //     - "Input" must be an object including fields like:
+    //         endpoint, method, pathParams, queryParams, body.
+    //     - If something doesn’t apply, use null.
 
-        CONTEXT (Java code):
-        %s
+    //     CONTEXT (Java code):
+    //     %s
 
-        QUESTION:
-        %s
+    //     QUESTION:
+    //     %s
+    // """.formatted(ctx, question);
+
+    //genralized prompt
+    return """
+      You are a senior Java QA engineer.
+
+      Based ONLY on the provided Java code, generate high-quality API functional test cases.
+
+      OUTPUT RULES (VERY IMPORTANT):
+      - Output ONLY a valid JSON ARRAY.
+      - NO comments, NO markdown, NO text outside the array.
+      - Every value must be a plain JSON value (string, number, boolean, null).
+      - DO NOT output code constructs like "A".repeat(255) or concatenation.
+      - If you need long strings, use placeholders like "MAX_NAME", "MAX_ROLE".
+      - Each test case object must include:
+        "Test Case ID", "Title", "Description", "Pre-Conditions",
+        "Test Steps", "Input", "Expected Result", "Priority", "Type".
+      - "Input" must contain: endpoint, method, pathParams, queryParams, body.
+
+      CONTEXT (Java code):
+      %s
+
+      QUESTION:
+    %s
     """.formatted(ctx, question);
+
 
     }
 }

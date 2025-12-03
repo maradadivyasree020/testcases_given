@@ -1,6 +1,6 @@
 {
-  "chunkLines": 80, 
-  "topK": 6,
+  "chunkLines": 120, 
+  "topK": 9,
   "testQuestion": "Generate detailed API functional test cases for all employee-related endpoints, especially EmployeeController."
 }
 

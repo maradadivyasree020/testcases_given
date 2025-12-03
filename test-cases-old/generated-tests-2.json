@@ -1,0 +1,237 @@
+[
+  {
+    "Test Case ID": "EMP-001",
+    "Title": "Get all employees - Success",
+    "Description": "Verify that the GET /api/employe endpoint returns a list of all employees successfully.",
+    "Pre-Conditions": "At least one employee exists in the database.",
+    "Test Steps": [
+      "Send a GET request to /api/employe",
+      "Verify the response status code is 200 OK",
+      "Verify the response body contains a list of employee objects"
+    ],
+    "Input": {
+      "endpoint": "/api/employe",
+      "method": "GET",
+      "pathParams": {},
+      "queryParams": {},
+      "body": null
+    },
+    "Expected Result": "Response status 200 OK with a JSON array of employee objects, each containing valid employee fields.",
+    "Priority": "High",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "EMP-002",
+    "Title": "Get employee by valid ID - Success",
+    "Description": "Verify that the GET /api/employe/{id} endpoint returns the employee details when a valid employee ID is provided.",
+    "Pre-Conditions": "An employee with ID 1 exists in the database.",
+    "Test Steps": [
+      "Send a GET request to /api/employe/1",
+      "Verify the response status code is 200 OK",
+      "Verify the response body contains the employee details with ID 1"
+    ],
+    "Input": {
+      "endpoint": "/api/employe/1",
+      "method": "GET",
+      "pathParams": {
+        "id": 1
+      },
+      "queryParams": {},
+      "body": null
+    },
+    "Expected Result": "Response status 200 OK with a JSON object containing employee details for ID 1.",
+    "Priority": "High",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "EMP-003",
+    "Title": "Get employee by non-existing ID - Returns empty employee",
+    "Description": "Verify that the GET /api/employe/{id} endpoint returns an empty employee object when the employee ID does not exist.",
+    "Pre-Conditions": "No employee exists with ID 9999.",
+    "Test Steps": [
+      "Send a GET request to /api/employe/9999",
+      "Verify the response status code is 200 OK",
+      "Verify the response body contains an empty employee object (default values)"
+    ],
+    "Input": {
+      "endpoint": "/api/employe/9999",
+      "method": "GET",
+      "pathParams": {
+        "id": 9999
+      },
+      "queryParams": {},
+      "body": null
+    },
+    "Expected Result": "Response status 200 OK with a JSON object representing an empty employee (default constructor values).",
+    "Priority": "Medium",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "EMP-004",
+    "Title": "Create new employee - Success",
+    "Description": "Verify that the POST /api/employee endpoint creates a new employee successfully when valid data is provided.",
+    "Pre-Conditions": "No employee with the same ID exists.",
+    "Test Steps": [
+      "Send a POST request to /api/employee with valid employee JSON body",
+      "Verify the response status code is 200 OK or 201 Created",
+      "Verify the employee is saved in the database"
+    ],
+    "Input": {
+      "endpoint": "/api/employee",
+      "method": "POST",
+      "pathParams": {},
+      "queryParams": {},
+      "body": {
+        "name": "John Doe",
+        "role": "Developer",
+        "absent": false
+      }
+    },
+    "Expected Result": "Response status 200 OK or 201 Created and the employee record is persisted with the provided details.",
+    "Priority": "High",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "EMP-005",
+    "Title": "Create new employee - Missing required fields",
+    "Description": "Verify that the POST /api/employee endpoint handles missing required fields gracefully.",
+    "Pre-Conditions": "None",
+    "Test Steps": [
+      "Send a POST request to /api/employee with an empty or incomplete employee JSON body",
+      "Verify the response status code indicates failure (e.g., 400 Bad Request) or no exception occurs",
+      "Verify no employee is created"
+    ],
+    "Input": {
+      "endpoint": "/api/employee",
+      "method": "POST",
+      "pathParams": {},
+      "queryParams": {},
+      "body": {}
+    },
+    "Expected Result": "Response status 400 Bad Request or 200 OK with no employee created; server handles missing fields without crashing.",
+    "Priority": "Medium",
+    "Type": "Negative"
+  },
+  {
+    "Test Case ID": "EMP-006",
+    "Title": "Update existing employee - Success",
+    "Description": "Verify that the PUT /api/employee/{id} endpoint updates an existing employee's details successfully.",
+    "Pre-Conditions": "An employee with ID 1 exists in the database.",
+    "Test Steps": [
+      "Send a PUT request to /api/employee/1 with updated employee JSON body",
+      "Verify the response status code is 200 OK",
+      "Verify the response body contains the updated employee details",
+      "Verify the employee record is updated in the database"
+    ],
+    "Input": {
+      "endpoint": "/api/employee/1",
+      "method": "PUT",
+      "pathParams": {
+        "id": 1
+      },
+      "queryParams": {},
+      "body": {
+        "name": "Jane Smith",
+        "role": "Manager",
+        "absent": true
+      }
+    },
+    "Expected Result": "Response status 200 OK with updated employee details reflecting the changes.",
+    "Priority": "High",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "EMP-007",
+    "Title": "Update non-existing employee - Not Found",
+    "Description": "Verify that the PUT /api/employee/{id} endpoint returns 404 Not Found when trying to update a non-existing employee.",
+    "Pre-Conditions": "No employee exists with ID 9999.",
+    "Test Steps": [
+      "Send a PUT request to /api/employee/9999 with employee JSON body",
+      "Verify the response status code is 404 Not Found",
+      "Verify the response body is empty"
+    ],
+    "Input": {
+      "endpoint": "/api/employee/9999",
+      "method": "PUT",
+      "pathParams": {
+        "id": 9999
+      },
+      "queryParams": {},
+      "body": {
+        "name": "Non Existent",
+        "role": "None",
+        "absent": false
+      }
+    },
+    "Expected Result": "Response status 404 Not Found with empty response body.",
+    "Priority": "Medium",
+    "Type": "Negative"
+  },
+  {
+    "Test Case ID": "EMP-008",
+    "Title": "Delete existing employee - Success",
+    "Description": "Verify that the DELETE /api/employee/{id} endpoint deletes an existing employee successfully.",
+    "Pre-Conditions": "An employee with ID 1 exists in the database.",
+    "Test Steps": [
+      "Send a DELETE request to /api/employee/1",
+      "Verify the response status code is 200 OK or 204 No Content",
+      "Verify the employee record is removed from the database"
+    ],
+    "Input": {
+      "endpoint": "/api/employee/1",
+      "method": "DELETE",
+      "pathParams": {
+        "id": 1
+      },
+      "queryParams": {},
+      "body": null
+    },
+    "Expected Result": "Response status 200 OK or 204 No Content and employee record is deleted.",
+    "Priority": "High",
+    "Type": "Functional"
+  },
+  {
+    "Test Case ID": "EMP-009",
+    "Title": "Delete non-existing employee - No error",
+    "Description": "Verify that the DELETE /api/employee/{id} endpoint handles deletion of a non-existing employee gracefully.",
+    "Pre-Conditions": "No employee exists with ID 9999.",
+    "Test Steps": [
+      "Send a DELETE request to /api/employee/9999",
+      "Verify the response status code is 200 OK or 204 No Content",
+      "Verify no error is returned"
+    ],
+    "Input": {
+      "endpoint": "/api/employee/9999",
+      "method": "DELETE",
+      "pathParams": {
+        "id": 9999
+      },
+      "queryParams": {},
+      "body": null
+    },
+    "Expected Result": "Response status 200 OK or 204 No Content with no error, even though employee did not exist.",
+    "Priority": "Low",
+    "Type": "Negative"
+  },
+  {
+    "Test Case ID": "EMP-010",
+    "Title": "Get all employees - Verify response structure",
+    "Description": "Verify that the GET /api/employe endpoint returns employee objects with expected fields: id, name, role, absent.",
+    "Pre-Conditions": "At least one employee exists in the database.",
+    "Test Steps": [
+      "Send a GET request to /api/employe",
+      "Verify the response status code is 200 OK",
+      "Verify each employee object contains fields: id (number), name (string), role (string), absent (boolean)"
+    ],
+    "Input": {
+      "endpoint": "/api/employe",
+      "method": "GET",
+      "pathParams": {},
+      "queryParams": {},
+      "body": null
+    },
+    "Expected Result": "Response status 200 OK with JSON array of employee objects containing all expected fields with correct data types.",
+    "Priority": "Medium",
+    "Type": "Functional"
+  }
+]
