@@ -33,9 +33,17 @@ public class GenerateTestsFromJson {
         RagService ragService = new RagService();
         ragService.ingestJavaSources(srcMainJava);
 
-        String question = "Generate detailed API functional test cases for all attendance-related " +
-                "endpoints in this project. Focus especially on AttendanceController and " +
-                "attendance/mark and attendance/mark-batch endpoints.";
+        //for attendance controller
+        // String question = "Generate detailed API functional test cases for all attendance-related " +
+        //         "endpoints in this project. Focus especially on AttendanceController and " +
+        //         "attendance/mark and attendance/mark-batch endpoints.";
+
+        //for employee controller
+        String question =
+        "Generate detailed API functional test cases for all employee-related " +
+        "endpoints in this project. Focus especially on EmployeeController and " +
+        "/api/employe, /api/employe/{id}, /api/employee, /api/employee/{id} endpoints.";
+
 
         System.out.println("Calling RAG pipeline with question:\n" + question + "\n");
 
@@ -48,16 +56,46 @@ public class GenerateTestsFromJson {
         System.out.println("✅ Wrote generated test cases to: " + outFile.toAbsolutePath());
     }
 
-    private static String ensureJsonArray(String raw) throws IOException {
-        String trimmed = raw.trim();
-        if (trimmed.startsWith("[")) {
-            // Looks like JSON array already
-            JsonNode node = MAPPER.readTree(trimmed); // will throw if invalid
-            return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-        }
+    // private static String ensureJsonArray(String raw) throws IOException {
+    //     String trimmed = raw.trim();
+    //     if (trimmed.startsWith("[")) {
+    //         // Looks like JSON array already
+    //         JsonNode node = MAPPER.readTree(trimmed); // will throw if invalid
+    //         return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+    //     }
 
-        // Otherwise wrap as an object with "raw" field so it is still valid JSON
-        JsonNode node = MAPPER.createObjectNode().put("raw", raw);
-        return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+    //     // Otherwise wrap as an object with "raw" field so it is still valid JSON
+    //     JsonNode node = MAPPER.createObjectNode().put("raw", raw);
+    //     return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+    // }
+
+    private static String ensureJsonArray(String raw) throws IOException {
+    // Trim leading/trailing whitespace
+    String trimmed = raw.trim();
+
+    // Try to isolate the JSON array part: from first '[' to last ']'
+    int start = trimmed.indexOf('[');
+    int end = trimmed.lastIndexOf(']');
+
+    if (start != -1 && end != -1 && start < end) {
+        String arrayPart = trimmed.substring(start, end + 1);
+
+        try {
+            // Try to parse the array to verify it's valid JSON
+            JsonNode node = MAPPER.readTree(arrayPart);  // may throw
+            return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+        } catch (IOException e) {
+            // If it's almost-JSON but slightly broken, keep the raw array content
+            System.err.println("WARNING: LLM output is not strictly valid JSON, " +
+                    "writing raw array substring. Parser error: " + e.getMessage());
+            return arrayPart;
+        }
     }
+
+    // If no '[' ... ']' found at all, just return the raw text so you can inspect it
+    System.err.println("WARNING: No JSON array delimiters found in LLM output. " +
+            "Writing raw response to file for manual inspection.");
+    return trimmed;
+}
+
 }
