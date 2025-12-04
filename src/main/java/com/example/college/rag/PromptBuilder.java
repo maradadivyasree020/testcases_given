@@ -105,6 +105,7 @@ public class PromptBuilder {
       - NO comments, NO markdown, NO text outside the array.
       - Every value must be a plain JSON value (string, number, boolean, null).
       - DO NOT output code constructs like "A".repeat(255) or concatenation.
+      - Give as many test cases as possible.
       - If you need long strings, use placeholders like "MAX_NAME", "MAX_ROLE".
       - Each test case object must include:
         "Test Case ID", "Title", "Description", "Pre-Conditions",
