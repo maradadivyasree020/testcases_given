@@ -54,7 +54,10 @@ public class LLMClient {
         userMessage.put("role", "user");
         userMessage.put("content", prompt);
 
-        root.put("temperature", 0.1);
+        root.put("temperature", 0.0);
+        root.put("top_p", 1.0);
+        root.put("frequency_penalty", 0.0);
+        root.put("presence_penalty", 0.0);
 
         return mapper.writeValueAsString(root);
     }
