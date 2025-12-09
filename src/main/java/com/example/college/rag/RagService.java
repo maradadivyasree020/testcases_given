@@ -64,9 +64,30 @@ public class RagService {
         }
     }
 
-    public String generateTestCasesForQuestion(String question) {
-        List<Map<String, String>> codeSnippets = retriever.retrieve(question, 6);
-        String prompt = promptBuilder.buildTestGenerationPrompt(question, codeSnippets);
-        return llmClient.complete(prompt);
+public String generateTestCasesForQuestion(String question) {
+    List<Map<String, String>> snippets = retriever.retrieve(question, 6);
+    String prompt = promptBuilder.buildTestGenerationPrompt(question, snippets);
+    return llmClient.complete(prompt);
+}
+
+public String generateTestCasesForQuestion(String question, String extraTestData) {
+    List<Map<String, String>> snippets = retriever.retrieve(question, 6);
+
+    // Build context from chunks
+    StringBuilder ctx = new StringBuilder();
+    for (Map<String, String> m : snippets) {
+        ctx.append("// File: ").append(m.getOrDefault("file", "UnknownFile")).append("\n");
+        ctx.append(m.getOrDefault("content", "")).append("\n\n");
     }
+
+    // Build final prompt
+    String prompt = promptBuilder.buildTestGenerationPrompt(
+            ctx.toString(),
+            question,
+            extraTestData
+    );
+
+    return llmClient.complete(prompt);
+}
+
 }

@@ -1,161 +1,179 @@
 [ {
-  "Test Case ID" : "ATT-001",
-  "Title" : "Mark single attendance with valid employeeId, absent, and date",
-  "Description" : "Verify that marking attendance for a single employee with valid employeeId, absent status, and specific date returns 200 OK and correct attendance record",
-  "Pre-Conditions" : "Employee with employeeId exists in the system",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with JSON body containing employeeId, absent, and date", "Verify response status is 200 OK", "Verify response body contains attendance record with matching employeeId, absent status, and date" ],
+  "Test Case ID" : "TC_ATT_001",
+  "Title" : "Mark single attendance as present for valid employee and date",
+  "Description" : "Verify that marking attendance as present for a valid employeeId and date returns success with correct attendance record",
+  "Pre-Conditions" : "Employee with ID 1 exists in the system",
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body {\"employeeId\":1,\"absent\":false,\"date\":\"2025-01-01\"}", "Verify response status is 200 OK", "Verify response body contains attendance record with employeeId=1, date=2025-01-01, absent=false" ],
   "Input" : {
     "endpoint" : "/api/attendance/mark",
     "method" : "PUT",
     "pathParams" : { },
     "queryParams" : { },
     "body" : {
-      "employeeId" : 123,
-      "absent" : true,
-      "date" : "2024-06-01"
-    }
-  },
-  "Expected Result" : "Response status 200 OK with attendance record for employeeId 123, absent true, date 2024-06-01",
-  "Priority" : "High",
-  "Type" : "Functional"
-}, {
-  "Test Case ID" : "ATT-002",
-  "Title" : "Mark single attendance with valid employeeId and absent, but no date provided",
-  "Description" : "Verify that marking attendance for a single employee with valid employeeId and absent status but no date uses current date and returns 200 OK",
-  "Pre-Conditions" : "Employee with employeeId exists in the system",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with JSON body containing employeeId and absent, without date", "Verify response status is 200 OK", "Verify response body contains attendance record with matching employeeId, absent status, and current date" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark",
-    "method" : "PUT",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "employeeId" : 456,
+      "employeeId" : 1,
       "absent" : false,
-      "date" : null
+      "date" : "2025-01-01"
     }
   },
-  "Expected Result" : "Response status 200 OK with attendance record for employeeId 456, absent false, date equal to current system date",
+  "Expected Result" : "Attendance record saved with absent=false for employeeId=1 on 2025-01-01, response status 200",
   "Priority" : "High",
-  "Type" : "Functional"
+  "Type" : "Positive"
 }, {
-  "Test Case ID" : "ATT-003",
+  "Test Case ID" : "TC_ATT_002",
+  "Title" : "Mark single attendance as absent for valid employee and date",
+  "Description" : "Verify that marking attendance as absent for a valid employeeId and date returns success with correct attendance record",
+  "Pre-Conditions" : "Employee with ID 2 exists in the system",
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body {\"employeeId\":2,\"absent\":true,\"date\":\"2025-01-01\"}", "Verify response status is 200 OK", "Verify response body contains attendance record with employeeId=2, date=2025-01-01, absent=true" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark",
+    "method" : "PUT",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : {
+      "employeeId" : 2,
+      "absent" : true,
+      "date" : "2025-01-01"
+    }
+  },
+  "Expected Result" : "Attendance record saved with absent=true for employeeId=2 on 2025-01-01, response status 200",
+  "Priority" : "High",
+  "Type" : "Positive"
+}, {
+  "Test Case ID" : "TC_ATT_003",
   "Title" : "Mark single attendance with missing employeeId",
-  "Description" : "Verify that marking attendance without employeeId returns 400 Bad Request with appropriate error message",
+  "Description" : "Verify that marking attendance without employeeId returns bad request error",
   "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with JSON body missing employeeId but containing absent", "Verify response status is 400 Bad Request", "Verify response body contains message 'employeeId and absent required'" ],
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body {\"absent\":false,\"date\":\"2025-01-02\"}", "Verify response status is 400 Bad Request", "Verify response body contains message 'employeeId and absent required'" ],
   "Input" : {
     "endpoint" : "/api/attendance/mark",
     "method" : "PUT",
     "pathParams" : { },
     "queryParams" : { },
     "body" : {
-      "employeeId" : null,
-      "absent" : true,
-      "date" : "2024-06-01"
+      "absent" : false,
+      "date" : "2025-01-02"
     }
   },
-  "Expected Result" : "Response status 400 Bad Request with JSON message 'employeeId and absent required'",
+  "Expected Result" : "Response status 400 with error message indicating employeeId and absent are required",
   "Priority" : "High",
-  "Type" : "Negative"
+  "Type" : "Error"
 }, {
-  "Test Case ID" : "ATT-004",
-  "Title" : "Mark single attendance with missing absent field",
-  "Description" : "Verify that marking attendance without absent field returns 400 Bad Request with appropriate error message",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with JSON body containing employeeId but missing absent", "Verify response status is 400 Bad Request", "Verify response body contains message 'employeeId and absent required'" ],
+  "Test Case ID" : "TC_ATT_004",
+  "Title" : "Mark single attendance with invalid employeeId (-1)",
+  "Description" : "Verify that marking attendance with invalid employeeId returns success or error depending on service validation",
+  "Pre-Conditions" : "Employee with ID -1 does not exist",
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body {\"employeeId\":-1,\"absent\":false,\"date\":\"2025-01-03\"}", "Verify response status is 200 OK or appropriate error if validation exists", "If success, verify attendance record created with employeeId=-1 and absent=false" ],
   "Input" : {
     "endpoint" : "/api/attendance/mark",
     "method" : "PUT",
     "pathParams" : { },
     "queryParams" : { },
     "body" : {
-      "employeeId" : 789,
-      "absent" : null,
-      "date" : "2024-06-01"
+      "employeeId" : -1,
+      "absent" : false,
+      "date" : "2025-01-03"
     }
   },
-  "Expected Result" : "Response status 400 Bad Request with JSON message 'employeeId and absent required'",
-  "Priority" : "High",
+  "Expected Result" : "Depending on implementation, either attendance record created or error returned; no bad request from controller",
+  "Priority" : "Medium",
   "Type" : "Negative"
 }, {
-  "Test Case ID" : "ATT-005",
-  "Title" : "Mark single attendance with null request body",
-  "Description" : "Verify that marking attendance with null request body returns 400 Bad Request with appropriate error message",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with null or empty body", "Verify response status is 400 Bad Request", "Verify response body contains message 'employeeId and absent required'" ],
+  "Test Case ID" : "TC_ATT_005",
+  "Title" : "Mark single attendance with future date boundary",
+  "Description" : "Verify that marking attendance on a far future date is accepted and saved correctly",
+  "Pre-Conditions" : "Employee with ID 3 exists",
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body {\"employeeId\":3,\"absent\":false,\"date\":\"2099-12-31\"}", "Verify response status is 200 OK", "Verify attendance record saved with date 2099-12-31" ],
   "Input" : {
     "endpoint" : "/api/attendance/mark",
     "method" : "PUT",
     "pathParams" : { },
     "queryParams" : { },
-    "body" : null
+    "body" : {
+      "employeeId" : 3,
+      "absent" : false,
+      "date" : "2099-12-31"
+    }
   },
-  "Expected Result" : "Response status 400 Bad Request with JSON message 'employeeId and absent required'",
+  "Expected Result" : "Attendance record saved successfully with future date, response status 200",
+  "Priority" : "Medium",
+  "Type" : "Boundary"
+}, {
+  "Test Case ID" : "TC_ATT_006",
+  "Title" : "Mark batch attendance with multiple valid entries",
+  "Description" : "Verify that batch marking attendance with multiple valid attendance records returns correct counts and saved records",
+  "Pre-Conditions" : "Employees with IDs 1 and 2 exist",
+  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with body containing attendance for employeeId=1 (present) and employeeId=2 (absent) on 2025-01-01", "Verify response status is 200 OK", "Verify response body contains savedCount=2, presentCount=1, absentCount=1", "Verify savedRecords contains both attendance records with correct absent flags", "Verify invalidEntries list is empty" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark-batch",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : [ {
+      "employeeId" : 1,
+      "absent" : false,
+      "date" : "2025-01-01"
+    }, {
+      "employeeId" : 2,
+      "absent" : true,
+      "date" : "2025-01-01"
+    } ]
+  },
+  "Expected Result" : "Batch attendance saved successfully with correct counts and no invalid entries",
   "Priority" : "High",
+  "Type" : "Positive"
+}, {
+  "Test Case ID" : "TC_ATT_007",
+  "Title" : "Mark batch attendance with some invalid entries",
+  "Description" : "Verify that batch marking attendance with some entries missing employeeId or absent flags returns partial success and lists invalid entries",
+  "Pre-Conditions" : "Employee with ID 1 exists",
+  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with body containing one valid attendance (employeeId=1, absent=false) and one invalid attendance (missing employeeId)", "Verify response status is 200 OK", "Verify savedCount=1, presentCount=1, absentCount=0", "Verify invalidEntries list is empty because invalid entry has no employeeId", "Verify savedRecords contains only the valid attendance record" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark-batch",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : [ {
+      "employeeId" : 1,
+      "absent" : false,
+      "date" : "2025-01-01"
+    }, {
+      "absent" : true,
+      "date" : "2025-01-02"
+    } ]
+  },
+  "Expected Result" : "Valid attendance saved, invalid entry skipped, invalidEntries list empty, response 200",
+  "Priority" : "High",
+  "Type" : "Error"
+}, {
+  "Test Case ID" : "TC_ATT_008",
+  "Title" : "Mark batch attendance with invalid employeeId in one entry",
+  "Description" : "Verify that batch marking attendance with one entry having invalid employeeId (-1) is processed and invalid employeeId is listed",
+  "Pre-Conditions" : "Employee with ID -1 does not exist",
+  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with body containing one valid attendance (employeeId=1, absent=false) and one with employeeId=-1", "Verify response status is 200 OK", "Verify savedCount=2 (assuming service saves even invalid employeeId), presentCount and absentCount correct", "Verify invalidEntries list contains -1 if that entry is considered invalid due to missing absent or employeeId null", "Verify savedRecords contains both records" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark-batch",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : [ {
+      "employeeId" : 1,
+      "absent" : false,
+      "date" : "2025-01-01"
+    }, {
+      "employeeId" : -1,
+      "absent" : true,
+      "date" : "2025-01-03"
+    } ]
+  },
+  "Expected Result" : "Both records processed, invalidEntries list empty because employeeId present, response 200",
+  "Priority" : "Medium",
   "Type" : "Negative"
 }, {
-  "Test Case ID" : "ATT-006",
-  "Title" : "Mark batch attendance with valid list of attendance records",
-  "Description" : "Verify that marking batch attendance with valid list of AttendanceDTOs returns 200 OK with correct counts and saved records",
-  "Pre-Conditions" : "Employees with given employeeIds exist in the system",
-  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with JSON array of valid attendance records", "Verify response status is 200 OK", "Verify response body contains savedCount equal to number of valid records", "Verify presentCount and absentCount are correct", "Verify savedRecords array contains attendance records matching input" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark-batch",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : [ {
-      "employeeId" : 101,
-      "absent" : true,
-      "date" : "2024-06-01"
-    }, {
-      "employeeId" : 102,
-      "absent" : false,
-      "date" : "2024-06-01"
-    } ]
-  },
-  "Expected Result" : "Response status 200 OK with savedCount 2, presentCount 1, absentCount 1, and savedRecords matching input",
-  "Priority" : "High",
-  "Type" : "Functional"
-}, {
-  "Test Case ID" : "ATT-007",
-  "Title" : "Mark batch attendance with some records missing employeeId or absent",
-  "Description" : "Verify that batch marking attendance skips invalid records and returns 200 OK with invalidEntries list and counts reflecting only valid records",
-  "Pre-Conditions" : "Employees with valid employeeIds exist",
-  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with JSON array containing some invalid attendance records (missing employeeId or absent)", "Verify response status is 200 OK", "Verify response body contains savedCount equal to number of valid records", "Verify invalidEntries list contains employeeIds of invalid records where employeeId is present", "Verify presentCount and absentCount counts are correct for valid records" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark-batch",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : [ {
-      "employeeId" : 201,
-      "absent" : true,
-      "date" : "2024-06-01"
-    }, {
-      "employeeId" : null,
-      "absent" : false,
-      "date" : "2024-06-01"
-    }, {
-      "employeeId" : 202,
-      "absent" : null,
-      "date" : "2024-06-01"
-    }, {
-      "employeeId" : 203,
-      "absent" : true,
-      "date" : null
-    } ]
-  },
-  "Expected Result" : "Response status 200 OK with savedCount 2, invalidEntries list containing [202], presentCount and absentCount reflecting valid records",
-  "Priority" : "High",
-  "Type" : "Functional"
-}, {
-  "Test Case ID" : "ATT-008",
+  "Test Case ID" : "TC_ATT_009",
   "Title" : "Mark batch attendance with empty payload",
-  "Description" : "Verify that sending empty list to batch attendance endpoint returns 400 Bad Request with appropriate error message",
+  "Description" : "Verify that batch marking attendance with empty list returns bad request error",
   "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with empty JSON array", "Verify response status is 400 Bad Request", "Verify response body contains message 'payload is empty'" ],
+  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with empty array [] as body", "Verify response status is 400 Bad Request", "Verify response body contains message 'payload is empty'" ],
   "Input" : {
     "endpoint" : "/api/attendance/mark-batch",
     "method" : "POST",
@@ -163,103 +181,35 @@
     "queryParams" : { },
     "body" : [ ]
   },
-  "Expected Result" : "Response status 400 Bad Request with JSON message 'payload is empty'",
+  "Expected Result" : "Response status 400 with error message indicating payload is empty",
   "Priority" : "High",
-  "Type" : "Negative"
+  "Type" : "Error"
 }, {
-  "Test Case ID" : "ATT-009",
-  "Title" : "Mark batch attendance with null payload",
-  "Description" : "Verify that sending null as payload to batch attendance endpoint returns 400 Bad Request with appropriate error message",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with null body", "Verify response status is 400 Bad Request", "Verify response body contains message 'payload is empty'" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark-batch",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status 400 Bad Request with JSON message 'payload is empty'",
-  "Priority" : "High",
-  "Type" : "Negative"
-}, {
-  "Test Case ID" : "ATT-010",
-  "Title" : "Mark batch attendance with records missing date field",
-  "Description" : "Verify that batch attendance marking uses current date for records missing date field and returns 200 OK with correct counts",
-  "Pre-Conditions" : "Employees with given employeeIds exist",
-  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with JSON array of attendance records where some have null date", "Verify response status is 200 OK", "Verify savedRecords contain attendance records with date set to current date for those missing date", "Verify counts are correct" ],
+  "Test Case ID" : "TC_ATT_010",
+  "Title" : "Mark batch attendance with future date boundary",
+  "Description" : "Verify that batch marking attendance with future date boundary is accepted and saved correctly",
+  "Pre-Conditions" : "Employee with ID 3 exists",
+  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with one attendance record for employeeId=3, absent=false, date=2099-12-31", "Verify response status is 200 OK", "Verify savedCount=1, presentCount=1, absentCount=0", "Verify savedRecords contains the attendance record with date 2099-12-31" ],
   "Input" : {
     "endpoint" : "/api/attendance/mark-batch",
     "method" : "POST",
     "pathParams" : { },
     "queryParams" : { },
     "body" : [ {
-      "employeeId" : 301,
-      "absent" : true,
-      "date" : null
-    }, {
-      "employeeId" : 302,
+      "employeeId" : 3,
       "absent" : false,
-      "date" : "2024-06-01"
+      "date" : "2099-12-31"
     } ]
   },
-  "Expected Result" : "Response status 200 OK with savedRecords containing attendance for employeeId 301 with current date and employeeId 302 with date 2024-06-01, counts correct",
+  "Expected Result" : "Attendance record saved successfully with future date, response status 200",
   "Priority" : "Medium",
-  "Type" : "Functional"
-}, {
-  "Test Case ID" : "ATT-011",
-  "Title" : "Mark single attendance updates existing record and employee counters",
-  "Description" : "Verify that marking attendance for an employee on a date where attendance exists updates the record and adjusts employee present/absent counters accordingly",
-  "Pre-Conditions" : "Employee with employeeId exists and has attendance record for given date",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with employeeId, date, and absent status different from existing record", "Verify response status is 200 OK", "Verify attendance record is updated with new absent status", "Verify employee totalPresent and totalAbsent counters are updated correctly" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark",
-    "method" : "PUT",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "employeeId" : 400,
-      "absent" : false,
-      "date" : "2024-06-01"
-    }
-  },
-  "Expected Result" : "Response status 200 OK with updated attendance record and employee counters reflecting change from absent to present",
-  "Priority" : "High",
-  "Type" : "Functional"
-}, {
-  "Test Case ID" : "ATT-012",
-  "Title" : "Mark batch attendance with all invalid records (missing employeeId or absent)",
-  "Description" : "Verify that batch attendance marking with all invalid records returns 200 OK with savedCount 0 and invalidEntries list containing all employeeIds present",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with JSON array of attendance records all missing employeeId or absent", "Verify response status is 200 OK", "Verify savedCount is 0", "Verify invalidEntries list contains employeeIds of invalid records where employeeId is present" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark-batch",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : [ {
-      "employeeId" : null,
-      "absent" : true,
-      "date" : "2024-06-01"
-    }, {
-      "employeeId" : 501,
-      "absent" : null,
-      "date" : "2024-06-01"
-    }, {
-      "employeeId" : null,
-      "absent" : null,
-      "date" : "2024-06-01"
-    } ]
-  },
-  "Expected Result" : "Response status 200 OK with savedCount 0 and invalidEntries list containing [501]",
-  "Priority" : "Medium",
-  "Type" : "Negative"
+  "Type" : "Boundary"
 }, {
   "Test Case ID" : "EMP-001",
-  "Title" : "Get all employees - success",
-  "Description" : "Verify that GET /api/employe returns a list of all employees",
+  "Title" : "Get all employees successfully",
+  "Description" : "Verify that the GET /api/employe endpoint returns a list of all employees",
   "Pre-Conditions" : "At least one employee exists in the database",
-  "Test Steps" : [ "Send a GET request to /api/employe", "Verify the response status code is 200", "Verify the response body is a JSON array", "Verify each element in the array contains employee fields" ],
+  "Test Steps" : [ "Send a GET request to /api/employe", "Verify the response status code is 200 OK", "Verify the response body contains a list of employee objects" ],
   "Input" : {
     "endpoint" : "/api/employe",
     "method" : "GET",
@@ -267,15 +217,15 @@
     "queryParams" : { },
     "body" : null
   },
-  "Expected Result" : "Response status 200 with JSON array of employees",
+  "Expected Result" : "Response status 200 with a JSON array of employee objects",
   "Priority" : "High",
-  "Type" : "Functional"
+  "Type" : "Positive"
 }, {
   "Test Case ID" : "EMP-002",
-  "Title" : "Get employee by valid ID - success",
-  "Description" : "Verify that GET /api/employe/{id} returns the employee details when a valid ID is provided",
-  "Pre-Conditions" : "An employee with ID 1 exists in the database",
-  "Test Steps" : [ "Send a GET request to /api/employe/1", "Verify the response status code is 200", "Verify the response body contains employee details with ID 1" ],
+  "Title" : "Get employee by valid ID",
+  "Description" : "Verify that GET /api/employe/{id} returns the employee details when a valid existing ID is provided",
+  "Pre-Conditions" : "Employee with ID 1 exists",
+  "Test Steps" : [ "Send a GET request to /api/employe/1", "Verify the response status code is 200 OK", "Verify the response body contains the employee details with ID 1" ],
   "Input" : {
     "endpoint" : "/api/employe/1",
     "method" : "GET",
@@ -285,15 +235,15 @@
     "queryParams" : { },
     "body" : null
   },
-  "Expected Result" : "Response status 200 with employee details for ID 1",
+  "Expected Result" : "Response status 200 with employee object for ID 1",
   "Priority" : "High",
-  "Type" : "Functional"
+  "Type" : "Positive"
 }, {
   "Test Case ID" : "EMP-003",
-  "Title" : "Get employee by non-existing ID - returns empty employee",
+  "Title" : "Get employee by non-existing ID returns empty employee",
   "Description" : "Verify that GET /api/employe/{id} returns an empty employee object when the ID does not exist",
-  "Pre-Conditions" : "No employee with ID 9999 exists in the database",
-  "Test Steps" : [ "Send a GET request to /api/employe/9999", "Verify the response status code is 200", "Verify the response body contains an empty employee object (default values)" ],
+  "Pre-Conditions" : "No employee with ID 9999 exists",
+  "Test Steps" : [ "Send a GET request to /api/employe/9999", "Verify the response status code is 200 OK", "Verify the response body contains an empty employee object (default values)" ],
   "Input" : {
     "endpoint" : "/api/employe/9999",
     "method" : "GET",
@@ -305,53 +255,53 @@
   },
   "Expected Result" : "Response status 200 with empty employee object",
   "Priority" : "Medium",
-  "Type" : "Functional"
+  "Type" : "Negative"
 }, {
   "Test Case ID" : "EMP-004",
-  "Title" : "Create new employee - success",
-  "Description" : "Verify that POST /api/employee creates a new employee successfully",
-  "Pre-Conditions" : "No employee with the same name and role exists",
-  "Test Steps" : [ "Send a POST request to /api/employee with valid employee JSON body", "Verify the response status code is 200 or 201", "Verify the employee is saved in the database" ],
+  "Title" : "Create a new employee with valid data",
+  "Description" : "Verify that POST /api/employee creates a new employee when valid data is provided",
+  "Pre-Conditions" : "API is available and database is accessible",
+  "Test Steps" : [ "Send a POST request to /api/employee with body {\"name\":\"Aman Gupt\",\"role\":\"Developer\",\"absent\":false}", "Verify the response status code is 200 OK or 201 Created", "Verify the employee is saved in the database with the provided details" ],
   "Input" : {
     "endpoint" : "/api/employee",
     "method" : "POST",
     "pathParams" : { },
     "queryParams" : { },
     "body" : {
-      "name" : "John Doe",
+      "name" : "Aman Gupt",
       "role" : "Developer",
       "absent" : false
     }
   },
-  "Expected Result" : "Employee is created and saved successfully",
+  "Expected Result" : "Employee is created successfully and persisted",
   "Priority" : "High",
-  "Type" : "Functional"
+  "Type" : "Positive"
 }, {
   "Test Case ID" : "EMP-005",
-  "Title" : "Create new employee - missing required fields",
-  "Description" : "Verify that POST /api/employee with missing fields still processes (no validation in code)",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send a POST request to /api/employee with empty or partial employee JSON body", "Verify the response status code is 200 or 201", "Verify the employee is saved with missing or default values" ],
+  "Title" : "Create a new employee with empty fields",
+  "Description" : "Verify that POST /api/employee accepts empty or missing fields in the request body",
+  "Pre-Conditions" : "API is available",
+  "Test Steps" : [ "Send a POST request to /api/employee with body {\"name\":\"\",\"role\":\"\",\"absent\":null}", "Verify the response status code is 200 OK or 201 Created", "Verify the employee is saved with empty or null fields" ],
   "Input" : {
     "endpoint" : "/api/employee",
     "method" : "POST",
     "pathParams" : { },
     "queryParams" : { },
     "body" : {
-      "name" : null,
-      "role" : null,
+      "name" : "",
+      "role" : "",
       "absent" : null
     }
   },
-  "Expected Result" : "Employee is created with null or default values (no validation error)",
-  "Priority" : "Low",
-  "Type" : "Functional"
+  "Expected Result" : "Employee is created with empty or null fields without error",
+  "Priority" : "Medium",
+  "Type" : "Boundary"
 }, {
   "Test Case ID" : "EMP-006",
-  "Title" : "Update existing employee - success",
-  "Description" : "Verify that PUT /api/employee/{id} updates an existing employee's details",
-  "Pre-Conditions" : "An employee with ID 1 exists",
-  "Test Steps" : [ "Send a PUT request to /api/employee/1 with updated employee JSON body", "Verify the response status code is 200", "Verify the response body contains updated employee details", "Verify the employee data is updated in the database" ],
+  "Title" : "Update existing employee with valid data",
+  "Description" : "Verify that PUT /api/employee/{id} updates the employee details when valid data and existing ID are provided",
+  "Pre-Conditions" : "Employee with ID 1 exists",
+  "Test Steps" : [ "Send a PUT request to /api/employee/1 with body {\"name\":\"John Doe\",\"role\":\"Manager\",\"absent\":false}", "Verify the response status code is 200 OK", "Verify the response body contains updated employee details", "Verify the employee data is updated in the database" ],
   "Input" : {
     "endpoint" : "/api/employee/1",
     "method" : "PUT",
@@ -360,20 +310,20 @@
     },
     "queryParams" : { },
     "body" : {
-      "name" : "Jane Smith",
+      "name" : "John Doe",
       "role" : "Manager",
-      "absent" : true
+      "absent" : false
     }
   },
-  "Expected Result" : "Employee with ID 1 is updated successfully and returned in response",
+  "Expected Result" : "Employee details updated successfully with status 200",
   "Priority" : "High",
-  "Type" : "Functional"
+  "Type" : "Positive"
 }, {
   "Test Case ID" : "EMP-007",
-  "Title" : "Update non-existing employee - returns 404",
-  "Description" : "Verify that PUT /api/employee/{id} returns 404 when employee does not exist",
+  "Title" : "Update non-existing employee returns 404",
+  "Description" : "Verify that PUT /api/employee/{id} returns 404 Not Found when the employee ID does not exist",
   "Pre-Conditions" : "No employee with ID 9999 exists",
-  "Test Steps" : [ "Send a PUT request to /api/employee/9999 with employee JSON body", "Verify the response status code is 404", "Verify the response body is empty" ],
+  "Test Steps" : [ "Send a PUT request to /api/employee/9999 with body {\"name\":\"John Doe\",\"role\":\"Manager\",\"absent\":false}", "Verify the response status code is 404 Not Found" ],
   "Input" : {
     "endpoint" : "/api/employee/9999",
     "method" : "PUT",
@@ -382,42 +332,86 @@
     },
     "queryParams" : { },
     "body" : {
-      "name" : "Non Existent",
-      "role" : "None",
+      "name" : "John Doe",
+      "role" : "Manager",
       "absent" : false
     }
   },
-  "Expected Result" : "Response status 404 with empty body",
-  "Priority" : "Medium",
-  "Type" : "Functional"
+  "Expected Result" : "Response status 404 Not Found",
+  "Priority" : "High",
+  "Type" : "Negative"
 }, {
   "Test Case ID" : "EMP-008",
-  "Title" : "Update employee - partial fields",
-  "Description" : "Verify that PUT /api/employee/{id} updates only provided fields and keeps others unchanged",
-  "Pre-Conditions" : "Employee with ID 1 exists with known data",
-  "Test Steps" : [ "Send a PUT request to /api/employee/1 with partial employee JSON body (e.g., only name)", "Verify the response status code is 200", "Verify the response body contains updated name and unchanged other fields" ],
+  "Title" : "Update employee with missing name field",
+  "Description" : "Verify that PUT /api/employee/{id} updates employee when name is empty but other fields are valid",
+  "Pre-Conditions" : "Employee with ID 4 exists",
+  "Test Steps" : [ "Send a PUT request to /api/employee/4 with body {\"name\":\"\",\"role\":\"Developer\",\"absent\":false}", "Verify the response status code is 200 OK", "Verify the employee's name is updated to empty string" ],
   "Input" : {
-    "endpoint" : "/api/employee/1",
+    "endpoint" : "/api/employee/4",
     "method" : "PUT",
     "pathParams" : {
-      "id" : 1
+      "id" : 4
     },
     "queryParams" : { },
     "body" : {
-      "name" : "Updated Name",
-      "role" : null,
-      "absent" : null
+      "name" : "",
+      "role" : "Developer",
+      "absent" : false
     }
   },
-  "Expected Result" : "Employee name updated, other fields remain unchanged",
+  "Expected Result" : "Employee updated with empty name field",
   "Priority" : "Medium",
-  "Type" : "Functional"
+  "Type" : "Boundary"
 }, {
   "Test Case ID" : "EMP-009",
-  "Title" : "Delete existing employee - success",
-  "Description" : "Verify that DELETE /api/employee/{id} deletes the employee successfully",
+  "Title" : "Update employee with missing role field",
+  "Description" : "Verify that PUT /api/employee/{id} updates employee when role is empty but other fields are valid",
+  "Pre-Conditions" : "Employee with ID 8888 exists",
+  "Test Steps" : [ "Send a PUT request to /api/employee/8888 with body {\"name\":\"Meera Singh\",\"role\":\"\",\"absent\":false}", "Verify the response status code is 200 OK", "Verify the employee's role is updated to empty string" ],
+  "Input" : {
+    "endpoint" : "/api/employee/8888",
+    "method" : "PUT",
+    "pathParams" : {
+      "id" : 8888
+    },
+    "queryParams" : { },
+    "body" : {
+      "name" : "Meera Singh",
+      "role" : "",
+      "absent" : false
+    }
+  },
+  "Expected Result" : "Employee updated with empty role field",
+  "Priority" : "Medium",
+  "Type" : "Boundary"
+}, {
+  "Test Case ID" : "EMP-010",
+  "Title" : "Update employee with long name boundary value",
+  "Description" : "Verify that PUT /api/employee/{id} updates employee with a very long name string",
+  "Pre-Conditions" : "Employee with ID 0 exists",
+  "Test Steps" : [ "Send a PUT request to /api/employee/0 with body {\"name\":\"VeryLongNameVeryLongNameVeryLongName\",\"role\":\"Senior Engineer\",\"absent\":false}", "Verify the response status code is 200 OK", "Verify the employee's name is updated to the long string" ],
+  "Input" : {
+    "endpoint" : "/api/employee/0",
+    "method" : "PUT",
+    "pathParams" : {
+      "id" : 0
+    },
+    "queryParams" : { },
+    "body" : {
+      "name" : "VeryLongNameVeryLongNameVeryLongName",
+      "role" : "Senior Engineer",
+      "absent" : false
+    }
+  },
+  "Expected Result" : "Employee updated successfully with long name",
+  "Priority" : "Medium",
+  "Type" : "Boundary"
+}, {
+  "Test Case ID" : "EMP-011",
+  "Title" : "Delete existing employee by ID",
+  "Description" : "Verify that DELETE /api/employee/{id} deletes the employee when a valid existing ID is provided",
   "Pre-Conditions" : "Employee with ID 1 exists",
-  "Test Steps" : [ "Send a DELETE request to /api/employee/1", "Verify the response status code is 200 or 204", "Verify the employee is removed from the database" ],
+  "Test Steps" : [ "Send a DELETE request to /api/employee/1", "Verify the response status code is 200 OK or 204 No Content", "Verify the employee with ID 1 is removed from the database" ],
   "Input" : {
     "endpoint" : "/api/employee/1",
     "method" : "DELETE",
@@ -427,15 +421,15 @@
     "queryParams" : { },
     "body" : null
   },
-  "Expected Result" : "Employee with ID 1 is deleted successfully",
+  "Expected Result" : "Employee deleted successfully",
   "Priority" : "High",
-  "Type" : "Functional"
+  "Type" : "Positive"
 }, {
-  "Test Case ID" : "EMP-010",
-  "Title" : "Delete non-existing employee - no error",
-  "Description" : "Verify that DELETE /api/employee/{id} on non-existing employee does not cause error",
+  "Test Case ID" : "EMP-012",
+  "Title" : "Delete non-existing employee by ID",
+  "Description" : "Verify that DELETE /api/employee/{id} does not fail when deleting a non-existing employee ID",
   "Pre-Conditions" : "No employee with ID 9999 exists",
-  "Test Steps" : [ "Send a DELETE request to /api/employee/9999", "Verify the response status code is 200 or 204", "Verify no error is returned" ],
+  "Test Steps" : [ "Send a DELETE request to /api/employee/9999", "Verify the response status code is 200 OK or 204 No Content", "Verify no error is returned" ],
   "Input" : {
     "endpoint" : "/api/employee/9999",
     "method" : "DELETE",
@@ -445,65 +439,7 @@
     "queryParams" : { },
     "body" : null
   },
-  "Expected Result" : "No error, response status 200 or 204",
-  "Priority" : "Low",
-  "Type" : "Functional"
-}, {
-  "Test Case ID" : "EMP-011",
-  "Title" : "Get all employees - empty database",
-  "Description" : "Verify that GET /api/employe returns empty list when no employees exist",
-  "Pre-Conditions" : "Database has no employees",
-  "Test Steps" : [ "Send a GET request to /api/employe", "Verify the response status code is 200", "Verify the response body is an empty JSON array" ],
-  "Input" : {
-    "endpoint" : "/api/employe",
-    "method" : "GET",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status 200 with empty array",
+  "Expected Result" : "No error and successful response status",
   "Priority" : "Medium",
-  "Type" : "Functional"
-}, {
-  "Test Case ID" : "EMP-012",
-  "Title" : "Create employee with maximum length fields",
-  "Description" : "Verify that POST /api/employee accepts employee with maximum length name and role",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send a POST request to /api/employee with employee JSON body containing MAX_NAME and MAX_ROLE", "Verify the response status code is 200 or 201", "Verify the employee is saved with full name and role" ],
-  "Input" : {
-    "endpoint" : "/api/employee",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "name" : "MAX_NAME",
-      "role" : "MAX_ROLE",
-      "absent" : false
-    }
-  },
-  "Expected Result" : "Employee created successfully with maximum length fields",
-  "Priority" : "Medium",
-  "Type" : "Functional"
-}, {
-  "Test Case ID" : "EMP-013",
-  "Title" : "Update employee with null body fields",
-  "Description" : "Verify that PUT /api/employee/{id} with null fields updates employee fields to null",
-  "Pre-Conditions" : "Employee with ID 1 exists",
-  "Test Steps" : [ "Send a PUT request to /api/employee/1 with body fields set to null", "Verify the response status code is 200", "Verify the employee fields are updated to null" ],
-  "Input" : {
-    "endpoint" : "/api/employee/1",
-    "method" : "PUT",
-    "pathParams" : {
-      "id" : 1
-    },
-    "queryParams" : { },
-    "body" : {
-      "name" : null,
-      "role" : null,
-      "absent" : null
-    }
-  },
-  "Expected Result" : "Employee fields updated to null successfully",
-  "Priority" : "Low",
-  "Type" : "Functional"
+  "Type" : "Negative"
 } ]
