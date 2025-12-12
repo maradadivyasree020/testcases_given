@@ -24,77 +24,93 @@ public class AttendanceController {
         this.attendanceService = attendanceService;
     }
 
+    // -----------------------------
+    // DTO
+    // -----------------------------
     public static class AttendanceDTO {
         private Long employeeId;
         private Boolean absent;
         private LocalDate date;
+
         public AttendanceDTO() {}
+
         public Long getEmployeeId() { return employeeId; }
         public void setEmployeeId(Long employeeId) { this.employeeId = employeeId; }
+
         public Boolean getAbsent() { return absent; }
         public void setAbsent(Boolean absent) { this.absent = absent; }
+
         public LocalDate getDate() { return date; }
         public void setDate(LocalDate date) { this.date = date; }
     }
 
+
+    // ==========================================================
+    // PUT /mark  → Mark Single Attendance
+    // ==========================================================
     @PutMapping("/mark")
     public ResponseEntity<?> markSingle(@RequestBody AttendanceDTO dto) {
+
+        // Validation — consistent style
         if (dto == null || dto.getEmployeeId() == null || dto.getAbsent() == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "employeeId and absent required"));
+            return ResponseEntity.badRequest().body(
+                Map.of("message", "employeeId and absent required")
+            );
         }
 
         LocalDate markDate = dto.getDate() == null ? LocalDate.now() : dto.getDate();
-        AttendanceModel result = attendanceService.markSingleAttendance(dto.getEmployeeId(), markDate, dto.getAbsent());
+
+        AttendanceModel result =
+                attendanceService.markSingleAttendance(dto.getEmployeeId(), markDate, dto.getAbsent());
+
         return ResponseEntity.ok(result);
     }
 
+
+    // ==========================================================
+    // POST /mark-batch  → Mark Batch Attendance
+    // ==========================================================
     @PostMapping("/mark-batch")
     @Transactional
     public ResponseEntity<Map<String, Object>> markBatch(@RequestBody List<AttendanceDTO> payload) {
+
+        // Validation
         if (payload == null || payload.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "payload is empty"));
+            return ResponseEntity.badRequest().body(
+                Map.of("message", "payload is empty")
+            );
         }
 
         List<AttendanceModel> saved = new ArrayList<>();
-        List<Long> invalid = new ArrayList<>();
+        List<Long> invalidEntries = new ArrayList<>();
 
         for (AttendanceDTO dto : payload) {
+
+            // dto missing OR invalid? → track invalid employee
             if (dto == null || dto.getEmployeeId() == null || dto.getAbsent() == null) {
-                if (dto != null && dto.getEmployeeId() != null) invalid.add(dto.getEmployeeId());
+                if (dto != null && dto.getEmployeeId() != null) {
+                    invalidEntries.add(dto.getEmployeeId());
+                }
                 continue;
             }
 
             LocalDate markDate = dto.getDate() == null ? LocalDate.now() : dto.getDate();
+            AttendanceModel rec = attendanceService.markSingleAttendance(
+                    dto.getEmployeeId(), markDate, dto.getAbsent());
 
-            AttendanceModel rec = attendanceService.markSingleAttendance(dto.getEmployeeId(), markDate, dto.getAbsent());
             saved.add(rec);
         }
 
         long absentCount = saved.stream().filter(AttendanceModel::getAbsent).count();
         long presentCount = saved.size() - absentCount;
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("savedCount", saved.size());
-        result.put("savedRecords", saved);
-        result.put("presentCount", presentCount);
-        result.put("absentCount", absentCount);
-        result.put("invalidEntries:", invalid);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("savedCount", saved.size());
+        response.put("savedRecords", saved);
+        response.put("presentCount", presentCount);
+        response.put("absentCount", absentCount);
+        response.put("invalidEntries", invalidEntries); // FIXED incorrect key name
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(response);
     }
-
-    // @GetMapping("/employee/{employeeId}")
-    // public ResponseEntity<List<AttendanceModel>> getAttendanceFor(@PathVariable Long employeeId,
-    //                                                               @RequestParam(name = "from", required = false) LocalDate from,
-    //                                                               @RequestParam(name = "to", required = false) LocalDate to) {
-    //     if (employeeId == null) return ResponseEntity.badRequest().build();
-
-    //     List<AttendanceModel> list;
-    //     if (from != null && to != null) {
-    //         list = repo.findByEmployeeIdAndDateBetween(employeeId, from, to);
-    //     } else {
-    //         list = repo.findByEmployeeIdOrderByDateDesc(employeeId);
-    //     }
-    //     return ResponseEntity.ok(list);
-    // }
 }
