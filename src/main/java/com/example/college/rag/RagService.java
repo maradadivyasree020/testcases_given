@@ -11,10 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Orchestrates:
- *  - ingesting Java code
- *  - retrieving relevant chunks
- *  - generating test cases via LLM
+ * RagService
+ *
+ * Responsibilities:
+ *  1) Ingest Java source code into vector store
+ *  2) Retrieve relevant code chunks
+ *  3) Generate NEW test cases (generate mode)
+ *  4) EDIT existing test cases with maximum stability (edit mode)
  */
 public class RagService {
 
@@ -34,10 +37,13 @@ public class RagService {
         this.promptBuilder = new PromptBuilder();
     }
 
+    // =========================================================
+    // 1️⃣ INGEST JAVA SOURCES
+    // =========================================================
     public void ingestJavaSources(Path root) throws IOException {
         try (var stream = Files.walk(root)) {
             stream.filter(p -> p.toString().endsWith(".java"))
-                    .forEach(this::ingestFileSafe);
+                  .forEach(this::ingestFileSafe);
         }
     }
 
@@ -64,30 +70,61 @@ public class RagService {
         }
     }
 
-public String generateTestCasesForQuestion(String question) {
-    List<Map<String, String>> snippets = retriever.retrieve(question, 6);
-    String prompt = promptBuilder.buildTestGenerationPrompt(question, snippets);
-    return llmClient.complete(prompt);
-}
-
-public String generateTestCasesForQuestion(String question, String extraTestData) {
-    List<Map<String, String>> snippets = retriever.retrieve(question, 6);
-
-    // Build context from chunks
-    StringBuilder ctx = new StringBuilder();
-    for (Map<String, String> m : snippets) {
-        ctx.append("// File: ").append(m.getOrDefault("file", "UnknownFile")).append("\n");
-        ctx.append(m.getOrDefault("content", "")).append("\n\n");
+    // =========================================================
+    // 2️⃣ GENERATE MODE (FIRST TIME / NEW CONTROLLER)
+    // =========================================================
+    public String generateTestCasesForQuestion(String question) {
+        List<Map<String, String>> snippets = retriever.retrieve(question, 6);
+        String prompt = promptBuilder.buildTestGenerationPrompt(question, snippets);
+        return llmClient.complete(prompt);
     }
 
-    // Build final prompt
-    String prompt = promptBuilder.buildTestGenerationPrompt(
-            ctx.toString(),
-            question,
-            extraTestData
-    );
+    public String generateTestCasesForQuestion(String question, String extraTestData) {
+        List<Map<String, String>> snippets = retriever.retrieve(question, 6);
+        String ctx = buildContext(snippets);
 
-    return llmClient.complete(prompt);
-}
+        String prompt = promptBuilder.buildTestGenerationPrompt(
+                ctx,
+                question,
+                extraTestData
+        );
 
+        return llmClient.complete(prompt);
+    }
+
+    // =========================================================
+    // 3️⃣ EDIT MODE (CONTROLLER CHANGED → KEEP TESTS STABLE)
+    // =========================================================
+    public String editExistingTests(
+            String oldTestsJson,
+            String question,
+            String extraTestData
+    ) {
+        List<Map<String, String>> snippets = retriever.retrieve(question, 6);
+        String ctx = buildContext(snippets);
+
+        String prompt = promptBuilder.buildEditPrompt(
+                oldTestsJson,
+                ctx,
+                extraTestData,
+                question
+        );
+
+        return llmClient.complete(prompt);
+    }
+
+    // =========================================================
+    // Helper: Build RAG context
+    // =========================================================
+    private String buildContext(List<Map<String, String>> snippets) {
+        StringBuilder ctx = new StringBuilder();
+        for (Map<String, String> m : snippets) {
+            ctx.append("// File: ")
+               .append(m.getOrDefault("file", "UnknownFile"))
+               .append("\n");
+            ctx.append(m.getOrDefault("content", ""))
+               .append("\n\n");
+        }
+        return ctx.toString();
+    }
 }

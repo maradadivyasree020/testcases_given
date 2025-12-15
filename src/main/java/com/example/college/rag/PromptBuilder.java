@@ -56,7 +56,7 @@ public class PromptBuilder {
             - "Description"
             - "Pre-Conditions"
             - "Test Steps"   (array of strings)
-            - "Input"        (object: endpoint, method, pathParams, queryParams, body)
+            - "Input"         (object: endpoint, method, pathParams, queryParams, body)
             - "Expected Result"
             - "Priority"     (High / Medium / Low)
             - "Type"         (Positive / Negative / Boundary / Error)
@@ -68,4 +68,39 @@ public class PromptBuilder {
             %s
             """.formatted(testDataSection, ctx, question);
     }
+    public String buildEditPrompt(
+        String oldTestsJson,
+        String ctx,
+        String testDataJson,
+        String question
+        ) {
+            return """
+            You are EDITING existing API test cases.
+
+            STABILITY RULES (MANDATORY):
+            - DO NOT change Test Case ID
+            - DO NOT reword Title or Description unless incorrect
+            - DO NOT change Steps unless logic is broken
+            - DO NOT reformat JSON
+            - Only update fields that are logically invalid due to code change
+            - If a test case is still valid, return it EXACTLY as-is
+
+            OLD TEST CASES:
+            %s
+
+            CONTROLLER CODE:
+            %s
+
+            TEST DATA:
+            %s
+
+            QUESTION:
+            %s
+
+            OUTPUT:
+            Return ONLY the updated JSON array.
+            """
+            .formatted(oldTestsJson, ctx, testDataJson, question);
+        }
+
 }

@@ -34,27 +34,25 @@ public class GenerateTestsFromJson {
             ArrayNode allTests = readArrayFromFile(testsFile);
             Map<String, String> meta = readMetadata(metaFile);
 
-            // ---- Controller specs ----
             ControllerSpec[] specs = new ControllerSpec[]{
-                    new ControllerSpec(
-                            "attendance",
-                            "Generate detailed API functional test cases for all attendance-related endpoints " +
-                                    "in this project. Focus especially on AttendanceController and endpoints " +
-                                    "/attendance/mark and /attendance/mark-batch.",
-                            List.of("src/main/java/com/example/college/controller/AttendanceController.java"),
-                            "src/main/resources/testdata/attendance-testdata.xlsx"
-                    ),
-                    new ControllerSpec(
-                            "employee",
-                            "Generate detailed API functional test cases for all employee-related endpoints " +
-                                    "in this project. Focus especially on EmployeeController and endpoints " +
-                                    "/api/employe, /api/employe/{id}, /api/employee, /api/employee/{id}.",
-                            List.of("src/main/java/com/example/college/controller/EmployeeController.java"),
-                            "src/main/resources/testdata/employee-testdata.xlsx"
-                    )
+                new ControllerSpec(
+                    "attendance",
+                    "Generate detailed API functional test cases for all attendance-related endpoints " +
+                    "in this project. Focus especially on AttendanceController and endpoints " +
+                    "/attendance/mark and /attendance/mark-batch.",
+                    List.of("src/main/java/com/example/college/controller/AttendanceController.java"),
+                    "src/main/resources/testdata/attendance-testdata.xlsx"
+                ),
+                new ControllerSpec(
+                    "employee",
+                    "Generate detailed API functional test cases for all employee-related endpoints " +
+                    "in this project. Focus especially on EmployeeController and endpoints " +
+                    "/api/employe, /api/employe/{id}, /api/employee, /api/employee/{id}.",
+                    List.of("src/main/java/com/example/college/controller/EmployeeController.java"),
+                    "src/main/resources/testdata/employee-testdata.xlsx"
+                )
             };
 
-            // ---- Process each controller ----
             for (ControllerSpec spec : specs) {
                 String controllerId = spec.id();
                 String question     = spec.question();
@@ -63,82 +61,60 @@ public class GenerateTestsFromJson {
                 String previousHash = meta.get(controllerId);
 
                 if (currentHash != null && currentHash.equals(previousHash)) {
-                    System.out.println("ℹ No changes detected for controller '" + controllerId +
-                                       "'. Skipping test generation.");
+                    System.out.println("ℹ No changes detected for controller '" + controllerId + "'");
                     continue;
                 }
 
                 System.out.println("\n====================================");
                 System.out.println("Generating tests for: " + controllerId);
-                System.out.println("QUESTION: " + question);
-                System.out.println("====================================\n");
+                System.out.println("====================================");
 
-                // ---- Load Excel-based test data ----
                 Path excelPath = projectRoot.resolve(spec.testDataPath());
-                String testDataJson = ExcelTestDataLoader.loadAsJsonArrayString(excelPath, "Sheet1");
+                String testDataJson =
+                        ExcelTestDataLoader.loadAsJsonArrayString(excelPath, "Sheet1");
 
-                // ---- RAG → LLM → test case generation ----
-                String llmOutput = ragService.generateTestCasesForQuestion(question, testDataJson);
+                String llmOutput =
+                        ragService.generateTestCasesForQuestion(question, testDataJson);
+
                 ArrayNode newTests = parseArrayFromLLM(llmOutput);
 
-                System.out.println("Generated " + newTests.size() +
-                                   " test cases for controller '" + controllerId + "'.");
+                // -----------------------------
+                // REPLACEMENT LOGIC (NO DUPLICATES)
+                // -----------------------------
 
-                // ---------------------------
-                // REPLACEMENT LOGIC
-                // ---------------------------
-                // Approach:
-                // 1) Remove any existing tests in allTests that have __generated_by == controllerId
-                // 2) Tag each element in newTests with "__generated_by": controllerId
-                // 3) Merge retained tests + new tests into allTests (replace in-place)
-                //
-                // This preserves manually-created tests (those without the marker) and
-                // ensures previous generated tests for the same controller are replaced.
-
-                // 1) Build retained array (tests that are NOT generated by this controller)
                 ArrayNode retained = MAPPER.createArrayNode();
-                for (int i = 0; i < allTests.size(); i++) {
-                    JsonNode existing = allTests.get(i);
-                    if (existing != null && existing.has("__generated_by")) {
-                        String genBy = existing.get("__generated_by").asText("");
-                        if (controllerId.equals(genBy)) {
-                            // skip - removing old tests for this controller
-                            continue;
-                        }
+
+                for (JsonNode existing : allTests) {
+                    if (existing.has("__generated_by")
+                        && controllerId.equals(existing.get("__generated_by").asText())) {
+                        continue; // remove old generated tests
                     }
                     retained.add(existing);
                 }
 
-                // 2) Tag new tests with __generated_by so future runs can find them
-                for (int i = 0; i < newTests.size(); i++) {
-                    JsonNode t = newTests.get(i);
-                    if (t != null && t.isObject()) {
+                for (JsonNode t : newTests) {
+                    if (t.isObject()) {
                         ((ObjectNode) t).put("__generated_by", controllerId);
                     }
                 }
 
-                // 3) Replace allTests content with retained + newTests
                 allTests.removeAll();
                 allTests.addAll(retained);
                 allTests.addAll(newTests);
 
-                System.out.println("Replaced generated tests for controller '" + controllerId + "'.");
-                // ---- Update controller metadata ----
-                if (currentHash != null) {
-                    meta.put(controllerId, currentHash);
-                }
+                meta.put(controllerId, currentHash);
+                System.out.println("✔ Replaced generated tests for controller: " + controllerId);
             }
 
-            // ---- Save updated tests ----
-            String prettyTests = MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(allTests);
-            Files.writeString(testsFile, prettyTests);
+            Files.writeString(
+                testsFile,
+                MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(allTests)
+            );
 
-            System.out.println("\n✅ Saved all tests to: " + testsFile.toAbsolutePath());
-            System.out.println("Total tests in file: " + allTests.size());
-
-            // ---- Save updated metadata ----
             writeMetadata(metaFile, meta);
-            System.out.println("✅ Updated metadata at: " + metaFile.toAbsolutePath());
+
+            System.out.println("\n✅ Test generation complete");
+            System.out.println("Total test cases: " + allTests.size());
 
         } catch (Exception e) {
             System.err.println("❌ Error generating tests: " + e.getMessage());
@@ -146,13 +122,13 @@ public class GenerateTestsFromJson {
         }
     }
 
-    // ================= Helper Classes & Methods =================
+    // -------------------------------------------------
 
     private record ControllerSpec(
-            String id,
-            String question,
-            List<String> codeFiles,
-            String testDataPath
+        String id,
+        String question,
+        List<String> codeFiles,
+        String testDataPath
     ) {}
 
     private static ArrayNode readArrayFromFile(Path file) {
@@ -161,11 +137,9 @@ public class GenerateTestsFromJson {
 
         try {
             JsonNode node = MAPPER.readTree(Files.readString(file));
-            if (node != null && node.isArray()) {
-                result.addAll((ArrayNode) node);
-            }
+            if (node.isArray()) result.addAll((ArrayNode) node);
         } catch (Exception e) {
-            System.err.println("WARNING: Could not parse test file. Starting fresh.");
+            System.err.println("WARNING: Failed to read test file.");
         }
         return result;
     }
@@ -176,11 +150,9 @@ public class GenerateTestsFromJson {
 
         try {
             JsonNode node = MAPPER.readTree(Files.readString(metaFile));
-            if (node != null && node.isObject()) {
-                node.fields().forEachRemaining(e -> map.put(e.getKey(), e.getValue().asText()));
-            }
+            node.fields().forEachRemaining(e -> map.put(e.getKey(), e.getValue().asText()));
         } catch (Exception e) {
-            System.err.println("WARNING: Failed to read metadata file.");
+            System.err.println("WARNING: Failed to read metadata.");
         }
         return map;
     }
@@ -189,7 +161,7 @@ public class GenerateTestsFromJson {
         ObjectNode root = MAPPER.createObjectNode();
         meta.forEach(root::put);
         Files.writeString(metaFile,
-                MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(root));
+            MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(root));
     }
 
     private static String computeHashForFiles(Path root, List<String> files) {
@@ -204,7 +176,6 @@ public class GenerateTestsFromJson {
             for (byte b : hash) sb.append(String.format("%02x", b));
             return sb.toString();
         } catch (Exception e) {
-            System.err.println("WARNING: Hashing failed: " + e.getMessage());
             return null;
         }
     }
@@ -216,19 +187,13 @@ public class GenerateTestsFromJson {
         int start = raw.indexOf('[');
         int end   = raw.lastIndexOf(']');
 
-        if (start == -1 || end == -1 || end <= start) {
-            System.err.println("WARNING: No valid JSON array found in LLM output.");
-            return empty;
-        }
-
-        String arrayPart = raw.substring(start, end + 1);
+        if (start < 0 || end <= start) return empty;
 
         try {
-            JsonNode node = MAPPER.readTree(arrayPart);
+            JsonNode node = MAPPER.readTree(raw.substring(start, end + 1));
             if (node.isArray()) return (ArrayNode) node;
-        } catch (Exception e) {
-            System.err.println("WARNING: JSON parse error: " + e.getMessage());
-        }
+        } catch (Exception ignored) {}
+
         return empty;
     }
 }
