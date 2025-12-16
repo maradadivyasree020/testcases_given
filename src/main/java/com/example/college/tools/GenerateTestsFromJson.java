@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.nio.file.*;
 import java.security.MessageDigest;
+import java.time.Instant;
 import java.util.*;
 
 public class GenerateTestsFromJson {
@@ -33,6 +34,13 @@ public class GenerateTestsFromJson {
 
             ArrayNode allTests = readArrayFromFile(testsFile);
             Map<String, String> meta = readMetadata(metaFile);
+
+            // ---- RUN METADATA ----
+            String runId = Instant.now().toString();
+            int runSeq = meta.containsKey("_runSeq")
+                    ? Integer.parseInt(meta.get("_runSeq")) + 1
+                    : 1;
+            meta.put("_runSeq", String.valueOf(runSeq));
 
             ControllerSpec[] specs = new ControllerSpec[]{
                 new ControllerSpec(
@@ -61,12 +69,14 @@ public class GenerateTestsFromJson {
                 String previousHash = meta.get(controllerId);
 
                 if (currentHash != null && currentHash.equals(previousHash)) {
-                    System.out.println("ℹ No changes detected for controller '" + controllerId + "'");
+                    System.out.println("ℹ No changes detected for controller: " + controllerId);
                     continue;
                 }
 
                 System.out.println("\n====================================");
                 System.out.println("Generating tests for: " + controllerId);
+                System.out.println("Run ID : " + runId);
+                System.out.println("Run Seq: " + runSeq);
                 System.out.println("====================================");
 
                 Path excelPath = projectRoot.resolve(spec.testDataPath());
@@ -78,23 +88,32 @@ public class GenerateTestsFromJson {
 
                 ArrayNode newTests = parseArrayFromLLM(llmOutput);
 
-                // -----------------------------
-                // REPLACEMENT LOGIC (NO DUPLICATES)
-                // -----------------------------
-
+                // ---- REMOVE OLD GENERATED TESTS FOR THIS CONTROLLER ----
                 ArrayNode retained = MAPPER.createArrayNode();
-
                 for (JsonNode existing : allTests) {
-                    if (existing.has("__generated_by")
-                        && controllerId.equals(existing.get("__generated_by").asText())) {
-                        continue; // remove old generated tests
+                    if (existing.has("_meta")) {
+                        JsonNode metaNode = existing.get("_meta");
+                        if (controllerId.equals(metaNode.path("controllerId").asText())) {
+                            continue; // remove old generated test
+                        }
                     }
                     retained.add(existing);
                 }
 
+                // ---- TAG NEW TESTS ----
                 for (JsonNode t : newTests) {
                     if (t.isObject()) {
-                        ((ObjectNode) t).put("__generated_by", controllerId);
+                        ObjectNode obj = (ObjectNode) t;
+
+                        ObjectNode metaNode = MAPPER.createObjectNode();
+                        metaNode.put("generatedBy", "rag");
+                        metaNode.put("controllerId", controllerId);
+                        metaNode.put("runId", runId);
+                        metaNode.put("runSeq", runSeq);
+                        metaNode.put("hash", currentHash);
+                        metaNode.put("mode", previousHash == null ? "GENERATE" : "EDIT");
+
+                        obj.set("_meta", metaNode);
                     }
                 }
 
@@ -103,7 +122,7 @@ public class GenerateTestsFromJson {
                 allTests.addAll(newTests);
 
                 meta.put(controllerId, currentHash);
-                System.out.println("✔ Replaced generated tests for controller: " + controllerId);
+                System.out.println("✔ Updated tests for controller: " + controllerId);
             }
 
             Files.writeString(
@@ -138,9 +157,7 @@ public class GenerateTestsFromJson {
         try {
             JsonNode node = MAPPER.readTree(Files.readString(file));
             if (node.isArray()) result.addAll((ArrayNode) node);
-        } catch (Exception e) {
-            System.err.println("WARNING: Failed to read test file.");
-        }
+        } catch (Exception ignored) {}
         return result;
     }
 
@@ -151,9 +168,7 @@ public class GenerateTestsFromJson {
         try {
             JsonNode node = MAPPER.readTree(Files.readString(metaFile));
             node.fields().forEachRemaining(e -> map.put(e.getKey(), e.getValue().asText()));
-        } catch (Exception e) {
-            System.err.println("WARNING: Failed to read metadata.");
-        }
+        } catch (Exception ignored) {}
         return map;
     }
 
@@ -186,7 +201,6 @@ public class GenerateTestsFromJson {
 
         int start = raw.indexOf('[');
         int end   = raw.lastIndexOf(']');
-
         if (start < 0 || end <= start) return empty;
 
         try {
@@ -196,4 +210,5 @@ public class GenerateTestsFromJson {
 
         return empty;
     }
+
 }

@@ -6,101 +6,124 @@ import java.util.Map;
 public class PromptBuilder {
 
     /**
-     * OLD MODE (no explicit test data) – still used by simpler callers.
-     * Builds context from snippet metadata and delegates to the main builder.
+     * SIMPLE MODE (no explicit test data)
+     * Used when caller only provides a question.
      */
-    public String buildTestGenerationPrompt(String question, List<Map<String, String>> snippetMaps) {
+    public String buildTestGenerationPrompt(
+            String question,
+            List<Map<String, String>> snippetMaps
+    ) {
         StringBuilder ctx = new StringBuilder();
+
         for (Map<String, String> m : snippetMaps) {
             ctx.append("// File: ")
-              .append(m.getOrDefault("file", "UnknownFile"))
-              .append("\n");
-            ctx.append(m.getOrDefault("content", ""))
-              .append("\n\n");
+               .append(m.getOrDefault("file", "UnknownFile"))
+               .append("\n")
+               .append(m.getOrDefault("content", ""))
+               .append("\n\n");
         }
-        // no extra test data
-        return buildTestGenerationPrompt(ctx.toString(), question, null);
+
+        return buildGeneratePrompt(ctx.toString(), question, null);
     }
 
     /**
-     * NEW MODE – full control with:
-     *  - ctx (java code chunks)
-     *  - question
-     *  - extraTestData (JSON or text – e.g., from Excel)
+     * GENERATE MODE
+     * Used for first-time generation OR full replacement.
      */
-    public String buildTestGenerationPrompt(String ctx, String question, String extraTestData) {
+    public String buildGeneratePrompt(
+            String ctx,
+            String question,
+            String testDataJson
+    ) {
 
-        String testDataSection = (extraTestData == null || extraTestData.isBlank())
-                ? "No explicit test data provided. You may choose reasonable values."
-                : extraTestData;
+        String testDataSection =
+                (testDataJson == null || testDataJson.isBlank())
+                        ? "No explicit test data provided."
+                        : testDataJson;
 
         return """
             You are a senior Java QA engineer.
 
-            Based ONLY on the provided Java code AND the test data below,
-            generate high-quality API FUNCTIONAL test cases.
+            TASK:
+            Generate API FUNCTIONAL test cases.
 
-            TEST DATA (use these values for request bodies whenever possible):
+            IMPORTANT STABILITY RULES:
+            - Use CLEAR, DIRECT, NON-CREATIVE language.
+            - Avoid paraphrasing or fancy wording.
+            - Keep Titles and Descriptions simple and consistent.
+            - Prefer deterministic wording (same wording every time).
+
+            TEST DATA (use these values strictly where applicable):
             %s
 
-            OUTPUT RULES (VERY IMPORTANT):
+            OUTPUT RULES (STRICT):
             - Output ONLY a valid JSON ARRAY.
-            - NO comments, NO markdown, NO backticks, NO extra text.
-            - Every value must be a plain JSON value (string, number, boolean, null).
-            - DO NOT output code constructs like "A".repeat(255), concatenation, or method calls.
-            - Prefer using the values from TEST DATA in Input.body.
+            - No markdown, no comments, no explanations.
+            - No code constructs (e.g. ".repeat()", concatenation).
+            - Every value must be valid JSON.
+            - Follow the SAME wording style across all test cases.
 
-            EACH TEST CASE OBJECT MUST CONTAIN:
+            EACH TEST CASE MUST CONTAIN:
             - "Test Case ID"
             - "Title"
             - "Description"
             - "Pre-Conditions"
-            - "Test Steps"   (array of strings)
-            - "Input"         (object: endpoint, method, pathParams, queryParams, body)
+            - "Test Steps" (array of strings)
+            - "Input" (object: endpoint, method, pathParams, queryParams, body)
             - "Expected Result"
-            - "Priority"     (High / Medium / Low)
-            - "Type"         (Positive / Negative / Boundary / Error)
-
-            CONTEXT (Java code):
-            %s
-
-            QUESTION:
-            %s
-            """.formatted(testDataSection, ctx, question);
-    }
-    public String buildEditPrompt(
-        String oldTestsJson,
-        String ctx,
-        String testDataJson,
-        String question
-        ) {
-            return """
-            You are EDITING existing API test cases.
-
-            STABILITY RULES (MANDATORY):
-            - DO NOT change Test Case ID
-            - DO NOT reword Title or Description unless incorrect
-            - DO NOT change Steps unless logic is broken
-            - DO NOT reformat JSON
-            - Only update fields that are logically invalid due to code change
-            - If a test case is still valid, return it EXACTLY as-is
-
-            OLD TEST CASES:
-            %s
+            - "Priority"
+            - "Type"
 
             CONTROLLER CODE:
             %s
 
-            TEST DATA:
+            QUESTION:
+            %s
+            """
+            .formatted(testDataSection, ctx, question);
+    }
+
+    /**
+     * EDIT MODE
+     * Used when controller code changes and tests must be UPDATED,
+     * NOT regenerated.
+     */
+    public String buildEditPrompt(
+            String oldTestsJson,
+            String ctx,
+            String testDataJson,
+            String question
+    ) {
+
+        return """
+            You are EDITING existing API test cases.
+
+            🔒 STABILITY RULES (MANDATORY):
+            - DO NOT change "Test Case ID"
+            - DO NOT reword "Title"
+            - DO NOT reword "Description"
+            - DO NOT reorder fields
+            - DO NOT remove valid test cases
+            - ONLY update a test case if it is logically invalid due to code change
+            - If a test case is still valid, return it EXACTLY as-is
+
+            OLD TEST CASES (SOURCE OF TRUTH):
+            %s
+
+            CONTROLLER CODE (UPDATED):
+            %s
+
+            TEST DATA (may be reused):
             %s
 
             QUESTION:
             %s
 
-            OUTPUT:
-            Return ONLY the updated JSON array.
+            OUTPUT RULES:
+            - Return ONLY a JSON ARRAY
+            - Preserve original formatting as much as possible
+            - Do NOT add commentary or explanations
             """
             .formatted(oldTestsJson, ctx, testDataJson, question);
-        }
-
+    }
 }
