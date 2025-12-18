@@ -47,7 +47,7 @@ public class EmployeeController {
         if (opt.isPresent()) {
             return ResponseEntity.ok(opt.get());
         } else {
-            return ResponseEntity.status(404).body(Map.of("message", "employee not found in db"));
+            return ResponseEntity.status(404).body(Map.of("message", "employee not found"));
         }
     }
 

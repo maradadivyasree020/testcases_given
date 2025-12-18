@@ -15,6 +15,8 @@ public class GenerateTestsFromJson {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    private static final ArrayNode DIFF_REPORT = MAPPER.createArrayNode();
+
     public static void main(String[] args) {
         try {
             Path root = Paths.get("").toAbsolutePath();
@@ -88,7 +90,23 @@ public class GenerateTestsFromJson {
                     MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(meta)
             );
 
+            ArrayNode diffReport = MAPPER.createArrayNode();
+
             System.out.println("\n✅ DONE");
+
+            Path diffFile = outDir.resolve("diff.json");
+
+            Files.writeString(
+                    diffFile,
+                    MAPPER.writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(DIFF_REPORT),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING
+            );
+
+            System.out.println("📝 diff.json written with "
+                    + DIFF_REPORT.size() + " change(s)");
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -152,7 +170,49 @@ public class GenerateTestsFromJson {
     }
 
     // 🔍 PRINT ONLY CHANGES
-    static void printDiff(String ep, ArrayNode oldTests, ArrayNode newTests) {
+//     static void printDiff(String ep, ArrayNode oldTests, ArrayNode newTests) {
+//     Map<String, JsonNode> oldMap = mapById(oldTests);
+//     Map<String, JsonNode> newMap = mapById(newTests);
+
+//     System.out.println("🔍 TEST CASE CHANGES FOR " + ep);
+
+//     boolean changed = false;
+
+//     for (String id : newMap.keySet()) {
+//         if (!oldMap.containsKey(id)) {
+//             System.out.println("\n🆕 NEW : " + id);
+//             System.out.println(pretty(newMap.get(id)));
+//             changed = true;
+
+//         } else if (!oldMap.get(id).equals(newMap.get(id))) {
+//             System.out.println("\n✏️ MODIFIED : " + id);
+
+//             System.out.println("----- OLD -----");
+//             System.out.println(pretty(oldMap.get(id)));
+
+//             System.out.println("----- NEW -----");
+//             System.out.println(pretty(newMap.get(id)));
+
+//             changed = true;
+//         }
+//     }
+
+//     for (String id : oldMap.keySet()) {
+//         if (!newMap.containsKey(id)) {
+//             System.out.println("\n❌ REMOVED : " + id);
+//             System.out.println(pretty(oldMap.get(id)));
+//             changed = true;
+//         }
+//     }
+
+//     if (!changed) {
+//         System.out.println("✅ No test case changes");
+//     }
+
+    
+// }
+
+static void printDiff(String ep, ArrayNode oldTests, ArrayNode newTests) {
     Map<String, JsonNode> oldMap = mapById(oldTests);
     Map<String, JsonNode> newMap = mapById(newTests);
 
@@ -164,6 +224,8 @@ public class GenerateTestsFromJson {
         if (!oldMap.containsKey(id)) {
             System.out.println("\n🆕 NEW : " + id);
             System.out.println(pretty(newMap.get(id)));
+
+            recordDiff(ep, "NEW", id, null, newMap.get(id));
             changed = true;
 
         } else if (!oldMap.get(id).equals(newMap.get(id))) {
@@ -175,6 +237,9 @@ public class GenerateTestsFromJson {
             System.out.println("----- NEW -----");
             System.out.println(pretty(newMap.get(id)));
 
+            recordDiff(ep, "MODIFIED", id,
+                       oldMap.get(id),
+                       newMap.get(id));
             changed = true;
         }
     }
@@ -183,6 +248,10 @@ public class GenerateTestsFromJson {
         if (!newMap.containsKey(id)) {
             System.out.println("\n❌ REMOVED : " + id);
             System.out.println(pretty(oldMap.get(id)));
+
+            recordDiff(ep, "REMOVED", id,
+                       oldMap.get(id),
+                       null);
             changed = true;
         }
     }
@@ -190,37 +259,9 @@ public class GenerateTestsFromJson {
     if (!changed) {
         System.out.println("✅ No test case changes");
     }
+
 }
 
-    // static void printDiff(String ep, ArrayNode oldTests, ArrayNode newTests) {
-    //     Map<String, JsonNode> oldMap = mapById(oldTests);
-    //     Map<String, JsonNode> newMap = mapById(newTests);
-
-    //     System.out.println("🔍 TEST CASE CHANGES FOR " + ep);
-
-    //     boolean changed = false;
-
-    //     for (String id : newMap.keySet()) {
-    //         if (!oldMap.containsKey(id)) {
-    //             System.out.println("  🆕 NEW      : " + id);
-    //             changed = true;
-    //         } else if (!oldMap.get(id).equals(newMap.get(id))) {
-    //             System.out.println("  ✏️ MODIFIED : " + id);
-    //             changed = true;
-    //         }
-    //     }
-
-    //     for (String id : oldMap.keySet()) {
-    //         if (!newMap.containsKey(id)) {
-    //             System.out.println("  ❌ REMOVED  : " + id);
-    //             changed = true;
-    //         }
-    //     }
-
-    //     if (!changed) {
-    //         System.out.println("  ✅ No test case changes");
-    //     }
-    // }
 
     static Map<String, JsonNode> mapById(ArrayNode arr) {
         Map<String, JsonNode> map = new HashMap<>();
@@ -387,6 +428,25 @@ static String pretty(JsonNode node) {
     }
 }
 
+static void recordDiff(
+        String ep,
+        String changeType,   // NEW / MODIFIED / REMOVED
+        String testCaseId,
+        JsonNode oldTc,
+        JsonNode newTc
+) {
+    ObjectNode d = DIFF_REPORT.addObject();
+    d.put("endpoint", ep);
+    d.put("changeType", changeType);
+    d.put("testCaseId", testCaseId);
+
+    if (oldTc != null) {
+        d.set("old", oldTc);
+    }
+    if (newTc != null) {
+        d.set("new", newTc);
+    }
+}
 
 
 }

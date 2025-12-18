@@ -21,78 +21,6 @@
     "mode" : "GENERATE"
   }
 }, {
-  "Test Case ID" : "GET__EMPLOYE__ID_-001",
-  "Title" : "Get employee by valid id",
-  "Description" : "Verify that the API returns employee details when a valid id is provided",
-  "Pre-Conditions" : "Employee with given id exists in the database",
-  "Test Steps" : [ "Send GET request to /api/employe/{id} with valid employee id" ],
-  "Input" : {
-    "endpoint" : "/api/employe/{id}",
-    "method" : "GET",
-    "pathParams" : {
-      "id" : 1
-    },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status 200 OK with employee details in response body",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "GET:/employe/{id}",
-    "hash" : "0126c506b516149fdc32780cc15c8289c16d564a5e87f4000da0baa8622038e3",
-    "runId" : "2025-12-18T06:26:54.211549200Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "GET__EMPLOYE__ID_-002",
-  "Title" : "Get employee by non-existing id",
-  "Description" : "Verify that the API returns 404 status when employee id does not exist",
-  "Pre-Conditions" : "No employee with given id exists in the database",
-  "Test Steps" : [ "Send GET request to /api/employe/{id} with non-existing employee id" ],
-  "Input" : {
-    "endpoint" : "/api/employe/{id}",
-    "method" : "GET",
-    "pathParams" : {
-      "id" : 9999
-    },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status 404 Not Found with message 'employee not found in db'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "GET:/employe/{id}",
-    "hash" : "0126c506b516149fdc32780cc15c8289c16d564a5e87f4000da0baa8622038e3",
-    "runId" : "2025-12-18T06:26:54.211549200Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "GET__EMPLOYE__ID_-003",
-  "Title" : "Get employee with null id",
-  "Description" : "Verify that the API returns 400 status when id is null",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send GET request to /api/employe/{id} with null id" ],
-  "Input" : {
-    "endpoint" : "/api/employe/{id}",
-    "method" : "GET",
-    "pathParams" : {
-      "id" : null
-    },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status 400 Bad Request with message 'id is required'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "GET:/employe/{id}",
-    "hash" : "0126c506b516149fdc32780cc15c8289c16d564a5e87f4000da0baa8622038e3",
-    "runId" : "2025-12-18T06:26:54.211549200Z",
-    "mode" : "GENERATE"
-  }
-}, {
   "Test Case ID" : "PUT__EMPLOYEE__ID_-001",
   "Title" : "Update employee with valid id and valid body",
   "Description" : "Verify updating an existing employee with valid id and valid request body updates the employee and returns 200",
@@ -223,78 +151,6 @@
   "_meta" : {
     "endpoint" : "PUT:/employee/{id}",
     "hash" : "af5e3988e13581bfd86a4ed4516735a0d354e83d3f9fa2218bbc046f0864efa6",
-    "runId" : "2025-12-18T06:26:54.211549200Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "DELETE__EMPLOYEE__ID_-001",
-  "Title" : "Delete employee with valid id",
-  "Description" : "Verify deleting an existing employee by valid id returns 204 No Content",
-  "Pre-Conditions" : "Employee with given id exists in the database",
-  "Test Steps" : [ "Send DELETE request to /api/employee/{id} with valid existing id" ],
-  "Input" : {
-    "endpoint" : "/api/employee/{id}",
-    "method" : "DELETE",
-    "pathParams" : {
-      "id" : 1
-    },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status is 204 No Content and employee is deleted from database",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "DELETE:/employee/{id}",
-    "hash" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623",
-    "runId" : "2025-12-18T06:26:54.211549200Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "DELETE__EMPLOYEE__ID_-002",
-  "Title" : "Delete employee with non-existing id",
-  "Description" : "Verify deleting an employee with non-existing id returns 404 with message",
-  "Pre-Conditions" : "No employee exists with the given id",
-  "Test Steps" : [ "Send DELETE request to /api/employee/{id} with non-existing id" ],
-  "Input" : {
-    "endpoint" : "/api/employee/{id}",
-    "method" : "DELETE",
-    "pathParams" : {
-      "id" : 9999
-    },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status is 404 Not Found with body {\"message\":\"employee not found\"}",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "DELETE:/employee/{id}",
-    "hash" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623",
-    "runId" : "2025-12-18T06:26:54.211549200Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "DELETE__EMPLOYEE__ID_-003",
-  "Title" : "Delete employee with null id",
-  "Description" : "Verify deleting an employee with null id returns 400 with message",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send DELETE request to /api/employee/{id} with id as null or missing" ],
-  "Input" : {
-    "endpoint" : "/api/employee/{id}",
-    "method" : "DELETE",
-    "pathParams" : {
-      "id" : null
-    },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status is 400 Bad Request with body {\"message\":\"id is required\"}",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "DELETE:/employee/{id}",
-    "hash" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623",
     "runId" : "2025-12-18T06:26:54.211549200Z",
     "mode" : "GENERATE"
   }
@@ -821,6 +677,150 @@
     "endpoint" : "PUT:/mark",
     "hash" : "fce20c01fe246334353f57d3ad61cc964a94f5a562165a5df858e0509b113a84",
     "runId" : "2025-12-18T16:02:54.122111600Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "DELETE__EMPLOYEE__ID_-001",
+  "Title" : "Delete employee with valid id",
+  "Description" : "Verify deleting an existing employee by valid id returns 204 No Content",
+  "Pre-Conditions" : "Employee with given id exists in the database",
+  "Test Steps" : [ "Send DELETE request to /api/employee/{id} with valid existing id" ],
+  "Input" : {
+    "endpoint" : "/api/employee/{id}",
+    "method" : "DELETE",
+    "pathParams" : {
+      "id" : 1
+    },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status is 204 No Content and employee is deleted from database",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "DELETE:/employee/{id}",
+    "hash" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623",
+    "runId" : "2025-12-18T16:34:00.590468500Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "DELETE__EMPLOYEE__ID_-002",
+  "Title" : "Delete employee with non-existing id",
+  "Description" : "Verify deleting an employee with non-existing id returns 404 with message",
+  "Pre-Conditions" : "No employee exists with the given id",
+  "Test Steps" : [ "Send DELETE request to /api/employee/{id} with non-existing id" ],
+  "Input" : {
+    "endpoint" : "/api/employee/{id}",
+    "method" : "DELETE",
+    "pathParams" : {
+      "id" : 9999
+    },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status is 404 Not Found with body {\"message\":\"employee not found\"}",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "DELETE:/employee/{id}",
+    "hash" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623",
+    "runId" : "2025-12-18T16:34:00.590468500Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "DELETE__EMPLOYEE__ID_-003",
+  "Title" : "Delete employee with null id",
+  "Description" : "Verify deleting an employee with null id returns 400 with message",
+  "Pre-Conditions" : "None",
+  "Test Steps" : [ "Send DELETE request to /api/employee/{id} with id as null or missing" ],
+  "Input" : {
+    "endpoint" : "/api/employee/{id}",
+    "method" : "DELETE",
+    "pathParams" : {
+      "id" : null
+    },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status is 400 Bad Request with body {\"message\":\"id is required\"}",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "DELETE:/employee/{id}",
+    "hash" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623",
+    "runId" : "2025-12-18T16:34:00.590468500Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "GET__EMPLOYE__ID_-001",
+  "Title" : "Get employee by valid id",
+  "Description" : "Verify that the API returns employee details when a valid id is provided",
+  "Pre-Conditions" : "Employee with given id exists in the database",
+  "Test Steps" : [ "Send GET request to /api/employe/{id} with valid employee id" ],
+  "Input" : {
+    "endpoint" : "/api/employe/{id}",
+    "method" : "GET",
+    "pathParams" : {
+      "id" : 1
+    },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status 200 OK with employee details in response body",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "GET:/employe/{id}",
+    "hash" : "512f1afd7444df14dd6cf5c3854fe764b4ff3f186c0abe002e88f44a7dc3726d",
+    "runId" : "2025-12-18T16:37:13.925452500Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "GET__EMPLOYE__ID_-002",
+  "Title" : "Get employee by non-existing id",
+  "Description" : "Verify that the API returns 404 status when employee id does not exist",
+  "Pre-Conditions" : "No employee with given id exists in the database",
+  "Test Steps" : [ "Send GET request to /api/employe/{id} with non-existing employee id" ],
+  "Input" : {
+    "endpoint" : "/api/employe/{id}",
+    "method" : "GET",
+    "pathParams" : {
+      "id" : 9999
+    },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status 404 Not Found with message 'employee not found'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "GET:/employe/{id}",
+    "hash" : "512f1afd7444df14dd6cf5c3854fe764b4ff3f186c0abe002e88f44a7dc3726d",
+    "runId" : "2025-12-18T16:37:13.925452500Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "GET__EMPLOYE__ID_-003",
+  "Title" : "Get employee with null id",
+  "Description" : "Verify that the API returns 400 status when id is null",
+  "Pre-Conditions" : "None",
+  "Test Steps" : [ "Send GET request to /api/employe/{id} with null id" ],
+  "Input" : {
+    "endpoint" : "/api/employe/{id}",
+    "method" : "GET",
+    "pathParams" : {
+      "id" : null
+    },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status 400 Bad Request with message 'id is required'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "GET:/employe/{id}",
+    "hash" : "512f1afd7444df14dd6cf5c3854fe764b4ff3f186c0abe002e88f44a7dc3726d",
+    "runId" : "2025-12-18T16:37:13.925452500Z",
     "mode" : "EDIT"
   }
 } ]
