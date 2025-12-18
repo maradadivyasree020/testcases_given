@@ -54,7 +54,7 @@ public class AttendanceController {
         // Validation — consistent style
         if (dto == null || dto.getEmployeeId() == null || dto.getAbsent() == null) {
             return ResponseEntity.badRequest().body(
-                Map.of("message", "employeeI and absent required")
+                Map.of("message", "employeeId and absent required")
             );
         }
 
