@@ -229,41 +229,69 @@ public class GenerateTestsFromJson {
     }
 }
 
-static String computeEndpointHash(Path srcRoot, String endpointKey, String endpointCode) {
-    try {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+// static String computeEndpointHash(Path srcRoot, String endpointKey, String endpointCode) {
+//     try {
+//         MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
-        // 1️⃣ hash controller method body
-        digest.update(endpointCode.getBytes());
+//         // 1️⃣ hash controller method body
+//         digest.update(endpointCode.getBytes());
 
-        // 2️⃣ infer dependencies from endpoint path
-        if (endpointKey.contains("/employee")) {
-            hashIfExists(digest, srcRoot.resolve(
-                "com/example/college/service/EmployeeService.java"));
-            hashIfExists(digest, srcRoot.resolve(
-                "com/example/college/repository/EmployeeRepo.java"));
-            hashIfExists(digest, srcRoot.resolve(
-                "com/example/college/model/EmployeeModel.java"));
-        }
+//         // 2️⃣ infer dependencies from endpoint path
+//         if (endpointKey.contains("/employee")) {
+//             hashIfExists(digest, srcRoot.resolve(
+//                 "com/example/college/service/EmployeeService.java"));
+//             hashIfExists(digest, srcRoot.resolve(
+//                 "com/example/college/repository/EmployeeRepo.java"));
+//             hashIfExists(digest, srcRoot.resolve(
+//                 "com/example/college/model/EmployeeModel.java"));
+//         }
 
-        if (endpointKey.contains("/attendance")) {
-            hashIfExists(digest, srcRoot.resolve(
-                "com/example/college/service/AttendanceService.java"));
-            hashIfExists(digest, srcRoot.resolve(
-                "com/example/college/repository/AttendanceRepo.java"));
-            hashIfExists(digest, srcRoot.resolve(
-                "com/example/college/model/AttendanceModel.java"));
-        }
+//         if (endpointKey.contains("/attendance")) {
+//             hashIfExists(digest, srcRoot.resolve(
+//                 "com/example/college/service/AttendanceService.java"));
+//             hashIfExists(digest, srcRoot.resolve(
+//                 "com/example/college/repository/AttendanceRepo.java"));
+//             hashIfExists(digest, srcRoot.resolve(
+//                 "com/example/college/model/AttendanceModel.java"));
+//         }
 
-        byte[] hash = digest.digest();
-        StringBuilder sb = new StringBuilder();
-        for (byte b : hash) sb.append(String.format("%02x", b));
-        return sb.toString();
+//         byte[] hash = digest.digest();
+//         StringBuilder sb = new StringBuilder();
+//         for (byte b : hash) sb.append(String.format("%02x", b));
+//         return sb.toString();
 
-    } catch (Exception e) {
-        throw new RuntimeException("Failed to compute endpoint hash", e);
-    }
-}
+//     } catch (Exception e) {
+//         throw new RuntimeException("Failed to compute endpoint hash", e);
+//     }
+// }
+
+// static String computeEndpointHash(
+//         Path srcRoot,
+//         EndpointExtractor.EndpointInfo ep
+// ) {
+//     try {
+//         MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+//         // 1️⃣ Controller method
+//         digest.update(ep.controllerCode.getBytes());
+
+//         // 2️⃣ Dependencies
+//         for (String dep : ep.dependencies) {
+//             Path p = findClassFile(srcRoot, dep);
+//             if (p != null && Files.exists(p)) {
+//                 digest.update(Files.readAllBytes(p));
+//             }
+//         }
+
+//         byte[] hash = digest.digest();
+//         StringBuilder sb = new StringBuilder();
+//         for (byte b : hash) sb.append(String.format("%02x", b));
+//         return sb.toString();
+
+//     } catch (Exception e) {
+//         throw new RuntimeException(e);
+//     }
+// }
 
 static String computeEndpointHash(
         Path srcRoot,
@@ -275,7 +303,7 @@ static String computeEndpointHash(
         // 1️⃣ Controller method
         digest.update(ep.controllerCode.getBytes());
 
-        // 2️⃣ Dependencies
+        // 2️⃣ Dependencies (service / repo / model)
         for (String dep : ep.dependencies) {
             Path p = findClassFile(srcRoot, dep);
             if (p != null && Files.exists(p)) {
@@ -292,6 +320,7 @@ static String computeEndpointHash(
         throw new RuntimeException(e);
     }
 }
+
 
 static Path findClassFile(Path srcRoot, String className) throws Exception {
     try (var stream = Files.walk(srcRoot)) {

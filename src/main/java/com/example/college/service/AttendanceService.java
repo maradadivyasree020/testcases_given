@@ -52,7 +52,7 @@ public class AttendanceService {
 
             if (previousAbsent == null) {
                 if (absent) employee.setTotalAbsent(employee.getTotalAbsent() + 1);
-                else employee.setTotalPresent(employee.getTotalPresent() + 5);
+                else employee.setTotalPresent(employee.getTotalPresent() + 1);
             } else if (!previousAbsent.equals(absent)) {
                 if (previousAbsent) {
                     // was absent, now present
