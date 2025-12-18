@@ -1,41 +1,149 @@
 package com.example.college.tools;
 
+import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EndpointExtractor {
 
-    public static class Endpoint {
-        public String id;       // PUT_/api/attendance/mark
-        public String code;     // full method code
-    }
+    // Matches @GetMapping("/x"), @PostMapping, @PutMapping, @DeleteMapping
+    private static final Pattern MAPPING_PATTERN = Pattern.compile(
+            "@(Get|Post|Put|Delete)Mapping\\s*\\(\\s*\"([^\"]+)\"\\s*\\)"
+    );
 
-    public static List<Endpoint> extract(Path controllerFile) throws Exception {
-        String src = Files.readString(controllerFile);
+    // Matches method declaration
+    private static final Pattern METHOD_PATTERN = Pattern.compile(
+            "(public|private|protected)\\s+[^{]+\\{",
+            Pattern.MULTILINE
+    );
 
-        Pattern p = Pattern.compile(
-                "@(Get|Post|Put|Delete)Mapping\\(\"([^\"]+)\"\\)[\\s\\S]*?\\{[\\s\\S]*?\\n\\}",
-                Pattern.MULTILINE);
+    // ===============================
+    // PUBLIC API
+    // ===============================
+    public static Map<String, EndpointInfo> extractEndpoints(Path srcRoot) throws IOException {
+        Map<String, EndpointInfo> endpoints = new LinkedHashMap<>();
 
-        Matcher m = p.matcher(src);
-        List<Endpoint> endpoints = new ArrayList<>();
+        Files.walk(srcRoot)
+                .filter(p -> p.toString().endsWith("Controller.java"))
+                .forEach(file -> {
+                    try {
+                        String code = Files.readString(file);
+                        extractFromController(code, endpoints);
+                    } catch (Exception e) {
+                        System.err.println("❌ Failed parsing " + file);
+                        e.printStackTrace();
+                    }
+                });
 
-        while (m.find()) {
-            String method = m.group(1).toUpperCase();
-            String path = m.group(2);
-            String code = m.group();
-
-            Endpoint e = new Endpoint();
-            e.id = method + "_" + resolveBasePath(src) + path;
-            e.code = code;
-            endpoints.add(e);
-        }
         return endpoints;
     }
 
-    private static String resolveBasePath(String src) {
-        Matcher m = Pattern.compile("@RequestMapping\\(\"([^\"]+)\"\\)").matcher(src);
-        return m.find() ? m.group(1) : "";
+    // ===============================
+    // INTERNAL LOGIC
+    // ===============================
+    private static void extractFromController(
+            String code,
+            Map<String, EndpointInfo> out
+    ) {
+        Matcher m = MAPPING_PATTERN.matcher(code);
+
+        while (m.find()) {
+            String httpMethod = m.group(1).toUpperCase();
+            String path = m.group(2);
+            String endpointKey = httpMethod + ":" + path;
+
+            int searchFrom = m.end();
+            Matcher methodMatcher = METHOD_PATTERN.matcher(code.substring(searchFrom));
+            if (!methodMatcher.find()) continue;
+
+            int methodStart = searchFrom + methodMatcher.start();
+            int bodyStart   = searchFrom + methodMatcher.end() - 1;
+
+            // ---- Extract full method body ----
+            int braceCount = 1;
+            int i = bodyStart + 1;
+            while (i < code.length() && braceCount > 0) {
+                if (code.charAt(i) == '{') braceCount++;
+                else if (code.charAt(i) == '}') braceCount--;
+                i++;
+            }
+
+            String methodCode = code.substring(m.start(), i);
+
+            // ---- Extract dependencies from method body ----
+            // Set<String> deps = extractDependencies(methodCode);
+            Set<String> deps = extractDependencies(code); // full controller code
+
+            out.put(
+                endpointKey,
+                new EndpointInfo(endpointKey, methodCode, deps)
+            );
+        }
+    }
+
+    // ===============================
+    // DEPENDENCY EXTRACTION
+    // ===============================
+    // private static Set<String> extractDependencies(String methodCode) {
+    //     Set<String> deps = new HashSet<>();
+
+    //     if (methodCode.contains("AttendanceService")) deps.add("AttendanceService");
+    //     if (methodCode.contains("EmployeeService"))   deps.add("EmployeeService");
+
+    //     if (methodCode.contains("AttendanceRepo"))    deps.add("AttendanceRepo");
+    //     if (methodCode.contains("EmployeeRepo"))      deps.add("EmployeeRepo");
+
+    //     if (methodCode.contains("AttendanceModel"))   deps.add("AttendanceModel");
+    //     if (methodCode.contains("EmployeeModel"))     deps.add("EmployeeModel");
+
+    //     return deps;
+    // }
+
+    private static Set<String> extractDependencies(String controllerCode) {
+    Set<String> deps = new HashSet<>();
+
+    // --- Service fields ---
+    if (controllerCode.matches("(?s).*AttendanceService\\s+\\w+.*"))
+        deps.add("AttendanceService");
+
+    if (controllerCode.matches("(?s).*EmployeeService\\s+\\w+.*"))
+        deps.add("EmployeeService");
+
+    // --- Repo fields ---
+    if (controllerCode.matches("(?s).*AttendanceRepo\\s+\\w+.*"))
+        deps.add("AttendanceRepo");
+
+    if (controllerCode.matches("(?s).*EmployeeRepo\\s+\\w+.*"))
+        deps.add("EmployeeRepo");
+
+    // --- Models (optional but safe) ---
+    if (controllerCode.contains("AttendanceModel"))
+        deps.add("AttendanceModel");
+
+    if (controllerCode.contains("EmployeeModel"))
+        deps.add("EmployeeModel");
+
+    return deps;
+}
+
+    // ===============================
+    // DATA HOLDER
+    // ===============================
+    public static class EndpointInfo {
+        public final String endpointKey;
+        public final String controllerCode;
+        public final Set<String> dependencies;
+
+        public EndpointInfo(
+                String endpointKey,
+                String controllerCode,
+                Set<String> dependencies
+        ) {
+            this.endpointKey = endpointKey;
+            this.controllerCode = controllerCode;
+            this.dependencies = dependencies;
+        }
     }
 }

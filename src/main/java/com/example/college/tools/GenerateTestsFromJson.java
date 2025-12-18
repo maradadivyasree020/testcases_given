@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.io.IOException;
 import java.nio.file.*;
 import java.security.MessageDigest;
 import java.time.Instant;
@@ -18,197 +17,298 @@ public class GenerateTestsFromJson {
 
     public static void main(String[] args) {
         try {
-            Path projectRoot = Paths.get("").toAbsolutePath();
-            Path srcMainJava = projectRoot.resolve("src/main/java");
-            Path outputDir = projectRoot.resolve("test-cases");
-            Files.createDirectories(outputDir);
+            Path root = Paths.get("").toAbsolutePath();
+            Path src = root.resolve("src/main/java");
+            Path outDir = root.resolve("test-cases");
+            Files.createDirectories(outDir);
 
-            Path testsFile = outputDir.resolve("all-tests.json");
-            Path metaFile  = outputDir.resolve("test-metadata.json");
+            Path testFile = outDir.resolve("all-tests.json");
+            Path metaFile = outDir.resolve("test-metadata.json");
 
-            System.out.println("Project root: " + projectRoot);
-            System.out.println("Scanning Java sources under: " + srcMainJava);
+            RagService rag = new RagService();
+            rag.ingestJavaSources(src);
 
-            RagService ragService = new RagService();
-            ragService.ingestJavaSources(srcMainJava);
+            ArrayNode allTests = readArray(testFile);
+            ObjectNode meta = readObject(metaFile);
 
-            ArrayNode allTests = readArrayFromFile(testsFile);
-            Map<String, String> meta = readMetadata(metaFile);
-
-            // ---- RUN METADATA ----
             String runId = Instant.now().toString();
-            int runSeq = meta.containsKey("_runSeq")
-                    ? Integer.parseInt(meta.get("_runSeq")) + 1
-                    : 1;
-            meta.put("_runSeq", String.valueOf(runSeq));
 
-            ControllerSpec[] specs = new ControllerSpec[]{
-                new ControllerSpec(
-                    "attendance",
-                    "Generate detailed API functional test cases for all attendance-related endpoints " +
-                    "in this project. Focus especially on AttendanceController and endpoints " +
-                    "/attendance/mark and /attendance/mark-batch.",
-                    List.of("src/main/java/com/example/college/controller/AttendanceController.java"),
-                    "src/main/resources/testdata/attendance-testdata.xlsx"
-                ),
-                new ControllerSpec(
-                    "employee",
-                    "Generate detailed API functional test cases for all employee-related endpoints " +
-                    "in this project. Focus especially on EmployeeController and endpoints " +
-                    "/api/employe, /api/employe/{id}, /api/employee, /api/employee/{id}.",
-                    List.of("src/main/java/com/example/college/controller/EmployeeController.java"),
-                    "src/main/resources/testdata/employee-testdata.xlsx"
-                )
-            };
+            // 1️⃣ Extract endpoints
+            Map<String, EndpointExtractor.EndpointInfo> endpoints =
+        EndpointExtractor.extractEndpoints(src);
 
-            for (ControllerSpec spec : specs) {
-                String controllerId = spec.id();
-                String question     = spec.question();
 
-                String currentHash  = computeHashForFiles(projectRoot, spec.codeFiles());
-                String previousHash = meta.get(controllerId);
+            for (EndpointExtractor.EndpointInfo ep : endpoints.values()) {
+                String epKey = ep.endpointKey;       // GET:/employee/{id}
+                // String epCode = ep.getValue();
 
-                if (currentHash != null && currentHash.equals(previousHash)) {
-                    System.out.println("ℹ No changes detected for controller: " + controllerId);
-                    continue;
+                // String newHash = EndpointHasher.hash(epCode);
+                String newHash = computeEndpointHash(src,ep);
+                String oldHash = meta.path(epKey).asText(null);
+
+                ArrayNode oldTests = filterTests(allTests, epKey);
+
+                if (oldHash == null) {
+                    System.out.println("\n[NEW ENDPOINT] " + epKey);
+
+                    ArrayNode gen = generate(rag, epKey, null);
+                    assignStableIds(gen, epKey);
+                    tag(gen, epKey, newHash, runId, "GENERATE");
+
+                    printDiff(epKey, MAPPER.createArrayNode(), gen);
+
+                    allTests.addAll(gen);
+                }
+                else if (!oldHash.equals(newHash)) {
+                    System.out.println("\n[MODIFIED ENDPOINT] " + epKey);
+
+                    ArrayNode edited = edit(rag, oldTests, epKey);
+                    assignStableIds(edited, epKey);
+                    tag(edited, epKey, newHash, runId, "EDIT");
+
+                    printDiff(epKey, oldTests, edited);
+
+                    removeOld(allTests, epKey);
+                    allTests.addAll(edited);
+                }
+                else {
+                    System.out.println("[SKIP] " + epKey);
                 }
 
-                System.out.println("\n====================================");
-                System.out.println("Generating tests for: " + controllerId);
-                System.out.println("Run ID : " + runId);
-                System.out.println("Run Seq: " + runSeq);
-                System.out.println("====================================");
-
-                Path excelPath = projectRoot.resolve(spec.testDataPath());
-                String testDataJson =
-                        ExcelTestDataLoader.loadAsJsonArrayString(excelPath, "Sheet1");
-
-                String llmOutput =
-                        ragService.generateTestCasesForQuestion(question, testDataJson);
-
-                ArrayNode newTests = parseArrayFromLLM(llmOutput);
-
-                // ---- REMOVE OLD GENERATED TESTS FOR THIS CONTROLLER ----
-                ArrayNode retained = MAPPER.createArrayNode();
-                for (JsonNode existing : allTests) {
-                    if (existing.has("_meta")) {
-                        JsonNode metaNode = existing.get("_meta");
-                        if (controllerId.equals(metaNode.path("controllerId").asText())) {
-                            continue; // remove old generated test
-                        }
-                    }
-                    retained.add(existing);
-                }
-
-                // ---- TAG NEW TESTS ----
-                for (JsonNode t : newTests) {
-                    if (t.isObject()) {
-                        ObjectNode obj = (ObjectNode) t;
-
-                        ObjectNode metaNode = MAPPER.createObjectNode();
-                        metaNode.put("generatedBy", "rag");
-                        metaNode.put("controllerId", controllerId);
-                        metaNode.put("runId", runId);
-                        metaNode.put("runSeq", runSeq);
-                        metaNode.put("hash", currentHash);
-                        metaNode.put("mode", previousHash == null ? "GENERATE" : "EDIT");
-
-                        obj.set("_meta", metaNode);
-                    }
-                }
-
-                allTests.removeAll();
-                allTests.addAll(retained);
-                allTests.addAll(newTests);
-
-                meta.put(controllerId, currentHash);
-                System.out.println("✔ Updated tests for controller: " + controllerId);
+                meta.put(epKey, newHash);
             }
 
             Files.writeString(
-                testsFile,
-                MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(allTests)
+                    testFile,
+                    MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(allTests)
             );
 
-            writeMetadata(metaFile, meta);
+            Files.writeString(
+                    metaFile,
+                    MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(meta)
+            );
 
-            System.out.println("\n✅ Test generation complete");
-            System.out.println("Total test cases: " + allTests.size());
+            System.out.println("\n✅ DONE");
 
         } catch (Exception e) {
-            System.err.println("❌ Error generating tests: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // -------------------------------------------------
+    // ---------------- HELPERS ----------------
 
-    private record ControllerSpec(
-        String id,
-        String question,
-        List<String> codeFiles,
-        String testDataPath
-    ) {}
-
-    private static ArrayNode readArrayFromFile(Path file) {
-        ArrayNode result = MAPPER.createArrayNode();
-        if (!Files.exists(file)) return result;
-
-        try {
-            JsonNode node = MAPPER.readTree(Files.readString(file));
-            if (node.isArray()) result.addAll((ArrayNode) node);
-        } catch (Exception ignored) {}
-        return result;
+    static ArrayNode generate(RagService rag, String ep, String data) {
+        String out = rag.generateTestCasesForQuestion(ep, data);
+        return parse(out);
     }
 
-    private static Map<String, String> readMetadata(Path metaFile) {
-        Map<String, String> map = new HashMap<>();
-        if (!Files.exists(metaFile)) return map;
-
-        try {
-            JsonNode node = MAPPER.readTree(Files.readString(metaFile));
-            node.fields().forEachRemaining(e -> map.put(e.getKey(), e.getValue().asText()));
-        } catch (Exception ignored) {}
-        return map;
+    static ArrayNode edit(RagService rag, ArrayNode old, String ep) {
+        String out = rag.editExistingTests(old.toString(), ep, null);
+        return parse(out);
     }
 
-    private static void writeMetadata(Path metaFile, Map<String, String> meta) throws IOException {
-        ObjectNode root = MAPPER.createObjectNode();
-        meta.forEach(root::put);
-        Files.writeString(metaFile,
-            MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(root));
-    }
-
-    private static String computeHashForFiles(Path root, List<String> files) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            for (String rel : files) {
-                Path p = root.resolve(rel);
-                if (Files.exists(p)) digest.update(Files.readAllBytes(p));
-            }
-            byte[] hash = digest.digest();
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hash) sb.append(String.format("%02x", b));
-            return sb.toString();
-        } catch (Exception e) {
-            return null;
+    // ✅ Stable IDs: endpoint + index
+    static void assignStableIds(ArrayNode arr, String ep) {
+        int i = 1;
+        for (JsonNode n : arr) {
+            ((ObjectNode) n).put(
+                "Test Case ID",
+                ep.replaceAll("[^a-zA-Z0-9]", "_").toUpperCase()
+                    + "-" + String.format("%03d", i++)
+            );
         }
     }
 
-    private static ArrayNode parseArrayFromLLM(String raw) {
-        ArrayNode empty = MAPPER.createArrayNode();
-        if (raw == null) return empty;
+    static void tag(ArrayNode arr, String ep, String hash, String runId, String mode) {
+        for (JsonNode n : arr) {
+            ObjectNode m = MAPPER.createObjectNode();
+            m.put("endpoint", ep);
+            m.put("hash", hash);
+            m.put("runId", runId);
+            m.put("mode", mode);
+            ((ObjectNode) n).set("_meta", m);
+        }
+    }
+
+    static void removeOld(ArrayNode all, String ep) {
+        ArrayNode keep = MAPPER.createArrayNode();
+        for (JsonNode t : all) {
+            if (!ep.equals(t.path("_meta").path("endpoint").asText())) {
+                keep.add(t);
+            }
+        }
+        all.removeAll();
+        all.addAll(keep);
+    }
+
+    static ArrayNode filterTests(ArrayNode all, String ep) {
+        ArrayNode out = MAPPER.createArrayNode();
+        for (JsonNode t : all) {
+            if (ep.equals(t.path("_meta").path("endpoint").asText())) {
+                out.add(t);
+            }
+        }
+        return out;
+    }
+
+    // 🔍 PRINT ONLY CHANGES
+    static void printDiff(String ep, ArrayNode oldTests, ArrayNode newTests) {
+        Map<String, JsonNode> oldMap = mapById(oldTests);
+        Map<String, JsonNode> newMap = mapById(newTests);
+
+        System.out.println("🔍 TEST CASE CHANGES FOR " + ep);
+
+        boolean changed = false;
+
+        for (String id : newMap.keySet()) {
+            if (!oldMap.containsKey(id)) {
+                System.out.println("  🆕 NEW      : " + id);
+                changed = true;
+            } else if (!oldMap.get(id).equals(newMap.get(id))) {
+                System.out.println("  ✏️ MODIFIED : " + id);
+                changed = true;
+            }
+        }
+
+        for (String id : oldMap.keySet()) {
+            if (!newMap.containsKey(id)) {
+                System.out.println("  ❌ REMOVED  : " + id);
+                changed = true;
+            }
+        }
+
+        if (!changed) {
+            System.out.println("  ✅ No test case changes");
+        }
+    }
+
+    static Map<String, JsonNode> mapById(ArrayNode arr) {
+        Map<String, JsonNode> map = new HashMap<>();
+        for (JsonNode t : arr) {
+            map.put(t.get("Test Case ID").asText(), t);
+        }
+        return map;
+    }
+
+    static ArrayNode readArray(Path p) throws Exception {
+        if (!Files.exists(p)) return MAPPER.createArrayNode();
+        return (ArrayNode) MAPPER.readTree(Files.readString(p));
+    }
+
+    static ObjectNode readObject(Path p) throws Exception {
+        if (!Files.exists(p)) return MAPPER.createObjectNode();
+        return (ObjectNode) MAPPER.readTree(Files.readString(p));
+    }
+
+    private static ArrayNode parse(String raw) {
+    try {
+        if (raw == null || raw.isBlank()) {
+            return MAPPER.createArrayNode();
+        }
 
         int start = raw.indexOf('[');
         int end   = raw.lastIndexOf(']');
-        if (start < 0 || end <= start) return empty;
 
-        try {
-            JsonNode node = MAPPER.readTree(raw.substring(start, end + 1));
-            if (node.isArray()) return (ArrayNode) node;
-        } catch (Exception ignored) {}
+        if (start < 0 || end <= start) {
+            throw new RuntimeException("LLM output does not contain a JSON array");
+        }
 
-        return empty;
+        String json = raw.substring(start, end + 1);
+        JsonNode node = MAPPER.readTree(json);
+
+        if (!node.isArray()) {
+            throw new RuntimeException("Parsed JSON is not an array");
+        }
+
+        return (ArrayNode) node;
+
+    } catch (Exception e) {
+        System.err.println("❌ Failed to parse LLM output:");
+        System.err.println(raw);
+        throw new RuntimeException("Test case parsing failed", e);
     }
+}
+
+static String computeEndpointHash(Path srcRoot, String endpointKey, String endpointCode) {
+    try {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+        // 1️⃣ hash controller method body
+        digest.update(endpointCode.getBytes());
+
+        // 2️⃣ infer dependencies from endpoint path
+        if (endpointKey.contains("/employee")) {
+            hashIfExists(digest, srcRoot.resolve(
+                "com/example/college/service/EmployeeService.java"));
+            hashIfExists(digest, srcRoot.resolve(
+                "com/example/college/repository/EmployeeRepo.java"));
+            hashIfExists(digest, srcRoot.resolve(
+                "com/example/college/model/EmployeeModel.java"));
+        }
+
+        if (endpointKey.contains("/attendance")) {
+            hashIfExists(digest, srcRoot.resolve(
+                "com/example/college/service/AttendanceService.java"));
+            hashIfExists(digest, srcRoot.resolve(
+                "com/example/college/repository/AttendanceRepo.java"));
+            hashIfExists(digest, srcRoot.resolve(
+                "com/example/college/model/AttendanceModel.java"));
+        }
+
+        byte[] hash = digest.digest();
+        StringBuilder sb = new StringBuilder();
+        for (byte b : hash) sb.append(String.format("%02x", b));
+        return sb.toString();
+
+    } catch (Exception e) {
+        throw new RuntimeException("Failed to compute endpoint hash", e);
+    }
+}
+
+static String computeEndpointHash(
+        Path srcRoot,
+        EndpointExtractor.EndpointInfo ep
+) {
+    try {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+        // 1️⃣ Controller method
+        digest.update(ep.controllerCode.getBytes());
+
+        // 2️⃣ Dependencies
+        for (String dep : ep.dependencies) {
+            Path p = findClassFile(srcRoot, dep);
+            if (p != null && Files.exists(p)) {
+                digest.update(Files.readAllBytes(p));
+            }
+        }
+
+        byte[] hash = digest.digest();
+        StringBuilder sb = new StringBuilder();
+        for (byte b : hash) sb.append(String.format("%02x", b));
+        return sb.toString();
+
+    } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
+}
+
+static Path findClassFile(Path srcRoot, String className) throws Exception {
+    try (var stream = Files.walk(srcRoot)) {
+        return stream
+                .filter(p -> p.getFileName().toString().equals(className + ".java"))
+                .findFirst()
+                .orElse(null);
+    }
+}
+
+
+private static void hashIfExists(MessageDigest digest, Path p) throws Exception {
+    if (Files.exists(p)) {
+        digest.update(Files.readAllBytes(p));
+    }
+}
+
+
 
 }

@@ -9,10 +9,7 @@ public class PromptBuilder {
      * SIMPLE MODE (no explicit test data)
      * Used when caller only provides a question.
      */
-    public String buildTestGenerationPrompt(
-            String question,
-            List<Map<String, String>> snippetMaps
-    ) {
+    public String buildTestGenerationPrompt(String question,List<Map<String, String>> snippetMaps) {
         StringBuilder ctx = new StringBuilder();
 
         for (Map<String, String> m : snippetMaps) {
@@ -30,11 +27,7 @@ public class PromptBuilder {
      * GENERATE MODE
      * Used for first-time generation OR full replacement.
      */
-    public String buildGeneratePrompt(
-            String ctx,
-            String question,
-            String testDataJson
-    ) {
+    public String buildGeneratePrompt(String ctx,String question,String testDataJson) {
 
         String testDataSection =
                 (testDataJson == null || testDataJson.isBlank())
@@ -53,6 +46,10 @@ public class PromptBuilder {
             - Keep Titles and Descriptions simple and consistent.
             - Prefer deterministic wording (same wording every time).
 
+            IMPORTANT:
+            - DO NOT generate or change "Test Case ID"
+            - Leave "Test Case ID" as empty string ""
+
             TEST DATA (use these values strictly where applicable):
             %s
 
@@ -62,6 +59,7 @@ public class PromptBuilder {
             - No code constructs (e.g. ".repeat()", concatenation).
             - Every value must be valid JSON.
             - Follow the SAME wording style across all test cases.
+            - Expected result write according to the code if error message is given then use that.
 
             EACH TEST CASE MUST CONTAIN:
             - "Test Case ID"
@@ -98,7 +96,7 @@ public class PromptBuilder {
         return """
             You are EDITING existing API test cases.
 
-            🔒 STABILITY RULES (MANDATORY):
+            STABILITY RULES (MANDATORY):
             - DO NOT change "Test Case ID"
             - DO NOT reword "Title"
             - DO NOT reword "Description"
@@ -106,6 +104,10 @@ public class PromptBuilder {
             - DO NOT remove valid test cases
             - ONLY update a test case if it is logically invalid due to code change
             - If a test case is still valid, return it EXACTLY as-is
+
+            IMPORTANT:
+            - DO NOT generate or change "Test Case ID"
+            - Leave "Test Case ID" as empty string ""
 
             OLD TEST CASES (SOURCE OF TRUTH):
             %s
@@ -119,10 +121,22 @@ public class PromptBuilder {
             QUESTION:
             %s
 
+            EACH TEST CASE MUST CONTAIN:
+            - "Test Case ID"
+            - "Title"
+            - "Description"
+            - "Pre-Conditions"
+            - "Test Steps" (array of strings)
+            - "Input" (object: endpoint, method, pathParams, queryParams, body)
+            - "Expected Result"
+            - "Priority"
+            - "Type"
+            
             OUTPUT RULES:
             - Return ONLY a JSON ARRAY
             - Preserve original formatting as much as possible
             - Do NOT add commentary or explanations
+            - Expected result write according to the code if error message is given then use that.
             """
             .formatted(oldTestsJson, ctx, testDataJson, question);
     }

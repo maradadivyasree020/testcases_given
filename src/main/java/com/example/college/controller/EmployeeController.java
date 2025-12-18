@@ -47,7 +47,7 @@ public class EmployeeController {
         if (opt.isPresent()) {
             return ResponseEntity.ok(opt.get());
         } else {
-            return ResponseEntity.status(404).body(Map.of("message", "employee not found"));
+            return ResponseEntity.status(404).body(Map.of("message", "employee not found in db"));
         }
     }
 
@@ -60,7 +60,7 @@ public class EmployeeController {
         if (employee == null
                 || employee.getName() == null || employee.getName().strip().isEmpty()
                 || employee.getRole() == null || employee.getRole().strip().isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "name and role are required"));
+            return ResponseEntity.badRequest().body(Map.of("message", "name and role are required to enter"));
         }
 
         EmployeeModel saved = repo.save(employee);
