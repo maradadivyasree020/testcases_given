@@ -169,49 +169,6 @@ public class GenerateTestsFromJson {
         return out;
     }
 
-    // 🔍 PRINT ONLY CHANGES
-//     static void printDiff(String ep, ArrayNode oldTests, ArrayNode newTests) {
-//     Map<String, JsonNode> oldMap = mapById(oldTests);
-//     Map<String, JsonNode> newMap = mapById(newTests);
-
-//     System.out.println("🔍 TEST CASE CHANGES FOR " + ep);
-
-//     boolean changed = false;
-
-//     for (String id : newMap.keySet()) {
-//         if (!oldMap.containsKey(id)) {
-//             System.out.println("\n🆕 NEW : " + id);
-//             System.out.println(pretty(newMap.get(id)));
-//             changed = true;
-
-//         } else if (!oldMap.get(id).equals(newMap.get(id))) {
-//             System.out.println("\n✏️ MODIFIED : " + id);
-
-//             System.out.println("----- OLD -----");
-//             System.out.println(pretty(oldMap.get(id)));
-
-//             System.out.println("----- NEW -----");
-//             System.out.println(pretty(newMap.get(id)));
-
-//             changed = true;
-//         }
-//     }
-
-//     for (String id : oldMap.keySet()) {
-//         if (!newMap.containsKey(id)) {
-//             System.out.println("\n❌ REMOVED : " + id);
-//             System.out.println(pretty(oldMap.get(id)));
-//             changed = true;
-//         }
-//     }
-
-//     if (!changed) {
-//         System.out.println("✅ No test case changes");
-//     }
-
-    
-// }
-
 static void printDiff(String ep, ArrayNode oldTests, ArrayNode newTests) {
     Map<String, JsonNode> oldMap = mapById(oldTests);
     Map<String, JsonNode> newMap = mapById(newTests);
@@ -310,70 +267,6 @@ static void printDiff(String ep, ArrayNode oldTests, ArrayNode newTests) {
     }
 }
 
-// static String computeEndpointHash(Path srcRoot, String endpointKey, String endpointCode) {
-//     try {
-//         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-
-//         // 1️⃣ hash controller method body
-//         digest.update(endpointCode.getBytes());
-
-//         // 2️⃣ infer dependencies from endpoint path
-//         if (endpointKey.contains("/employee")) {
-//             hashIfExists(digest, srcRoot.resolve(
-//                 "com/example/college/service/EmployeeService.java"));
-//             hashIfExists(digest, srcRoot.resolve(
-//                 "com/example/college/repository/EmployeeRepo.java"));
-//             hashIfExists(digest, srcRoot.resolve(
-//                 "com/example/college/model/EmployeeModel.java"));
-//         }
-
-//         if (endpointKey.contains("/attendance")) {
-//             hashIfExists(digest, srcRoot.resolve(
-//                 "com/example/college/service/AttendanceService.java"));
-//             hashIfExists(digest, srcRoot.resolve(
-//                 "com/example/college/repository/AttendanceRepo.java"));
-//             hashIfExists(digest, srcRoot.resolve(
-//                 "com/example/college/model/AttendanceModel.java"));
-//         }
-
-//         byte[] hash = digest.digest();
-//         StringBuilder sb = new StringBuilder();
-//         for (byte b : hash) sb.append(String.format("%02x", b));
-//         return sb.toString();
-
-//     } catch (Exception e) {
-//         throw new RuntimeException("Failed to compute endpoint hash", e);
-//     }
-// }
-
-// static String computeEndpointHash(
-//         Path srcRoot,
-//         EndpointExtractor.EndpointInfo ep
-// ) {
-//     try {
-//         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-
-//         // 1️⃣ Controller method
-//         digest.update(ep.controllerCode.getBytes());
-
-//         // 2️⃣ Dependencies
-//         for (String dep : ep.dependencies) {
-//             Path p = findClassFile(srcRoot, dep);
-//             if (p != null && Files.exists(p)) {
-//                 digest.update(Files.readAllBytes(p));
-//             }
-//         }
-
-//         byte[] hash = digest.digest();
-//         StringBuilder sb = new StringBuilder();
-//         for (byte b : hash) sb.append(String.format("%02x", b));
-//         return sb.toString();
-
-//     } catch (Exception e) {
-//         throw new RuntimeException(e);
-//     }
-// }
-
 static String computeEndpointHash(
         Path srcRoot,
         EndpointExtractor.EndpointInfo ep
@@ -447,6 +340,4 @@ static void recordDiff(
         d.set("new", newTc);
     }
 }
-
-
 }
