@@ -1,0 +1,24 @@
+package com.example.college.pipeline;
+
+import java.util.Map;
+
+public class ExecutableSpec {
+
+    public String method;
+    public String endpoint;
+    public Object body;
+    public Map<String, String> queryParams;
+    public int expectedStatus;
+
+    public ExecutableSpec(String method,
+                          String endpoint,
+                          Object body,
+                          Map<String, String> queryParams,
+                          int expectedStatus) {
+        this.method = method;
+        this.endpoint = endpoint;
+        this.body = body;
+        this.queryParams = queryParams;
+        this.expectedStatus = expectedStatus;
+    }
+}
