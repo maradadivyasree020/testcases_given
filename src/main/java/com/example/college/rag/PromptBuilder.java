@@ -59,7 +59,15 @@ public class PromptBuilder {
     public String buildEditPrompt(String oldTestsJson,String ctx,String testDataJson,String question) {
 
         return """
-            You are EDITING existing API test cases.
+            CRITICAL RULE (MUST FOLLOW):
+            - Test Case ID defines the scenario and MUST NOT change its intent.
+            - Do NOT swap meanings across Test Case IDs.
+            - If a Test Case ID already exists:
+            - Keep the same logical scenario (inputs, intent).
+            - Only update Expected Result if controller behavior truly changed.
+            - NEVER flip boolean meanings (true ↔ false) for the same Test Case ID.
+
+                        You are EDITING existing API test cases.
 
             STABILITY RULES (MANDATORY):
             - DO NOT change "Test Case ID"

@@ -1,7 +1,7 @@
 [ {
   "endpoint" : "GET:/diff",
-  "changeType" : "MODIFIED",
   "testCaseId" : "GET__DIFF-004",
+  "changeType" : "SERVICE_ONLY_CHANGE",
   "old" : {
     "Test Case ID" : "GET__DIFF-004",
     "Title" : "Verify GET /diff returns empty array when no diffs",
@@ -24,34 +24,11 @@
       "runId" : "2025-12-26T06:47:28.960499700Z",
       "mode" : "GENERATE"
     }
-  },
-  "new" : {
-    "Test Case ID" : "GET__DIFF-004",
-    "Title" : "Verify GET /diff returns empty array when no diffs",
-    "Description" : "Verify that GET /diff returns an empty JSON array when there are no test case differences",
-    "Pre-Conditions" : "No test case differences exist",
-    "Test Steps" : [ "Send GET request to /diff endpoint", "Check response body" ],
-    "Input" : {
-      "endpoint" : "/diff",
-      "method" : "GET",
-      "pathParams" : { },
-      "queryParams" : { },
-      "body" : null
-    },
-    "Expected Result" : "Response body is an empty JSON array []",
-    "Priority" : "Medium",
-    "Type" : "Functional",
-    "_meta" : {
-      "endpoint" : "GET:/diff",
-      "hash" : "917b43ed3146fe74ff9a1a8a0ab0fd30b92116a3864e0baacf0109ab591ea851",
-      "runId" : "2025-12-26T14:31:40.293763100Z",
-      "mode" : "EDIT"
-    }
   }
 }, {
   "endpoint" : "GET:/diff",
-  "changeType" : "MODIFIED",
   "testCaseId" : "GET__DIFF-005",
+  "changeType" : "SERVICE_ONLY_CHANGE",
   "old" : {
     "Test Case ID" : "GET__DIFF-005",
     "Title" : "Verify GET /diff returns diff report with expected fields",
@@ -74,34 +51,11 @@
       "runId" : "2025-12-26T06:47:28.960499700Z",
       "mode" : "GENERATE"
     }
-  },
-  "new" : {
-    "Test Case ID" : "GET__DIFF-005",
-    "Title" : "Verify GET /diff returns diff report with expected fields",
-    "Description" : "Verify that each object in GET /diff response array contains fields endpoint, changeType, testCaseId",
-    "Pre-Conditions" : "Test case differences exist",
-    "Test Steps" : [ "Send GET request to /diff endpoint", "Parse response body as JSON array", "For each object in array verify it contains keys endpoint, changeType, testCaseId" ],
-    "Input" : {
-      "endpoint" : "/diff",
-      "method" : "GET",
-      "pathParams" : { },
-      "queryParams" : { },
-      "body" : null
-    },
-    "Expected Result" : "Each object contains keys endpoint, changeType, testCaseId",
-    "Priority" : "Medium",
-    "Type" : "Functional",
-    "_meta" : {
-      "endpoint" : "GET:/diff",
-      "hash" : "917b43ed3146fe74ff9a1a8a0ab0fd30b92116a3864e0baacf0109ab591ea851",
-      "runId" : "2025-12-26T14:31:40.293763100Z",
-      "mode" : "EDIT"
-    }
   }
 }, {
   "endpoint" : "GET:/diff",
-  "changeType" : "MODIFIED",
   "testCaseId" : "GET__DIFF-002",
+  "changeType" : "SERVICE_ONLY_CHANGE",
   "old" : {
     "Test Case ID" : "GET__DIFF-002",
     "Title" : "Verify GET /diff response content type",
@@ -124,34 +78,11 @@
       "runId" : "2025-12-26T06:47:28.960499700Z",
       "mode" : "GENERATE"
     }
-  },
-  "new" : {
-    "Test Case ID" : "GET__DIFF-002",
-    "Title" : "Verify GET /diff response content type",
-    "Description" : "Verify that GET /diff response has content type application/json",
-    "Pre-Conditions" : "API server is running",
-    "Test Steps" : [ "Send GET request to /diff endpoint", "Check response content type" ],
-    "Input" : {
-      "endpoint" : "/diff",
-      "method" : "GET",
-      "pathParams" : { },
-      "queryParams" : { },
-      "body" : null
-    },
-    "Expected Result" : "Response content type is application/json",
-    "Priority" : "Medium",
-    "Type" : "Functional",
-    "_meta" : {
-      "endpoint" : "GET:/diff",
-      "hash" : "917b43ed3146fe74ff9a1a8a0ab0fd30b92116a3864e0baacf0109ab591ea851",
-      "runId" : "2025-12-26T14:31:40.293763100Z",
-      "mode" : "EDIT"
-    }
   }
 }, {
   "endpoint" : "GET:/diff",
-  "changeType" : "MODIFIED",
   "testCaseId" : "GET__DIFF-003",
+  "changeType" : "SERVICE_ONLY_CHANGE",
   "old" : {
     "Test Case ID" : "GET__DIFF-003",
     "Title" : "Verify GET /diff response body is JSON array",
@@ -173,35 +104,12 @@
       "hash" : "66097e4517683288e74bb098ad082fbce5be904c468d121cac221f5eb242a129",
       "runId" : "2025-12-26T06:47:28.960499700Z",
       "mode" : "GENERATE"
-    }
-  },
-  "new" : {
-    "Test Case ID" : "GET__DIFF-003",
-    "Title" : "Verify GET /diff response body is JSON array",
-    "Description" : "Verify that GET /diff response body is a JSON array",
-    "Pre-Conditions" : "API server is running",
-    "Test Steps" : [ "Send GET request to /diff endpoint", "Parse response body as JSON", "Verify response body is a JSON array" ],
-    "Input" : {
-      "endpoint" : "/diff",
-      "method" : "GET",
-      "pathParams" : { },
-      "queryParams" : { },
-      "body" : null
-    },
-    "Expected Result" : "Response body is a valid JSON array",
-    "Priority" : "Medium",
-    "Type" : "Functional",
-    "_meta" : {
-      "endpoint" : "GET:/diff",
-      "hash" : "917b43ed3146fe74ff9a1a8a0ab0fd30b92116a3864e0baacf0109ab591ea851",
-      "runId" : "2025-12-26T14:31:40.293763100Z",
-      "mode" : "EDIT"
     }
   }
 }, {
   "endpoint" : "GET:/diff",
-  "changeType" : "MODIFIED",
   "testCaseId" : "GET__DIFF-001",
+  "changeType" : "SERVICE_ONLY_CHANGE",
   "old" : {
     "Test Case ID" : "GET__DIFF-001",
     "Title" : "Verify GET /diff returns 200",
@@ -223,29 +131,6 @@
       "hash" : "66097e4517683288e74bb098ad082fbce5be904c468d121cac221f5eb242a129",
       "runId" : "2025-12-26T06:47:28.960499700Z",
       "mode" : "GENERATE"
-    }
-  },
-  "new" : {
-    "Test Case ID" : "GET__DIFF-001",
-    "Title" : "Verify GET /diff returns 200",
-    "Description" : "Verify that GET request to /diff endpoint returns HTTP status 200",
-    "Pre-Conditions" : "API server is running",
-    "Test Steps" : [ "Send GET request to /diff endpoint" ],
-    "Input" : {
-      "endpoint" : "/diff",
-      "method" : "GET",
-      "pathParams" : { },
-      "queryParams" : { },
-      "body" : null
-    },
-    "Expected Result" : "Response status code is 200",
-    "Priority" : "High",
-    "Type" : "Functional",
-    "_meta" : {
-      "endpoint" : "GET:/diff",
-      "hash" : "917b43ed3146fe74ff9a1a8a0ab0fd30b92116a3864e0baacf0109ab591ea851",
-      "runId" : "2025-12-26T14:31:40.293763100Z",
-      "mode" : "EDIT"
     }
   }
 } ]

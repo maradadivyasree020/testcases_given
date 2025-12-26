@@ -96,6 +96,15 @@ public class GenerateTestsFromJson {
 
             System.out.println("diff.json written with "
                     + DIFF_REPORT.size() + " change(s)");
+
+            if (DIFF_REPORT.size() > 0) {
+                ArrayNode updatedDiff = buildUpdatedDiff(DIFF_REPORT);
+
+                Path updatedDiffFile = outDir.resolve("updated-diff.json");
+                Files.writeString(updatedDiffFile,MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(updatedDiff));
+
+                System.out.println("updated-diff.json written with "+ updatedDiff.size() + " entry(s)");
+            }
         } 
         catch (Exception e) {
             e.printStackTrace();
@@ -103,6 +112,12 @@ public class GenerateTestsFromJson {
     }
 
     // ---------------- HELPERS ----------------
+
+    static JsonNode stripMeta(JsonNode tc) {
+        ObjectNode copy = tc.deepCopy();
+        copy.remove("_meta");
+        return copy;
+    }
 
     static ArrayNode generate(RagService rag, String ep, String data) {
         String out = rag.generateTestCasesForQuestion(ep, data);
@@ -201,6 +216,48 @@ public class GenerateTestsFromJson {
             System.out.println("No test case changes");
         }
     }
+
+    static ArrayNode buildUpdatedDiff(ArrayNode diffJson) {
+
+        ArrayNode updated = MAPPER.createArrayNode();
+
+        for (JsonNode d : diffJson) {
+
+            JsonNode oldTc = d.get("old");
+            JsonNode newTc = d.get("new");
+
+        // NEW or REMOVED → keep as-is
+            if (oldTc == null || newTc == null) {
+                updated.add(d);
+                continue;
+            }
+
+            JsonNode oldClean = stripMeta(oldTc);
+            JsonNode newClean = stripMeta(newTc);
+
+            boolean realChange = !oldClean.equals(newClean);
+
+            ObjectNode out = MAPPER.createObjectNode();
+            out.put("endpoint", d.get("endpoint").asText());
+            out.put("testCaseId", d.get("testCaseId").asText());
+
+            if (realChange) {
+            // ✅ real change → keep both
+                out.put("changeType", "CONTENT_CHANGED");
+                out.set("old", oldTc);
+                out.set("new", newTc);
+            } 
+            else {
+                // ❌ only metadata change → keep OLD only
+                out.put("changeType", "SERVICE_ONLY_CHANGE");
+                out.set("old", oldTc);
+            }
+
+            updated.add(out);
+        }
+    return updated;
+}
+
 
 
     static Map<String, JsonNode> mapById(ArrayNode arr) {

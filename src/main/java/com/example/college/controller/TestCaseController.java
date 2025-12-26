@@ -45,7 +45,7 @@ public class TestCaseController {
     @GetMapping("/diff")
     public ResponseEntity<?> getDiff() {
         try {
-            Path file = root().resolve("test-cases/diff.json");
+            Path file = root().resolve("test-cases/updated-diff.json");
             if (!Files.exists(file))
                 return ResponseEntity.status(404).body("diff.json not found");
 
