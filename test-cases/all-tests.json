@@ -1,130 +1,683 @@
 [ {
-  "Test Case ID" : "PUT__MARK-001",
-  "Title" : "Mark attendance with valid employeeId and absent",
-  "Description" : "Verify marking attendance with valid employeeId and absent status returns 200 and attendance data",
-  "Pre-Conditions" : "Employee with given employeeId exists",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body containing employeeId and absent", "Verify response status is 200", "Verify response body contains attendance data with employeeId and absent" ],
+  "Test Case ID" : "GET__EMPLOYE-001",
+  "Title" : "Get all employees successfully",
+  "Description" : "Verify that GET /api/employe returns a list of all employees",
+  "Pre-Conditions" : "At least one employee exists in the database",
+  "Test Steps" : [ "Send GET request to /api/employe", "Receive response" ],
   "Input" : {
-    "endpoint" : "/api/attendance/mark",
-    "method" : "PUT",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "employeeId" : 1,
-      "absent" : true
-    }
-  },
-  "Expected Result" : "Response status is 200 and response body contains attendance data with employeeId 1 and absent true",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "PUT:/mark",
-    "hash" : "e55c0f4fcab7fd320afba70ad947785cc29266e7a4027d7c2a72f58b072e2ca2",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "PUT__MARK-002",
-  "Title" : "Mark attendance with valid employeeId, absent and date",
-  "Description" : "Verify marking attendance with valid employeeId, absent status and date returns 200 and attendance data",
-  "Pre-Conditions" : "Employee with given employeeId exists",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body containing employeeId, absent and date", "Verify response status is 200", "Verify response body contains attendance data with employeeId, absent and date" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark",
-    "method" : "PUT",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "employeeId" : 1,
-      "absent" : false,
-      "date" : "2024-06-01"
-    }
-  },
-  "Expected Result" : "Response status is 200 and response body contains attendance data with employeeId 1, absent false and date 2024-06-01",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "PUT:/mark",
-    "hash" : "e55c0f4fcab7fd320afba70ad947785cc29266e7a4027d7c2a72f58b072e2ca2",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "PUT__MARK-003",
-  "Title" : "Mark attendance with null request body",
-  "Description" : "Verify marking attendance with null request body returns 400 with error message",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with null body", "Verify response status is 400", "Verify response body contains message 'employeeId and absent required'" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark",
-    "method" : "PUT",
+    "endpoint" : "/api/employe",
+    "method" : "GET",
     "pathParams" : { },
     "queryParams" : { },
     "body" : null
   },
-  "Expected Result" : "Response status is 400 and response body contains message 'employeeId and absent required'",
+  "Expected Result" : "Response status is 200 OK and response body contains a list of employees",
   "Priority" : "High",
   "Type" : "Functional",
   "_meta" : {
-    "endpoint" : "PUT:/mark",
-    "hash" : "e55c0f4fcab7fd320afba70ad947785cc29266e7a4027d7c2a72f58b072e2ca2",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
+    "endpoint" : "GET:/employe",
+    "hash" : "813279c18aa129aca6f5afac93d49fc136a5dec628dad61410d67b4828d41c93",
+    "runId" : "2025-12-26T03:02:49.543232Z",
     "mode" : "GENERATE"
   }
 }, {
-  "Test Case ID" : "PUT__MARK-004",
-  "Title" : "Mark attendance with missing employeeId",
-  "Description" : "Verify marking attendance with missing employeeId returns 400 with error message",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body missing employeeId", "Verify response status is 400", "Verify response body contains message 'employeeId and absent required'" ],
+  "Test Case ID" : "GET__EMPLOYE__ID_-001",
+  "Title" : "Get employee by valid id",
+  "Description" : "Verify that the API returns employee details when a valid id is provided",
+  "Pre-Conditions" : "Employee with given id exists in the database",
+  "Test Steps" : [ "Send GET request to /api/employe/{id} with valid employee id" ],
   "Input" : {
-    "endpoint" : "/api/attendance/mark",
-    "method" : "PUT",
+    "endpoint" : "/api/employe/{id}",
+    "method" : "GET",
+    "pathParams" : {
+      "id" : 1
+    },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status 200 OK with employee details in response body",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "GET:/employe/{id}",
+    "hash" : "512f1afd7444df14dd6cf5c3854fe764b4ff3f186c0abe002e88f44a7dc3726d",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "GET__EMPLOYE__ID_-002",
+  "Title" : "Get employee by non-existing id",
+  "Description" : "Verify that the API returns 404 when employee with given id does not exist",
+  "Pre-Conditions" : "No employee with given id exists in the database",
+  "Test Steps" : [ "Send GET request to /api/employe/{id} with non-existing employee id" ],
+  "Input" : {
+    "endpoint" : "/api/employe/{id}",
+    "method" : "GET",
+    "pathParams" : {
+      "id" : 9999
+    },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status 404 Not Found with message 'employee not found'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "GET:/employe/{id}",
+    "hash" : "512f1afd7444df14dd6cf5c3854fe764b4ff3f186c0abe002e88f44a7dc3726d",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "GET__EMPLOYE__ID_-003",
+  "Title" : "Get employee with null id",
+  "Description" : "Verify that the API returns 400 when id path parameter is null",
+  "Pre-Conditions" : "None",
+  "Test Steps" : [ "Send GET request to /api/employe/{id} with null id" ],
+  "Input" : {
+    "endpoint" : "/api/employe/{id}",
+    "method" : "GET",
+    "pathParams" : {
+      "id" : null
+    },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status 400 Bad Request with message 'id is required'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "GET:/employe/{id}",
+    "hash" : "512f1afd7444df14dd6cf5c3854fe764b4ff3f186c0abe002e88f44a7dc3726d",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "POST__EMPLOYEE-001",
+  "Title" : "Create employee with valid name and role",
+  "Description" : "Verify that creating an employee with valid name and role succeeds",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send POST request to /api/employee with valid name and role in body" ],
+  "Input" : {
+    "endpoint" : "/api/employee",
+    "method" : "POST",
     "pathParams" : { },
     "queryParams" : { },
     "body" : {
+      "name" : "John Doe",
+      "role" : "Developer"
+    }
+  },
+  "Expected Result" : "Response status 201 Created with employee object in response body and Location header set",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/employee",
+    "hash" : "575787417f7222eb3f551ee706ecd0a5e5a7e588b7414543aefe182a6775dd5a",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "POST__EMPLOYEE-002",
+  "Title" : "Create employee with missing name",
+  "Description" : "Verify that creating an employee without name returns bad request",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send POST request to /api/employee with role only in body" ],
+  "Input" : {
+    "endpoint" : "/api/employee",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : {
+      "role" : "Developer"
+    }
+  },
+  "Expected Result" : "Response status 400 Bad Request with message 'name and role are required to enter'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/employee",
+    "hash" : "575787417f7222eb3f551ee706ecd0a5e5a7e588b7414543aefe182a6775dd5a",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "POST__EMPLOYEE-003",
+  "Title" : "Create employee with missing role",
+  "Description" : "Verify that creating an employee without role returns bad request",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send POST request to /api/employee with name only in body" ],
+  "Input" : {
+    "endpoint" : "/api/employee",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : {
+      "name" : "John Doe"
+    }
+  },
+  "Expected Result" : "Response status 400 Bad Request with message 'name and role are required to enter'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/employee",
+    "hash" : "575787417f7222eb3f551ee706ecd0a5e5a7e588b7414543aefe182a6775dd5a",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "POST__EMPLOYEE-004",
+  "Title" : "Create employee with empty name",
+  "Description" : "Verify that creating an employee with empty name returns bad request",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send POST request to /api/employee with empty name and valid role in body" ],
+  "Input" : {
+    "endpoint" : "/api/employee",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : {
+      "name" : "   ",
+      "role" : "Developer"
+    }
+  },
+  "Expected Result" : "Response status 400 Bad Request with message 'name and role are required to enter'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/employee",
+    "hash" : "575787417f7222eb3f551ee706ecd0a5e5a7e588b7414543aefe182a6775dd5a",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "POST__EMPLOYEE-005",
+  "Title" : "Create employee with empty role",
+  "Description" : "Verify that creating an employee with empty role returns bad request",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send POST request to /api/employee with valid name and empty role in body" ],
+  "Input" : {
+    "endpoint" : "/api/employee",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : {
+      "name" : "John Doe",
+      "role" : "   "
+    }
+  },
+  "Expected Result" : "Response status 400 Bad Request with message 'name and role are required to enter'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/employee",
+    "hash" : "575787417f7222eb3f551ee706ecd0a5e5a7e588b7414543aefe182a6775dd5a",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "POST__EMPLOYEE-006",
+  "Title" : "Create employee with null body",
+  "Description" : "Verify that creating an employee with null request body returns bad request",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send POST request to /api/employee with null body" ],
+  "Input" : {
+    "endpoint" : "/api/employee",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status 400 Bad Request with message 'name and role are required to enter'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/employee",
+    "hash" : "575787417f7222eb3f551ee706ecd0a5e5a7e588b7414543aefe182a6775dd5a",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "PUT__EMPLOYEE__ID_-001",
+  "Title" : "Update employee with valid id and valid body",
+  "Description" : "Verify updating an existing employee with valid id and valid request body updates the employee and returns 200",
+  "Pre-Conditions" : "Employee with given id exists in the database",
+  "Test Steps" : [ "Send PUT request to /api/employee/{id} with valid id", "Include valid JSON body with fields to update" ],
+  "Input" : {
+    "endpoint" : "/api/employee/{id}",
+    "method" : "PUT",
+    "pathParams" : {
+      "id" : 1
+    },
+    "queryParams" : { },
+    "body" : {
+      "name" : "Updated Name",
+      "role" : "Updated Role",
+      "absent" : false
+    }
+  },
+  "Expected Result" : "Response status is 200 OK and response body contains updated employee with new values",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "PUT:/employee/{id}",
+    "hash" : "af5e3988e13581bfd86a4ed4516735a0d354e83d3f9fa2218bbc046f0864efa6",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "PUT__EMPLOYEE__ID_-002",
+  "Title" : "Update employee with null id",
+  "Description" : "Verify updating employee with null id returns 400 with error message",
+  "Pre-Conditions" : "None",
+  "Test Steps" : [ "Send PUT request to /api/employee/{id} with id as null or missing" ],
+  "Input" : {
+    "endpoint" : "/api/employee/{id}",
+    "method" : "PUT",
+    "pathParams" : {
+      "id" : null
+    },
+    "queryParams" : { },
+    "body" : {
+      "name" : "Name",
+      "role" : "Role",
       "absent" : true
     }
   },
-  "Expected Result" : "Response status is 400 and response body contains message 'employeeId and absent required'",
+  "Expected Result" : "Response status is 400 Bad Request with body {\"message\":\"id is required\"}",
   "Priority" : "High",
   "Type" : "Functional",
   "_meta" : {
-    "endpoint" : "PUT:/mark",
-    "hash" : "e55c0f4fcab7fd320afba70ad947785cc29266e7a4027d7c2a72f58b072e2ca2",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
+    "endpoint" : "PUT:/employee/{id}",
+    "hash" : "af5e3988e13581bfd86a4ed4516735a0d354e83d3f9fa2218bbc046f0864efa6",
+    "runId" : "2025-12-26T03:02:49.543232Z",
     "mode" : "GENERATE"
   }
 }, {
-  "Test Case ID" : "PUT__MARK-005",
-  "Title" : "Mark attendance with missing absent field",
-  "Description" : "Verify marking attendance with missing absent field returns 400 with error message",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body missing absent", "Verify response status is 400", "Verify response body contains message 'employeeId and absent required'" ],
+  "Test Case ID" : "PUT__EMPLOYEE__ID_-003",
+  "Title" : "Update employee with null request body",
+  "Description" : "Verify updating employee with null request body returns 400 with error message",
+  "Pre-Conditions" : "Employee with given id exists",
+  "Test Steps" : [ "Send PUT request to /api/employee/{id} with valid id", "Do not include request body or send null body" ],
   "Input" : {
-    "endpoint" : "/api/attendance/mark",
+    "endpoint" : "/api/employee/{id}",
     "method" : "PUT",
-    "pathParams" : { },
+    "pathParams" : {
+      "id" : 1
+    },
     "queryParams" : { },
-    "body" : {
-      "employeeId" : 1
-    }
+    "body" : null
   },
-  "Expected Result" : "Response status is 400 and response body contains message 'employeeId and absent required'",
+  "Expected Result" : "Response status is 400 Bad Request with body {\"message\":\"request body is required\"}",
   "Priority" : "High",
   "Type" : "Functional",
   "_meta" : {
-    "endpoint" : "PUT:/mark",
-    "hash" : "e55c0f4fcab7fd320afba70ad947785cc29266e7a4027d7c2a72f58b072e2ca2",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
+    "endpoint" : "PUT:/employee/{id}",
+    "hash" : "af5e3988e13581bfd86a4ed4516735a0d354e83d3f9fa2218bbc046f0864efa6",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "PUT__EMPLOYEE__ID_-004",
+  "Title" : "Update employee with non-existing id",
+  "Description" : "Verify updating employee with id that does not exist returns 404 with error message",
+  "Pre-Conditions" : "No employee exists with given id",
+  "Test Steps" : [ "Send PUT request to /api/employee/{id} with non-existing id", "Include valid request body" ],
+  "Input" : {
+    "endpoint" : "/api/employee/{id}",
+    "method" : "PUT",
+    "pathParams" : {
+      "id" : 9999
+    },
+    "queryParams" : { },
+    "body" : {
+      "name" : "Name",
+      "role" : "Role",
+      "absent" : true
+    }
+  },
+  "Expected Result" : "Response status is 404 Not Found with body {\"message\":\"employee not found\"}",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "PUT:/employee/{id}",
+    "hash" : "af5e3988e13581bfd86a4ed4516735a0d354e83d3f9fa2218bbc046f0864efa6",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "PUT__EMPLOYEE__ID_-005",
+  "Title" : "Update employee with partial fields in request body",
+  "Description" : "Verify updating employee with partial fields updates only those fields and returns 200",
+  "Pre-Conditions" : "Employee with given id exists",
+  "Test Steps" : [ "Send PUT request to /api/employee/{id} with valid id", "Include request body with only some fields (e.g. only name)" ],
+  "Input" : {
+    "endpoint" : "/api/employee/{id}",
+    "method" : "PUT",
+    "pathParams" : {
+      "id" : 1
+    },
+    "queryParams" : { },
+    "body" : {
+      "name" : "Partial Update Name"
+    }
+  },
+  "Expected Result" : "Response status is 200 OK and response body contains employee with updated name and other fields unchanged",
+  "Priority" : "Medium",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "PUT:/employee/{id}",
+    "hash" : "af5e3988e13581bfd86a4ed4516735a0d354e83d3f9fa2218bbc046f0864efa6",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "DELETE__EMPLOYEE__ID_-001",
+  "Title" : "Delete employee with valid id",
+  "Description" : "Verify deleting an existing employee by valid id returns 204 No Content",
+  "Pre-Conditions" : "Employee with given id exists in the database",
+  "Test Steps" : [ "Send DELETE request to /api/employee/{id} with valid existing id" ],
+  "Input" : {
+    "endpoint" : "/api/employee/{id}",
+    "method" : "DELETE",
+    "pathParams" : {
+      "id" : 1
+    },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status is 204 No Content and employee is deleted",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "DELETE:/employee/{id}",
+    "hash" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "DELETE__EMPLOYEE__ID_-002",
+  "Title" : "Delete employee with non-existing id",
+  "Description" : "Verify deleting an employee with non-existing id returns 404 employee not found",
+  "Pre-Conditions" : "No employee exists with the given id",
+  "Test Steps" : [ "Send DELETE request to /api/employee/{id} with non-existing id" ],
+  "Input" : {
+    "endpoint" : "/api/employee/{id}",
+    "method" : "DELETE",
+    "pathParams" : {
+      "id" : 9999
+    },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status is 404 with body {\"message\":\"employee not found\"}",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "DELETE:/employee/{id}",
+    "hash" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "DELETE__EMPLOYEE__ID_-003",
+  "Title" : "Delete employee with null id",
+  "Description" : "Verify deleting an employee with null id returns 400 id is required",
+  "Pre-Conditions" : "None",
+  "Test Steps" : [ "Send DELETE request to /api/employee/{id} with id as null or missing" ],
+  "Input" : {
+    "endpoint" : "/api/employee/{id}",
+    "method" : "DELETE",
+    "pathParams" : {
+      "id" : null
+    },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status is 400 with body {\"message\":\"id is required\"}",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "DELETE:/employee/{id}",
+    "hash" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "GET__DIFF-001",
+  "Title" : "Get diff with no parameters",
+  "Description" : "Verify GET /diff returns diff report with default parameters",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send GET request to /diff without any query parameters", "Observe the response" ],
+  "Input" : {
+    "endpoint" : "/diff",
+    "method" : "GET",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status is 200 OK and response body contains diff report JSON array",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "GET:/diff",
+    "hash" : "66097e4517683288e74bb098ad082fbce5be904c468d121cac221f5eb242a129",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "GET__DIFF-002",
+  "Title" : "Get diff with unsupported query parameter",
+  "Description" : "Verify GET /diff returns error or ignores unsupported query parameters",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send GET request to /diff with unsupported query parameter ?invalid=param", "Observe the response" ],
+  "Input" : {
+    "endpoint" : "/diff",
+    "method" : "GET",
+    "pathParams" : { },
+    "queryParams" : {
+      "invalid" : "param"
+    },
+    "body" : null
+  },
+  "Expected Result" : "Response status is 200 OK and response body contains diff report JSON array ignoring unsupported parameters",
+  "Priority" : "Medium",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "GET:/diff",
+    "hash" : "66097e4517683288e74bb098ad082fbce5be904c468d121cac221f5eb242a129",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "GET__DIFF-003",
+  "Title" : "Get diff with large data set",
+  "Description" : "Verify GET /diff returns correct diff report when large data set exists",
+  "Pre-Conditions" : "API server is running and large test data sets are present",
+  "Test Steps" : [ "Send GET request to /diff", "Observe the response" ],
+  "Input" : {
+    "endpoint" : "/diff",
+    "method" : "GET",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status is 200 OK and response body contains complete diff report JSON array with all changes",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "GET:/diff",
+    "hash" : "66097e4517683288e74bb098ad082fbce5be904c468d121cac221f5eb242a129",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "POST__RUN-001",
+  "Title" : "POST /run with valid body",
+  "Description" : "Verify POST /run returns success with valid request body",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send POST request to /run with valid JSON body" ],
+  "Input" : {
+    "endpoint" : "/run",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : { }
+  },
+  "Expected Result" : "Response status is 200 OK and response body contains success indication",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/run",
+    "hash" : "09c5e7b303fe3264f582f98f313cd9e199e3bf86dc2e51f46828baf23da13ad3",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "POST__RUN-002",
+  "Title" : "POST /run with empty body",
+  "Description" : "Verify POST /run returns error when request body is empty",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send POST request to /run with empty body" ],
+  "Input" : {
+    "endpoint" : "/run",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status is 400 Bad Request and error message is returned",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/run",
+    "hash" : "09c5e7b303fe3264f582f98f313cd9e199e3bf86dc2e51f46828baf23da13ad3",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "POST__RUN-003",
+  "Title" : "POST /run with invalid JSON body",
+  "Description" : "Verify POST /run returns error when request body is invalid JSON",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send POST request to /run with invalid JSON body" ],
+  "Input" : {
+    "endpoint" : "/run",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : "invalid-json"
+  },
+  "Expected Result" : "Response status is 400 Bad Request and error message is returned",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/run",
+    "hash" : "09c5e7b303fe3264f582f98f313cd9e199e3bf86dc2e51f46828baf23da13ad3",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "POST__RUN-004",
+  "Title" : "POST /run with missing required fields",
+  "Description" : "Verify POST /run returns error when required fields are missing in request body",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send POST request to /run with JSON body missing required fields" ],
+  "Input" : {
+    "endpoint" : "/run",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : { }
+  },
+  "Expected Result" : "Response status is 400 Bad Request and error message is returned",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/run",
+    "hash" : "09c5e7b303fe3264f582f98f313cd9e199e3bf86dc2e51f46828baf23da13ad3",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "POST__RUN-005",
+  "Title" : "POST /run with extra fields in body",
+  "Description" : "Verify POST /run ignores extra fields in request body and returns success",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send POST request to /run with valid JSON body including extra fields" ],
+  "Input" : {
+    "endpoint" : "/run",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : {
+      "extraField" : "extraValue"
+    }
+  },
+  "Expected Result" : "Response status is 200 OK and response body contains success indication",
+  "Priority" : "Medium",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/run",
+    "hash" : "09c5e7b303fe3264f582f98f313cd9e199e3bf86dc2e51f46828baf23da13ad3",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "POST__RUN-006",
+  "Title" : "POST /run with large payload",
+  "Description" : "Verify POST /run handles large request body without error",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send POST request to /run with large JSON body" ],
+  "Input" : {
+    "endpoint" : "/run",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : {
+      "data" : "large_string_repeated_multiple_times"
+    }
+  },
+  "Expected Result" : "Response status is 200 OK and response body contains success indication",
+  "Priority" : "Medium",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/run",
+    "hash" : "09c5e7b303fe3264f582f98f313cd9e199e3bf86dc2e51f46828baf23da13ad3",
+    "runId" : "2025-12-26T03:02:49.543232Z",
+    "mode" : "GENERATE"
+  }
+}, {
+  "Test Case ID" : "POST__RUN-007",
+  "Title" : "POST /run with invalid content type",
+  "Description" : "Verify POST /run returns error when Content-Type header is invalid",
+  "Pre-Conditions" : "API server is running",
+  "Test Steps" : [ "Send POST request to /run with valid JSON body and invalid Content-Type header" ],
+  "Input" : {
+    "endpoint" : "/run",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : { },
+    "headers" : {
+      "Content-Type" : "text/plain"
+    }
+  },
+  "Expected Result" : "Response status is 415 Unsupported Media Type and error message is returned",
+  "Priority" : "Medium",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/run",
+    "hash" : "09c5e7b303fe3264f582f98f313cd9e199e3bf86dc2e51f46828baf23da13ad3",
+    "runId" : "2025-12-26T03:02:49.543232Z",
     "mode" : "GENERATE"
   }
 }, {
   "Test Case ID" : "POST__MARK_BATCH-001",
   "Title" : "Mark batch attendance with valid payload",
-  "Description" : "Send POST request to /mark-batch with a valid list of attendance DTOs",
-  "Pre-Conditions" : "Attendance service and repository are available",
-  "Test Steps" : [ "Prepare a list of AttendanceDTO objects with valid employeeId, absent, and optional date", "Send POST request to /api/attendance/mark-batch with the list as JSON body", "Verify response status is 200 OK", "Verify response body contains savedCount equal to number of valid entries", "Verify response body contains presentCount and absentCount matching input data", "Verify response body contains invalidEntries as empty list" ],
+  "Description" : "Send a valid list of attendance records to mark batch attendance",
+  "Pre-Conditions" : "Employees exist in the system",
+  "Test Steps" : [ "Prepare a list of attendance DTOs with valid employeeId, absent, and optional date", "Send POST request to /api/attendance/mark-batch with the list as body", "Verify response status is 200 OK", "Verify response contains savedCount equal to number of valid entries", "Verify response contains savedRecords list with attendance records", "Verify presentCount and absentCount are correct", "Verify invalidEntries list is empty" ],
   "Input" : {
     "endpoint" : "/api/attendance/mark-batch",
     "method" : "POST",
@@ -150,16 +703,16 @@
   "Type" : "Functional",
   "_meta" : {
     "endpoint" : "POST:/mark-batch",
-    "hash" : "89cb81d111f00fc3e4ce4ab5803081d1d33c4549d6f9a1e538bd090132d5c980",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
+    "hash" : "edb99d37e526dce4584b216f0dd5024c77448235ea4c5b43062bcd224f7d1a2f",
+    "runId" : "2025-12-26T03:15:43.805585600Z",
+    "mode" : "EDIT"
   }
 }, {
   "Test Case ID" : "POST__MARK_BATCH-002",
   "Title" : "Mark batch attendance with empty payload",
-  "Description" : "Send POST request to /mark-batch with an empty list",
-  "Pre-Conditions" : "Attendance service and repository are available",
-  "Test Steps" : [ "Prepare an empty list", "Send POST request to /api/attendance/mark-batch with empty list as JSON body", "Verify response status is 400 Bad Request", "Verify response body contains message 'payload is empty'" ],
+  "Description" : "Send an empty list to mark batch attendance",
+  "Pre-Conditions" : "None",
+  "Test Steps" : [ "Prepare an empty list", "Send POST request to /api/attendance/mark-batch with empty list as body", "Verify response status is 400 Bad Request", "Verify response body contains message 'payload is empty'" ],
   "Input" : {
     "endpoint" : "/api/attendance/mark-batch",
     "method" : "POST",
@@ -174,15 +727,15 @@
   "Type" : "Functional",
   "_meta" : {
     "endpoint" : "POST:/mark-batch",
-    "hash" : "89cb81d111f00fc3e4ce4ab5803081d1d33c4549d6f9a1e538bd090132d5c980",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
+    "hash" : "edb99d37e526dce4584b216f0dd5024c77448235ea4c5b43062bcd224f7d1a2f",
+    "runId" : "2025-12-26T03:15:43.805585600Z",
+    "mode" : "EDIT"
   }
 }, {
   "Test Case ID" : "POST__MARK_BATCH-003",
   "Title" : "Mark batch attendance with null payload",
-  "Description" : "Send POST request to /mark-batch with null body",
-  "Pre-Conditions" : "Attendance service and repository are available",
+  "Description" : "Send null as payload to mark batch attendance",
+  "Pre-Conditions" : "None",
   "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with null body", "Verify response status is 400 Bad Request", "Verify response body contains message 'payload is empty'" ],
   "Input" : {
     "endpoint" : "/api/attendance/mark-batch",
@@ -198,16 +751,16 @@
   "Type" : "Functional",
   "_meta" : {
     "endpoint" : "POST:/mark-batch",
-    "hash" : "89cb81d111f00fc3e4ce4ab5803081d1d33c4549d6f9a1e538bd090132d5c980",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
+    "hash" : "edb99d37e526dce4584b216f0dd5024c77448235ea4c5b43062bcd224f7d1a2f",
+    "runId" : "2025-12-26T03:15:43.805585600Z",
+    "mode" : "EDIT"
   }
 }, {
   "Test Case ID" : "POST__MARK_BATCH-004",
   "Title" : "Mark batch attendance with some invalid entries",
-  "Description" : "Send POST request to /mark-batch with list containing valid and invalid attendance DTOs",
-  "Pre-Conditions" : "Attendance service and repository are available",
-  "Test Steps" : [ "Prepare a list of AttendanceDTO objects where some have null employeeId or absent", "Send POST request to /api/attendance/mark-batch with the list as JSON body", "Verify response status is 200 OK", "Verify response body contains savedCount equal to number of valid entries", "Verify response body contains invalidEntries list with employeeIds of invalid entries", "Verify presentCount and absentCount match valid entries" ],
+  "Description" : "Send a list with some attendance DTOs missing required fields",
+  "Pre-Conditions" : "Employees exist in the system",
+  "Test Steps" : [ "Prepare a list of attendance DTOs where some have null employeeId or absent", "Send POST request to /api/attendance/mark-batch with the list as body", "Verify response status is 200 OK", "Verify response contains savedCount equal to number of valid entries", "Verify invalidEntries list contains employeeIds of invalid entries", "Verify presentCount and absentCount are correct" ],
   "Input" : {
     "endpoint" : "/api/attendance/mark-batch",
     "method" : "POST",
@@ -235,674 +788,162 @@
     "savedCount" : 2,
     "presentCount" : 1,
     "absentCount" : 1,
-    "invalidEntries" : [ ]
+    "invalidEntries" : [ null, null ]
   },
   "Priority" : "High",
   "Type" : "Functional",
   "_meta" : {
     "endpoint" : "POST:/mark-batch",
-    "hash" : "89cb81d111f00fc3e4ce4ab5803081d1d33c4549d6f9a1e538bd090132d5c980",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
+    "hash" : "edb99d37e526dce4584b216f0dd5024c77448235ea4c5b43062bcd224f7d1a2f",
+    "runId" : "2025-12-26T03:15:43.805585600Z",
+    "mode" : "EDIT"
   }
 }, {
-  "Test Case ID" : "POST__MARK_BATCH-005",
-  "Title" : "Mark batch attendance with null DTO in list",
-  "Description" : "Send POST request to /mark-batch with list containing null element",
-  "Pre-Conditions" : "Attendance service and repository are available",
-  "Test Steps" : [ "Prepare a list of AttendanceDTO objects with one element as null", "Send POST request to /api/attendance/mark-batch with the list as JSON body", "Verify response status is 200 OK", "Verify response body contains savedCount equal to number of valid entries", "Verify invalidEntries list is empty", "Verify presentCount and absentCount match valid entries" ],
+  "Test Case ID" : "PUT__MARK-001",
+  "Title" : "Mark attendance with valid employeeId and absent true",
+  "Description" : "Verify marking attendance with valid employeeId and absent set to true",
+  "Pre-Conditions" : "Employee with given employeeId exists",
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body containing employeeId and absent true", "Verify response status is 200", "Verify response body contains attendance record with absent true" ],
   "Input" : {
-    "endpoint" : "/api/attendance/mark-batch",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : [ {
-      "employeeId" : 1,
-      "absent" : false,
-      "date" : "2024-06-01"
-    }, null, {
-      "employeeId" : 2,
-      "absent" : true,
-      "date" : "2024-06-01"
-    } ]
-  },
-  "Expected Result" : {
-    "savedCount" : 2,
-    "presentCount" : 1,
-    "absentCount" : 1,
-    "invalidEntries" : [ ]
-  },
-  "Priority" : "Medium",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/mark-batch",
-    "hash" : "89cb81d111f00fc3e4ce4ab5803081d1d33c4549d6f9a1e538bd090132d5c980",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "GET__EMPLOYE-001",
-  "Title" : "Get all employees successfully",
-  "Description" : "Verify that GET /api/employe returns a list of all employees",
-  "Pre-Conditions" : "At least one employee exists in the database",
-  "Test Steps" : [ "Send GET request to /api/employe", "Receive response" ],
-  "Input" : {
-    "endpoint" : "/api/employe",
-    "method" : "GET",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status is 200 OK and response body contains a list of employees",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "GET:/employe",
-    "hash" : "813279c18aa129aca6f5afac93d49fc136a5dec628dad61410d67b4828d41c93",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "GET__EMPLOYE-002",
-  "Title" : "Get all employees when no employees exist",
-  "Description" : "Verify that GET /api/employe returns an empty list when no employees exist",
-  "Pre-Conditions" : "No employees exist in the database",
-  "Test Steps" : [ "Send GET request to /api/employe", "Receive response" ],
-  "Input" : {
-    "endpoint" : "/api/employe",
-    "method" : "GET",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status is 200 OK and response body contains an empty list",
-  "Priority" : "Medium",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "GET:/employe",
-    "hash" : "813279c18aa129aca6f5afac93d49fc136a5dec628dad61410d67b4828d41c93",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "GET__EMPLOYE__ID_-001",
-  "Title" : "Get employee by valid id",
-  "Description" : "Verify that the API returns employee details when a valid id is provided",
-  "Pre-Conditions" : "Employee with given id exists in the database",
-  "Test Steps" : [ "Send GET request to /api/employe/{id} with valid employee id" ],
-  "Input" : {
-    "endpoint" : "/api/employe/{id}",
-    "method" : "GET",
-    "pathParams" : {
-      "id" : 1
-    },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status 200 OK with employee details in the response body",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "GET:/employe/{id}",
-    "hash" : "512f1afd7444df14dd6cf5c3854fe764b4ff3f186c0abe002e88f44a7dc3726d",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "GET__EMPLOYE__ID_-002",
-  "Title" : "Get employee by non-existing id",
-  "Description" : "Verify that the API returns 404 when employee with given id does not exist",
-  "Pre-Conditions" : "No employee with given id exists in the database",
-  "Test Steps" : [ "Send GET request to /api/employe/{id} with non-existing employee id" ],
-  "Input" : {
-    "endpoint" : "/api/employe/{id}",
-    "method" : "GET",
-    "pathParams" : {
-      "id" : 9999
-    },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status 404 Not Found with message 'employee not found'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "GET:/employe/{id}",
-    "hash" : "512f1afd7444df14dd6cf5c3854fe764b4ff3f186c0abe002e88f44a7dc3726d",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "GET__EMPLOYE__ID_-003",
-  "Title" : "Get employee with null id",
-  "Description" : "Verify that the API returns 400 when id path parameter is null",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send GET request to /api/employe/{id} with null or missing id" ],
-  "Input" : {
-    "endpoint" : "/api/employe/{id}",
-    "method" : "GET",
-    "pathParams" : {
-      "id" : null
-    },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status 400 Bad Request with message 'id is required'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "GET:/employe/{id}",
-    "hash" : "512f1afd7444df14dd6cf5c3854fe764b4ff3f186c0abe002e88f44a7dc3726d",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "POST__EMPLOYEE-001",
-  "Title" : "Create employee with valid name and role",
-  "Description" : "Verify creating an employee with valid name and role returns 201 and employee data",
-  "Pre-Conditions" : "API server is running",
-  "Test Steps" : [ "Send POST request to /api/employee with valid name and role in body" ],
-  "Input" : {
-    "endpoint" : "/api/employee",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "name" : "John Doe",
-      "role" : "Developer"
-    }
-  },
-  "Expected Result" : "Response status is 201 Created with Location header and response body contains created employee with id, name, and role",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/employee",
-    "hash" : "575787417f7222eb3f551ee706ecd0a5e5a7e588b7414543aefe182a6775dd5a",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "POST__EMPLOYEE-002",
-  "Title" : "Create employee with missing name",
-  "Description" : "Verify creating an employee without name returns 400 with error message",
-  "Pre-Conditions" : "API server is running",
-  "Test Steps" : [ "Send POST request to /api/employee with role only in body" ],
-  "Input" : {
-    "endpoint" : "/api/employee",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "role" : "Developer"
-    }
-  },
-  "Expected Result" : "Response status is 400 Bad Request with message 'name and role are required to enter'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/employee",
-    "hash" : "575787417f7222eb3f551ee706ecd0a5e5a7e588b7414543aefe182a6775dd5a",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "POST__EMPLOYEE-003",
-  "Title" : "Create employee with missing role",
-  "Description" : "Verify creating an employee without role returns 400 with error message",
-  "Pre-Conditions" : "API server is running",
-  "Test Steps" : [ "Send POST request to /api/employee with name only in body" ],
-  "Input" : {
-    "endpoint" : "/api/employee",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "name" : "John Doe"
-    }
-  },
-  "Expected Result" : "Response status is 400 Bad Request with message 'name and role are required to enter'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/employee",
-    "hash" : "575787417f7222eb3f551ee706ecd0a5e5a7e588b7414543aefe182a6775dd5a",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "POST__EMPLOYEE-004",
-  "Title" : "Create employee with empty name",
-  "Description" : "Verify creating an employee with empty name returns 400 with error message",
-  "Pre-Conditions" : "API server is running",
-  "Test Steps" : [ "Send POST request to /api/employee with empty name and valid role in body" ],
-  "Input" : {
-    "endpoint" : "/api/employee",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "name" : "   ",
-      "role" : "Developer"
-    }
-  },
-  "Expected Result" : "Response status is 400 Bad Request with message 'name and role are required to enter'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/employee",
-    "hash" : "575787417f7222eb3f551ee706ecd0a5e5a7e588b7414543aefe182a6775dd5a",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "POST__EMPLOYEE-005",
-  "Title" : "Create employee with empty role",
-  "Description" : "Verify creating an employee with empty role returns 400 with error message",
-  "Pre-Conditions" : "API server is running",
-  "Test Steps" : [ "Send POST request to /api/employee with valid name and empty role in body" ],
-  "Input" : {
-    "endpoint" : "/api/employee",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "name" : "John Doe",
-      "role" : "   "
-    }
-  },
-  "Expected Result" : "Response status is 400 Bad Request with message 'name and role are required to enter'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/employee",
-    "hash" : "575787417f7222eb3f551ee706ecd0a5e5a7e588b7414543aefe182a6775dd5a",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "POST__EMPLOYEE-006",
-  "Title" : "Create employee with null body",
-  "Description" : "Verify creating an employee with null request body returns 400 with error message",
-  "Pre-Conditions" : "API server is running",
-  "Test Steps" : [ "Send POST request to /api/employee with null body" ],
-  "Input" : {
-    "endpoint" : "/api/employee",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status is 400 Bad Request with message 'name and role are required to enter'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/employee",
-    "hash" : "575787417f7222eb3f551ee706ecd0a5e5a7e588b7414543aefe182a6775dd5a",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "PUT__EMPLOYEE__ID_-001",
-  "Title" : "Update employee with valid id and valid body",
-  "Description" : "Verify updating an existing employee with valid id and valid request body updates the employee and returns 200",
-  "Pre-Conditions" : "Employee with given id exists in the database",
-  "Test Steps" : [ "Send PUT request to /api/employee/{id} with valid id", "Include valid JSON body with fields to update" ],
-  "Input" : {
-    "endpoint" : "/api/employee/{id}",
+    "endpoint" : "/api/attendance/mark",
     "method" : "PUT",
-    "pathParams" : {
-      "id" : 1
-    },
+    "pathParams" : { },
     "queryParams" : { },
     "body" : {
-      "name" : "Updated Name",
-      "role" : "Updated Role",
+      "employeeId" : 1,
+      "absent" : true
+    }
+  },
+  "Expected Result" : "Response status 200 with attendance record showing absent true",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "PUT:/mark",
+    "hash" : "e0bc252bc32d25416c5d04d97413035676478bd2371021c4ebf42d63fd2c438b",
+    "runId" : "2025-12-26T03:19:25.958216300Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "PUT__MARK-002",
+  "Title" : "Mark attendance with valid employeeId and absent false",
+  "Description" : "Verify marking attendance with valid employeeId and absent set to false",
+  "Pre-Conditions" : "Employee with given employeeId exists",
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body containing employeeId and absent false", "Verify response status is 200", "Verify response body contains attendance record with absent false" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark",
+    "method" : "PUT",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : {
+      "employeeId" : 1,
       "absent" : false
     }
   },
-  "Expected Result" : "Response status 200 OK with updated employee object in response body",
+  "Expected Result" : "Response status 200 with attendance record showing absent false",
   "Priority" : "High",
   "Type" : "Functional",
   "_meta" : {
-    "endpoint" : "PUT:/employee/{id}",
-    "hash" : "af5e3988e13581bfd86a4ed4516735a0d354e83d3f9fa2218bbc046f0864efa6",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
+    "endpoint" : "PUT:/mark",
+    "hash" : "e0bc252bc32d25416c5d04d97413035676478bd2371021c4ebf42d63fd2c438b",
+    "runId" : "2025-12-26T03:19:25.958216300Z",
+    "mode" : "EDIT"
   }
 }, {
-  "Test Case ID" : "PUT__EMPLOYEE__ID_-002",
-  "Title" : "Update employee with null id",
-  "Description" : "Verify updating employee with null id returns 400 with error message",
+  "Test Case ID" : "PUT__MARK-003",
+  "Title" : "Mark attendance with null employeeId",
+  "Description" : "Verify response when employeeId is null in request body",
   "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send PUT request to /api/employee/{id} with id as null or missing" ],
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body containing absent true and employeeId null", "Verify response status is 400", "Verify response body contains message 'employeeId and absent required to enter'" ],
   "Input" : {
-    "endpoint" : "/api/employee/{id}",
+    "endpoint" : "/api/attendance/mark",
     "method" : "PUT",
-    "pathParams" : {
-      "id" : null
-    },
+    "pathParams" : { },
     "queryParams" : { },
     "body" : {
-      "name" : "Name",
-      "role" : "Role",
+      "employeeId" : null,
       "absent" : true
     }
   },
-  "Expected Result" : "Response status 400 Bad Request with body {\"message\":\"id is required\"}",
+  "Expected Result" : "Response status 400 with message 'employeeId and absent required to enter'",
   "Priority" : "High",
   "Type" : "Functional",
   "_meta" : {
-    "endpoint" : "PUT:/employee/{id}",
-    "hash" : "af5e3988e13581bfd86a4ed4516735a0d354e83d3f9fa2218bbc046f0864efa6",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
+    "endpoint" : "PUT:/mark",
+    "hash" : "e0bc252bc32d25416c5d04d97413035676478bd2371021c4ebf42d63fd2c438b",
+    "runId" : "2025-12-26T03:19:25.958216300Z",
+    "mode" : "EDIT"
   }
 }, {
-  "Test Case ID" : "PUT__EMPLOYEE__ID_-003",
-  "Title" : "Update employee with null request body",
-  "Description" : "Verify updating employee with null request body returns 400 with error message",
-  "Pre-Conditions" : "Employee with given id exists",
-  "Test Steps" : [ "Send PUT request to /api/employee/{id} with valid id", "Do not include request body or send null body" ],
-  "Input" : {
-    "endpoint" : "/api/employee/{id}",
-    "method" : "PUT",
-    "pathParams" : {
-      "id" : 1
-    },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status 400 Bad Request with body {\"message\":\"request body is required\"}",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "PUT:/employee/{id}",
-    "hash" : "af5e3988e13581bfd86a4ed4516735a0d354e83d3f9fa2218bbc046f0864efa6",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "PUT__EMPLOYEE__ID_-004",
-  "Title" : "Update employee with non-existing id",
-  "Description" : "Verify updating employee with id that does not exist returns 404 with error message",
-  "Pre-Conditions" : "No employee exists with given id",
-  "Test Steps" : [ "Send PUT request to /api/employee/{id} with non-existing id", "Include valid request body" ],
-  "Input" : {
-    "endpoint" : "/api/employee/{id}",
-    "method" : "PUT",
-    "pathParams" : {
-      "id" : 9999
-    },
-    "queryParams" : { },
-    "body" : {
-      "name" : "Name",
-      "role" : "Role",
-      "absent" : true
-    }
-  },
-  "Expected Result" : "Response status 404 Not Found with body {\"message\":\"employee not found\"}",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "PUT:/employee/{id}",
-    "hash" : "af5e3988e13581bfd86a4ed4516735a0d354e83d3f9fa2218bbc046f0864efa6",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "PUT__EMPLOYEE__ID_-005",
-  "Title" : "Update employee with partial fields in request body",
-  "Description" : "Verify updating employee with partial fields updates only those fields and returns 200",
-  "Pre-Conditions" : "Employee with given id exists",
-  "Test Steps" : [ "Send PUT request to /api/employee/{id} with valid id", "Include request body with only some fields (e.g. only name)" ],
-  "Input" : {
-    "endpoint" : "/api/employee/{id}",
-    "method" : "PUT",
-    "pathParams" : {
-      "id" : 1
-    },
-    "queryParams" : { },
-    "body" : {
-      "name" : "Partial Update Name"
-    }
-  },
-  "Expected Result" : "Response status 200 OK with employee object updated only for provided fields",
-  "Priority" : "Medium",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "PUT:/employee/{id}",
-    "hash" : "af5e3988e13581bfd86a4ed4516735a0d354e83d3f9fa2218bbc046f0864efa6",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "DELETE__EMPLOYEE__ID_-001",
-  "Title" : "Delete employee with valid id",
-  "Description" : "Verify deleting an existing employee by valid id returns 204 No Content",
-  "Pre-Conditions" : "Employee with given id exists in the database",
-  "Test Steps" : [ "Send DELETE request to /api/employee/{id} with valid existing id" ],
-  "Input" : {
-    "endpoint" : "/api/employee/{id}",
-    "method" : "DELETE",
-    "pathParams" : {
-      "id" : 1
-    },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status is 204 No Content and employee is deleted from database",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "DELETE:/employee/{id}",
-    "hash" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "DELETE__EMPLOYEE__ID_-002",
-  "Title" : "Delete employee with non-existing id",
-  "Description" : "Verify deleting an employee with non-existing id returns 404 employee not found",
-  "Pre-Conditions" : "No employee exists with the given id",
-  "Test Steps" : [ "Send DELETE request to /api/employee/{id} with non-existing id" ],
-  "Input" : {
-    "endpoint" : "/api/employee/{id}",
-    "method" : "DELETE",
-    "pathParams" : {
-      "id" : 9999
-    },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status is 404 with body {\"message\":\"employee not found\"}",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "DELETE:/employee/{id}",
-    "hash" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "DELETE__EMPLOYEE__ID_-003",
-  "Title" : "Delete employee with null id",
-  "Description" : "Verify deleting an employee with null id returns 400 id is required",
+  "Test Case ID" : "PUT__MARK-004",
+  "Title" : "Mark attendance with null absent",
+  "Description" : "Verify response when absent is null in request body",
   "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send DELETE request to /api/employee/{id} with id as null or missing" ],
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body containing employeeId and absent null", "Verify response status is 400", "Verify response body contains message 'employeeId and absent required to enter'" ],
   "Input" : {
-    "endpoint" : "/api/employee/{id}",
-    "method" : "DELETE",
-    "pathParams" : {
-      "id" : null
-    },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status is 400 with body {\"message\":\"id is required\"}",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "DELETE:/employee/{id}",
-    "hash" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "GET__DIFF-001",
-  "Title" : "Get diff without query parameters",
-  "Description" : "Verify GET /diff returns diff data successfully without any query parameters",
-  "Pre-Conditions" : "API server is running",
-  "Test Steps" : [ "Send GET request to /diff without query parameters", "Observe the response" ],
-  "Input" : {
-    "endpoint" : "/diff",
-    "method" : "GET",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status is 200 OK and response body contains diff data",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "GET:/diff",
-    "hash" : "66097e4517683288e74bb098ad082fbce5be904c468d121cac221f5eb242a129",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "GET__DIFF-002",
-  "Title" : "Get diff with unsupported query parameter",
-  "Description" : "Verify GET /diff returns 200 OK and ignores unsupported query parameters",
-  "Pre-Conditions" : "API server is running",
-  "Test Steps" : [ "Send GET request to /diff with unsupported query parameter ?invalid=123", "Observe the response" ],
-  "Input" : {
-    "endpoint" : "/diff",
-    "method" : "GET",
-    "pathParams" : { },
-    "queryParams" : {
-      "invalid" : "123"
-    },
-    "body" : null
-  },
-  "Expected Result" : "Response status is 200 OK and response body contains diff data ignoring unsupported parameters",
-  "Priority" : "Medium",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "GET:/diff",
-    "hash" : "66097e4517683288e74bb098ad082fbce5be904c468d121cac221f5eb242a129",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "POST__RUN-001",
-  "Title" : "POST /run with valid body",
-  "Description" : "Verify POST /run returns success with valid request body",
-  "Pre-Conditions" : "API server is running",
-  "Test Steps" : [ "Send POST request to /run with valid JSON body" ],
-  "Input" : {
-    "endpoint" : "/run",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : { }
-  },
-  "Expected Result" : "Response status is 200 OK and response body contains success indication",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/run",
-    "hash" : "09c5e7b303fe3264f582f98f313cd9e199e3bf86dc2e51f46828baf23da13ad3",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "POST__RUN-002",
-  "Title" : "POST /run with empty body",
-  "Description" : "Verify POST /run returns error when request body is empty",
-  "Pre-Conditions" : "API server is running",
-  "Test Steps" : [ "Send POST request to /run with empty body" ],
-  "Input" : {
-    "endpoint" : "/run",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status is 400 Bad Request and error message is returned",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/run",
-    "hash" : "09c5e7b303fe3264f582f98f313cd9e199e3bf86dc2e51f46828baf23da13ad3",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "POST__RUN-003",
-  "Title" : "POST /run with invalid JSON body",
-  "Description" : "Verify POST /run returns error when request body is invalid JSON",
-  "Pre-Conditions" : "API server is running",
-  "Test Steps" : [ "Send POST request to /run with invalid JSON body" ],
-  "Input" : {
-    "endpoint" : "/run",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : "invalid-json"
-  },
-  "Expected Result" : "Response status is 400 Bad Request and error message is returned",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/run",
-    "hash" : "09c5e7b303fe3264f582f98f313cd9e199e3bf86dc2e51f46828baf23da13ad3",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "POST__RUN-004",
-  "Title" : "POST /run with missing required fields",
-  "Description" : "Verify POST /run returns error when required fields are missing in request body",
-  "Pre-Conditions" : "API server is running",
-  "Test Steps" : [ "Send POST request to /run with JSON body missing required fields" ],
-  "Input" : {
-    "endpoint" : "/run",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : { }
-  },
-  "Expected Result" : "Response status is 400 Bad Request and error message is returned",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/run",
-    "hash" : "09c5e7b303fe3264f582f98f313cd9e199e3bf86dc2e51f46828baf23da13ad3",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
-  }
-}, {
-  "Test Case ID" : "POST__RUN-005",
-  "Title" : "POST /run with extra unknown fields",
-  "Description" : "Verify POST /run ignores extra unknown fields in request body and returns success",
-  "Pre-Conditions" : "API server is running",
-  "Test Steps" : [ "Send POST request to /run with valid JSON body including extra unknown fields" ],
-  "Input" : {
-    "endpoint" : "/run",
-    "method" : "POST",
+    "endpoint" : "/api/attendance/mark",
+    "method" : "PUT",
     "pathParams" : { },
     "queryParams" : { },
     "body" : {
-      "unknownField" : "value"
+      "employeeId" : 1,
+      "absent" : null
     }
   },
-  "Expected Result" : "Response status is 200 OK and response body contains success indication",
+  "Expected Result" : "Response status 400 with message 'employeeId and absent required to enter'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "PUT:/mark",
+    "hash" : "e0bc252bc32d25416c5d04d97413035676478bd2371021c4ebf42d63fd2c438b",
+    "runId" : "2025-12-26T03:19:25.958216300Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "PUT__MARK-005",
+  "Title" : "Mark attendance with null request body",
+  "Description" : "Verify response when request body is null",
+  "Pre-Conditions" : "None",
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with null body", "Verify response status is 400", "Verify response body contains message 'employeeId and absent required to enter'" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark",
+    "method" : "PUT",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status 400 with message 'employeeId and absent required to enter'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "PUT:/mark",
+    "hash" : "e0bc252bc32d25416c5d04d97413035676478bd2371021c4ebf42d63fd2c438b",
+    "runId" : "2025-12-26T03:19:25.958216300Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "PUT__MARK-006",
+  "Title" : "Mark attendance with date provided",
+  "Description" : "Verify marking attendance with valid employeeId, absent and date provided",
+  "Pre-Conditions" : "Employee with given employeeId exists",
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body containing employeeId, absent and date", "Verify response status is 200", "Verify response body contains attendance record with given date" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark",
+    "method" : "PUT",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : {
+      "employeeId" : 1,
+      "absent" : false,
+      "date" : "2024-06-01"
+    }
+  },
+  "Expected Result" : "Response status 200 with attendance record showing date 2024-06-01",
   "Priority" : "Medium",
   "Type" : "Functional",
   "_meta" : {
-    "endpoint" : "POST:/run",
-    "hash" : "09c5e7b303fe3264f582f98f313cd9e199e3bf86dc2e51f46828baf23da13ad3",
-    "runId" : "2025-12-23T06:35:04.348804300Z",
-    "mode" : "GENERATE"
+    "endpoint" : "PUT:/mark",
+    "hash" : "e0bc252bc32d25416c5d04d97413035676478bd2371021c4ebf42d63fd2c438b",
+    "runId" : "2025-12-26T03:19:25.958216300Z",
+    "mode" : "EDIT"
   }
 } ]

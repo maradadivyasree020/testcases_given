@@ -19,9 +19,6 @@ public class EndpointExtractor {
             Pattern.MULTILINE
     );
 
-    // ===============================
-    // PUBLIC API
-    // ===============================
     public static Map<String, EndpointInfo> extractEndpoints(Path srcRoot) throws IOException {
         Map<String, EndpointInfo> endpoints = new LinkedHashMap<>();
 
@@ -32,7 +29,7 @@ public class EndpointExtractor {
                         String code = Files.readString(file);
                         extractFromController(code, endpoints);
                     } catch (Exception e) {
-                        System.err.println("❌ Failed parsing " + file);
+                        System.err.println("Failed parsing " + file);
                         e.printStackTrace();
                     }
                 });
@@ -40,13 +37,7 @@ public class EndpointExtractor {
         return endpoints;
     }
 
-    // ===============================
-    // INTERNAL LOGIC
-    // ===============================
-    private static void extractFromController(
-            String code,
-            Map<String, EndpointInfo> out
-    ) {
+    private static void extractFromController(String code,Map<String, EndpointInfo> out) {
         Matcher m = MAPPING_PATTERN.matcher(code);
 
         while (m.find()) {
@@ -83,24 +74,6 @@ public class EndpointExtractor {
         }
     }
 
-    // ===============================
-    // DEPENDENCY EXTRACTION
-    // ===============================
-    // private static Set<String> extractDependencies(String methodCode) {
-    //     Set<String> deps = new HashSet<>();
-
-    //     if (methodCode.contains("AttendanceService")) deps.add("AttendanceService");
-    //     if (methodCode.contains("EmployeeService"))   deps.add("EmployeeService");
-
-    //     if (methodCode.contains("AttendanceRepo"))    deps.add("AttendanceRepo");
-    //     if (methodCode.contains("EmployeeRepo"))      deps.add("EmployeeRepo");
-
-    //     if (methodCode.contains("AttendanceModel"))   deps.add("AttendanceModel");
-    //     if (methodCode.contains("EmployeeModel"))     deps.add("EmployeeModel");
-
-    //     return deps;
-    // }
-
     private static Set<String> extractDependencies(String controllerCode) {
     Set<String> deps = new HashSet<>();
 
@@ -118,7 +91,7 @@ public class EndpointExtractor {
     if (controllerCode.matches("(?s).*EmployeeRepo\\s+\\w+.*"))
         deps.add("EmployeeRepo");
 
-    // --- Models (optional but safe) ---
+    // --- Models ---
     if (controllerCode.contains("AttendanceModel"))
         deps.add("AttendanceModel");
 

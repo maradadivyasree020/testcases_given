@@ -22,10 +22,12 @@ public class GenerateTestsFromJson {
             Path root = Paths.get("").toAbsolutePath();
             Path src = root.resolve("src/main/java");
             Path outDir = root.resolve("test-cases");
+            Path testdataPath = root.resolve("resources");
             Files.createDirectories(outDir);
 
             Path testFile = outDir.resolve("all-tests.json");
             Path metaFile = outDir.resolve("test-metadata.json");
+            Path attendanceTestData=outDir.resolve("testdata/attendance-testdata.xlsx");
 
             RagService rag = new RagService();
             rag.ingestJavaSources(src);
@@ -35,10 +37,8 @@ public class GenerateTestsFromJson {
 
             String runId = Instant.now().toString();
 
-            // 1️⃣ Extract endpoints
-            Map<String, EndpointExtractor.EndpointInfo> endpoints =
-        EndpointExtractor.extractEndpoints(src);
-
+            // Extract endpoints
+            Map<String, EndpointExtractor.EndpointInfo> endpoints = EndpointExtractor.extractEndpoints(src);
 
             for (EndpointExtractor.EndpointInfo ep : endpoints.values()) {
                 String epKey = ep.endpointKey;       // GET:/employee/{id}
@@ -53,6 +53,7 @@ public class GenerateTestsFromJson {
                 if (oldHash == null) {
                     System.out.println("\n[NEW ENDPOINT] " + epKey);
 
+                    //TODO : NOT PASSING TEST DATA
                     ArrayNode gen = generate(rag, epKey, null);
                     assignStableIds(gen, epKey);
                     tag(gen, epKey, newHash, runId, "GENERATE");
@@ -70,6 +71,7 @@ public class GenerateTestsFromJson {
 
                     printDiff(epKey, oldTests, edited);
 
+                    //TODO: STUDY MORE ABOUT THIS
                     removeOld(allTests, epKey);
                     allTests.addAll(edited);
                 }
@@ -80,35 +82,22 @@ public class GenerateTestsFromJson {
                 meta.put(epKey, newHash);
             }
 
-            Files.writeString(
-                    testFile,
-                    MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(allTests)
-            );
+            Files.writeString(testFile,MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(allTests));
 
-            Files.writeString(
-                    metaFile,
-                    MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(meta)
-            );
+            Files.writeString(metaFile,MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(meta));
 
             ArrayNode diffReport = MAPPER.createArrayNode();
 
-            System.out.println("\n✅ DONE");
+            System.out.println("\n DONE");
 
             Path diffFile = outDir.resolve("diff.json");
 
-            Files.writeString(
-                    diffFile,
-                    MAPPER.writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(DIFF_REPORT),
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING
-            );
+            Files.writeString(diffFile,MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(DIFF_REPORT),StandardOpenOption.CREATE,StandardOpenOption.TRUNCATE_EXISTING);
 
-            System.out.println("📝 diff.json written with "
+            System.out.println("diff.json written with "
                     + DIFF_REPORT.size() + " change(s)");
-
-
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -125,7 +114,7 @@ public class GenerateTestsFromJson {
         return parse(out);
     }
 
-    // ✅ Stable IDs: endpoint + index
+    // Stable IDs: endpoint + index
     static void assignStableIds(ArrayNode arr, String ep) {
         int i = 1;
         for (JsonNode n : arr) {
@@ -169,55 +158,49 @@ public class GenerateTestsFromJson {
         return out;
     }
 
-static void printDiff(String ep, ArrayNode oldTests, ArrayNode newTests) {
-    Map<String, JsonNode> oldMap = mapById(oldTests);
-    Map<String, JsonNode> newMap = mapById(newTests);
+    static void printDiff(String ep, ArrayNode oldTests, ArrayNode newTests) {
+        Map<String, JsonNode> oldMap = mapById(oldTests);
+        Map<String, JsonNode> newMap = mapById(newTests);
 
-    System.out.println("🔍 TEST CASE CHANGES FOR " + ep);
+        System.out.println("TEST CASE CHANGES FOR " + ep);
 
-    boolean changed = false;
+        boolean changed = false;
 
-    for (String id : newMap.keySet()) {
-        if (!oldMap.containsKey(id)) {
-            System.out.println("\n🆕 NEW : " + id);
-            System.out.println(pretty(newMap.get(id)));
+        for (String id : newMap.keySet()) {
+            if (!oldMap.containsKey(id)) {
+                System.out.println("\nNEW : " + id);
+                System.out.println(pretty(newMap.get(id)));
+                
+                recordDiff(ep, "NEW", id, null, newMap.get(id));
+                changed = true;
+            } 
+            else if (!oldMap.get(id).equals(newMap.get(id))) {
+                System.out.println("\nMODIFIED : " + id);
 
-            recordDiff(ep, "NEW", id, null, newMap.get(id));
-            changed = true;
+                System.out.println("----- OLD -----");
+                System.out.println(pretty(oldMap.get(id)));
 
-        } else if (!oldMap.get(id).equals(newMap.get(id))) {
-            System.out.println("\n✏️ MODIFIED : " + id);
+                System.out.println("----- NEW -----");
+                System.out.println(pretty(newMap.get(id)));
 
-            System.out.println("----- OLD -----");
-            System.out.println(pretty(oldMap.get(id)));
+                recordDiff(ep, "MODIFIED", id,oldMap.get(id),newMap.get(id));
+                changed = true;
+            }
+        }
+        //REMOVED TC
+        for (String id : oldMap.keySet()) {
+            if (!newMap.containsKey(id)) {
+                System.out.println("\nREMOVED : " + id);
+                System.out.println(pretty(oldMap.get(id)));
 
-            System.out.println("----- NEW -----");
-            System.out.println(pretty(newMap.get(id)));
-
-            recordDiff(ep, "MODIFIED", id,
-                       oldMap.get(id),
-                       newMap.get(id));
-            changed = true;
+                recordDiff(ep, "REMOVED", id,oldMap.get(id),null);
+                changed = true;
+            }
+        }
+        if (!changed) {
+            System.out.println("No test case changes");
         }
     }
-
-    for (String id : oldMap.keySet()) {
-        if (!newMap.containsKey(id)) {
-            System.out.println("\n❌ REMOVED : " + id);
-            System.out.println(pretty(oldMap.get(id)));
-
-            recordDiff(ep, "REMOVED", id,
-                       oldMap.get(id),
-                       null);
-            changed = true;
-        }
-    }
-
-    if (!changed) {
-        System.out.println("✅ No test case changes");
-    }
-
-}
 
 
     static Map<String, JsonNode> mapById(ArrayNode arr) {
@@ -239,99 +222,84 @@ static void printDiff(String ep, ArrayNode oldTests, ArrayNode newTests) {
     }
 
     private static ArrayNode parse(String raw) {
-    try {
-        if (raw == null || raw.isBlank()) {
-            return MAPPER.createArrayNode();
-        }
-
-        int start = raw.indexOf('[');
-        int end   = raw.lastIndexOf(']');
-
-        if (start < 0 || end <= start) {
-            throw new RuntimeException("LLM output does not contain a JSON array");
-        }
-
-        String json = raw.substring(start, end + 1);
-        JsonNode node = MAPPER.readTree(json);
-
-        if (!node.isArray()) {
-            throw new RuntimeException("Parsed JSON is not an array");
-        }
-
-        return (ArrayNode) node;
-
-    } catch (Exception e) {
-        System.err.println("❌ Failed to parse LLM output:");
-        System.err.println(raw);
-        throw new RuntimeException("Test case parsing failed", e);
-    }
-}
-
-static String computeEndpointHash(
-        Path srcRoot,
-        EndpointExtractor.EndpointInfo ep
-) {
-    try {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-
-        // 1️⃣ Controller method
-        digest.update(ep.controllerCode.getBytes());
-
-        // 2️⃣ Dependencies (service / repo / model)
-        for (String dep : ep.dependencies) {
-            Path p = findClassFile(srcRoot, dep);
-            if (p != null && Files.exists(p)) {
-                digest.update(Files.readAllBytes(p));
+        try {
+            if (raw == null || raw.isBlank()) {
+                return MAPPER.createArrayNode();
             }
+
+            int start = raw.indexOf('[');
+            int end   = raw.lastIndexOf(']');
+
+            if (start < 0 || end <= start) {
+                throw new RuntimeException("LLM output does not contain a JSON array");
+            }
+
+            String json = raw.substring(start, end + 1);
+            JsonNode node = MAPPER.readTree(json);
+
+            if (!node.isArray()) {
+                throw new RuntimeException("Parsed JSON is not an array");
+            }
+
+            return (ArrayNode) node;
+
+        } catch (Exception e) {
+            System.err.println("Failed to parse LLM output:");
+            System.err.println(raw);
+            throw new RuntimeException("Test case parsing failed", e);
         }
-
-        byte[] hash = digest.digest();
-        StringBuilder sb = new StringBuilder();
-        for (byte b : hash) sb.append(String.format("%02x", b));
-        return sb.toString();
-
-    } catch (Exception e) {
-        throw new RuntimeException(e);
     }
-}
 
+    static String computeEndpointHash(Path srcRoot,EndpointExtractor.EndpointInfo ep) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
-static Path findClassFile(Path srcRoot, String className) throws Exception {
-    try (var stream = Files.walk(srcRoot)) {
-        return stream
-                .filter(p -> p.getFileName().toString().equals(className + ".java"))
-                .findFirst()
-                .orElse(null);
+            // Controller method
+            digest.update(ep.controllerCode.getBytes());
+
+            // Dependencies (service / repo / model)
+            for (String dep : ep.dependencies) {
+                Path p = findClassFile(srcRoot, dep);
+                if (p != null && Files.exists(p)) {
+                    digest.update(Files.readAllBytes(p));
+                }
+            }
+
+            //raw hashbytes-hexcodea
+            byte[] hash = digest.digest();
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) sb.append(String.format("%02x", b));
+            return sb.toString();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
-}
 
-
-private static void hashIfExists(MessageDigest digest, Path p) throws Exception {
-    if (Files.exists(p)) {
-        digest.update(Files.readAllBytes(p));
+    //Returns .java files
+    static Path findClassFile(Path srcRoot, String className) throws Exception {
+        try (var stream = Files.walk(srcRoot)) {
+            return stream
+                    .filter(p -> p.getFileName().toString().equals(className + ".java"))
+                    .findFirst()
+                    .orElse(null);
+        }
     }
-}
 
-static String pretty(JsonNode node) {
-    try {
-        return MAPPER.writerWithDefaultPrettyPrinter()
-                     .writeValueAsString(node);
-    } catch (Exception e) {
-        return node.toString();
+    static String pretty(JsonNode node) {
+        try {
+            return MAPPER.writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(node);
+        } catch (Exception e) {
+            return node.toString();
+        }
     }
-}
 
-static void recordDiff(
-        String ep,
-        String changeType,   // NEW / MODIFIED / REMOVED
-        String testCaseId,
-        JsonNode oldTc,
-        JsonNode newTc
-) {
-    ObjectNode d = DIFF_REPORT.addObject();
-    d.put("endpoint", ep);
-    d.put("changeType", changeType);
-    d.put("testCaseId", testCaseId);
+    static void recordDiff(String ep,String changeType,String testCaseId,JsonNode oldTc,JsonNode newTc) {
+        ObjectNode d = DIFF_REPORT.addObject();
+        d.put("endpoint", ep);
+        d.put("changeType", changeType);
+        d.put("testCaseId", testCaseId);
 
     if (oldTc != null) {
         d.set("old", oldTc);

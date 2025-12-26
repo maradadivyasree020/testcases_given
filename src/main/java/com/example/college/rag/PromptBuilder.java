@@ -5,34 +5,9 @@ import java.util.Map;
 
 public class PromptBuilder {
 
-    /**
-     * SIMPLE MODE (no explicit test data)
-     * Used when caller only provides a question.
-     */
-    public String buildTestGenerationPrompt(String question,List<Map<String, String>> snippetMaps) {
-        StringBuilder ctx = new StringBuilder();
-
-        for (Map<String, String> m : snippetMaps) {
-            ctx.append("// File: ")
-               .append(m.getOrDefault("file", "UnknownFile"))
-               .append("\n")
-               .append(m.getOrDefault("content", ""))
-               .append("\n\n");
-        }
-
-        return buildGeneratePrompt(ctx.toString(), question, null);
-    }
-
-    /**
-     * GENERATE MODE
-     * Used for first-time generation OR full replacement.
-     */
     public String buildGeneratePrompt(String ctx,String question,String testDataJson) {
 
-        String testDataSection =
-                (testDataJson == null || testDataJson.isBlank())
-                        ? "No explicit test data provided."
-                        : testDataJson;
+        String testDataSection =(testDataJson == null || testDataJson.isBlank())? "No explicit test data provided.":testDataJson;
 
         return """
             You are a senior Java QA engineer.
@@ -81,17 +56,7 @@ public class PromptBuilder {
             .formatted(testDataSection, ctx, question);
     }
 
-    /**
-     * EDIT MODE
-     * Used when controller code changes and tests must be UPDATED,
-     * NOT regenerated.
-     */
-    public String buildEditPrompt(
-            String oldTestsJson,
-            String ctx,
-            String testDataJson,
-            String question
-    ) {
+    public String buildEditPrompt(String oldTestsJson,String ctx,String testDataJson,String question) {
 
         return """
             You are EDITING existing API test cases.

@@ -48,7 +48,7 @@ public class EmbeddingClient {
                     .put("model", model)
                     .put("input", text)
                     .toString();
-// Build POST request
+            // Build POST request
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(baseUrl))
                     .header("Content-Type", "application/json")
@@ -64,7 +64,7 @@ public class EmbeddingClient {
                         + " body=" + response.body());
             }
 
-// Parse embedding array- numerical vector (float[]) returned by the API representing the meaning of your text.
+            // Parse embedding array- numerical vector (float[]) returned by the API representing the meaning of your text.
             JsonNode root = mapper.readTree(response.body());
             JsonNode arr = root.path("data").get(0).path("embedding");
 

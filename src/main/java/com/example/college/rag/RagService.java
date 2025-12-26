@@ -37,9 +37,7 @@ public class RagService {
         this.promptBuilder = new PromptBuilder();
     }
 
-    // =========================================================
-    // 1️⃣ INGEST JAVA SOURCES (VECTOR STORE)
-    // =========================================================
+    //  INGEST JAVA SOURCES (VECTOR STORE)
     public void ingestJavaSources(Path root) throws IOException {
         try (var stream = Files.walk(root)) {
             stream.filter(p -> p.toString().endsWith(".java"))
@@ -72,62 +70,36 @@ public class RagService {
         }
     }
 
-    // =========================================================
-    // 2️⃣ GENERATE MODE (FIRST RUN / NEW CONTROLLER / NEW ENDPOINT)
-    // =========================================================
+    // GENERATE MODE (FIRST RUN / NEW CONTROLLER / NEW ENDPOINT)
     public String generateTestCasesForQuestion(String question) {
         List<Map<String, String>> snippets = retriever.retrieve(question, 6);
         String ctx = buildContext(snippets);
 
-        String prompt = promptBuilder.buildGeneratePrompt(
-                ctx,
-                question,
-                null
-        );
+        String prompt = promptBuilder.buildGeneratePrompt(ctx,question,null);
 
         return llmClient.complete(prompt);
     }
 
-    public String generateTestCasesForQuestion(
-            String question,
-            String extraTestData
-    ) {
+    public String generateTestCasesForQuestion(String question,String extraTestData) {
         List<Map<String, String>> snippets = retriever.retrieve(question, 6);
         String ctx = buildContext(snippets);
 
-        String prompt = promptBuilder.buildGeneratePrompt(
-                ctx,
-                question,
-                extraTestData
-        );
+        String prompt = promptBuilder.buildGeneratePrompt(ctx,question,extraTestData);
 
         return llmClient.complete(prompt);
     }
 
-    // =========================================================
-    // 3️⃣ EDIT MODE (CONTROLLER CHANGED → UPDATE ONLY WHAT IS NEEDED)
-    // =========================================================
-    public String editExistingTests(
-            String oldTestsJson,
-            String question,
-            String extraTestData
-    ) {
+    //  EDIT MODE (CONTROLLER CHANGED → UPDATE ONLY WHAT IS NEEDED)
+    public String editExistingTests(String oldTestsJson,String question,String extraTestData) {
         List<Map<String, String>> snippets = retriever.retrieve(question, 6);
         String ctx = buildContext(snippets);
 
-        String prompt = promptBuilder.buildEditPrompt(
-                oldTestsJson,
-                ctx,
-                extraTestData,
-                question
-        );
+        String prompt = promptBuilder.buildEditPrompt(oldTestsJson,ctx,extraTestData,question);
 
         return llmClient.complete(prompt);
     }
 
-    // =========================================================
     // Helper: Build deterministic RAG context
-    // =========================================================
     private String buildContext(List<Map<String, String>> snippets) {
         StringBuilder ctx = new StringBuilder();
         for (Map<String, String> m : snippets) {

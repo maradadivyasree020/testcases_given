@@ -28,10 +28,12 @@ public class VectorStoreClient {
         if (store.isEmpty()) return Collections.emptyList();
 
         List<Map.Entry<String, Entry>> entries = new ArrayList<>(store.entrySet());
+
         // Custom comparator:
-// Computes similarity between queryEmbedding and each stored embedding.
-// simB and simA are the similarities for b and a.
-// Double.compare(simB, simA) sorts so that higher similarity comes first (descending order).
+        // Computes similarity between queryEmbedding and each stored embedding.
+        // simB and simA are the similarities for b and a.
+        // Double.compare(simB, simA) sorts so that higher similarity comes first (descending order).
+        
         entries.sort((a, b) -> {
             double simB = cosineSimilarity(queryEmbedding, b.getValue().embedding);
             double simA = cosineSimilarity(queryEmbedding, a.getValue().embedding);

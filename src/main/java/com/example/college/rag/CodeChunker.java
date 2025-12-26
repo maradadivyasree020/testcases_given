@@ -3,9 +3,6 @@ package com.example.college.rag;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Splits source code into chunks by lines.
- */
 public class CodeChunker {
 
     private final int maxLinesPerChunk;
