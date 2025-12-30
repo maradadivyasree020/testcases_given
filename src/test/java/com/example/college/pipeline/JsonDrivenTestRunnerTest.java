@@ -9,7 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import com.example.college.CollegeApplication;
 
 
-@SpringBootTest(classes = CollegeApplication.class,webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class JsonDrivenTestRunnerTest {
