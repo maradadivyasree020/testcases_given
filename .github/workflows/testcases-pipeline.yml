@@ -1,0 +1,70 @@
+name: Testcase Execution Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  testcase-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ---------------------------
+      # 1️⃣ Checkout code
+      # ---------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2   # IMPORTANT for git diff
+
+      # ---------------------------
+      # 2️⃣ Setup Java
+      # ---------------------------
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # ---------------------------
+      # 3️⃣ Detect backend changes
+      # ---------------------------
+      - name: Detect backend code changes
+        id: diff
+        run: |
+          echo "Checking backend changes..."
+          git diff --name-only HEAD~1 HEAD > changes.txt
+
+          if grep -E "src/main/java/com/example/college/(controller|service|repository)" changes.txt; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      # ---------------------------
+      # 4️⃣ Generate test cases (ONLY IF CHANGED)
+      # ---------------------------
+      - name: Generate test cases
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          echo "Backend logic changed → Generating all-tests.json"
+          mvn -q -DskipTests exec:java
+
+      # ---------------------------
+      # 5️⃣ Execute tests + generate PDF
+      # ---------------------------
+      - name: Execute test cases and generate PDF
+        run: |
+          echo "Running test execution pipeline"
+          mvn test -Dtest=JsonDrivenTestRunnerTest
+
+      # ---------------------------
+      # 6️⃣ Upload results.pdf
+      # ---------------------------
+      - name: Upload Test Execution Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-pdf
+          path: test-cases/results.pdf
