@@ -18,7 +18,7 @@
   <name>college</name>
 
   <properties>
-    <java.version>21</java.version>
+    <java.version>17</java.version>
     <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
     <surefire.plugin.version>3.1.2</surefire.plugin.version>
     <exec.plugin.version>3.5.0</exec.plugin.version>
