@@ -1,23 +1,7 @@
 spring:
-  profiles:
-    active: test
-
   main:
     allow-bean-definition-overriding: true
-
-  autoconfigure:
-    exclude:
-      # Disable DB
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
-
-      # Disable Spring Security (VERY IMPORTANT)
-      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-      - org.springframework.boot.autoconfigure.security.oauth2.client.servlet.OAuth2ClientAutoConfiguration
-      - org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration
 
 logging:
   level:
     root: WARN
-    org.springframework.test: WARN
-    org.springframework.boot.test: WARN
