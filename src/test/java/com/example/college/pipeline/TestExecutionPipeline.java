@@ -55,13 +55,55 @@ public class TestExecutionPipeline {
         try {
             ExecutableSpec spec = ApiSpec.from(tc);
 
-            MockHttpServletRequestBuilder request =
-                switch (spec.method.toUpperCase()) {
-                    case "POST" -> post(spec.endpoint);
-                    case "PUT" -> put(spec.endpoint);
-                    case "DELETE" -> delete(spec.endpoint);
-                    default -> get(spec.endpoint);
-                };
+            MockHttpServletRequestBuilder request;
+
+            boolean hasPathVars = spec.endpoint.contains("{");
+
+
+    if (!hasPathVars) {
+        // No {id} in URL → no path params needed
+        request = switch (spec.method.toUpperCase()) {
+            case "POST" -> post(spec.endpoint);
+            case "PUT" -> put(spec.endpoint);
+            case "DELETE" -> delete(spec.endpoint);
+            default -> get(spec.endpoint);
+        };
+    } else {
+        // Endpoint has path variables → must validate pathParams
+        if (spec.pathParams == null || spec.pathParams.isEmpty()) {
+            return new TestResult(
+                id,
+                title,
+                spec.expectedStatus,
+                -1,
+                "FAIL",
+                "Missing path parameters for endpoint"
+            );
+        }
+
+        for (Object v : spec.pathParams.values()) {
+            if (v == null) {
+                return new TestResult(
+                    id,
+                    title,
+                    spec.expectedStatus,
+                    -1,
+                    "FAIL",
+                    "Path variable is null, cannot expand URI"
+                );
+            }
+        }
+
+        Object[] uriVars = spec.pathParams.values().toArray();
+
+        request = switch (spec.method.toUpperCase()) {
+            case "POST" -> post(spec.endpoint, uriVars);
+            case "PUT" -> put(spec.endpoint, uriVars);
+            case "DELETE" -> delete(spec.endpoint, uriVars);
+            default -> get(spec.endpoint, uriVars);
+        };
+    }
+
 
             // Query params
             if (spec.queryParams != null) {

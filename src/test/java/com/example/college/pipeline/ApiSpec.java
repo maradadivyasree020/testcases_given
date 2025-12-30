@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ApiSpec {
@@ -38,6 +39,17 @@ public class ApiSpec {
             }
         }
 
+        Map<String, Object> pathParams = new LinkedHashMap<>();
+        JsonNode pathNode = input.path("pathParams");
+
+        if (pathNode.isObject()) {
+            pathNode.fields().forEachRemaining(e -> {
+                if (!e.getValue().isNull()) {
+                    pathParams.put(e.getKey(), e.getValue().asText());
+                }
+            });
+        }
+
         int expectedStatus = inferExpectedStatus(tc);
 
         return new ExecutableSpec(
@@ -45,6 +57,7 @@ public class ApiSpec {
             endpoint,
             body,
             queryParams.isEmpty() ? null : queryParams,
+            pathParams.isEmpty() ? null : pathParams,
             expectedStatus
         );
     }

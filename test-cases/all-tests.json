@@ -580,273 +580,6 @@
     "mode" : "GENERATE"
   }
 }, {
-  "Test Case ID" : "PUT__MARK-001",
-  "Title" : "Mark attendance with null request body",
-  "Description" : "Verify marking attendance with null request body returns 400 with error message",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with null body", "Verify response status is 400", "Verify response body contains message 'employeeId and absent required to enter'" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark",
-    "method" : "PUT",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status is 400 and response body contains message 'employeeId and absent required to enter'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "PUT:/mark",
-    "hash" : "79fd6517cfc5231110465d642e6aae928ae55c0553f39985b9eadc56d6d9c134",
-    "runId" : "2025-12-26T07:17:34.005134700Z",
-    "mode" : "EDIT"
-  }
-}, {
-  "Test Case ID" : "PUT__MARK-002",
-  "Title" : "Mark attendance with valid employeeId and absent",
-  "Description" : "Verify marking attendance with valid employeeId and absent fields returns 200 and attendance data",
-  "Pre-Conditions" : "Employee with given employeeId exists",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body containing valid employeeId and absent", "Verify response status is 200", "Verify response body contains attendance data with employeeId and absent" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark",
-    "method" : "PUT",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "employeeId" : 1,
-      "absent" : false
-    }
-  },
-  "Expected Result" : "Response status is 200 and response body contains attendance data with employeeId 1 and absent false",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "PUT:/mark",
-    "hash" : "79fd6517cfc5231110465d642e6aae928ae55c0553f39985b9eadc56d6d9c134",
-    "runId" : "2025-12-26T07:17:34.005134700Z",
-    "mode" : "EDIT"
-  }
-}, {
-  "Test Case ID" : "PUT__MARK-003",
-  "Title" : "Mark attendance with missing absent field",
-  "Description" : "Verify marking attendance with missing absent field returns 400 with error message",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body missing absent field", "Verify response status is 400", "Verify response body contains message 'employeeId and absent required to enter'" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark",
-    "method" : "PUT",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "employeeId" : 1
-    }
-  },
-  "Expected Result" : "Response status is 400 and response body contains message 'employeeId and absent required to enter'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "PUT:/mark",
-    "hash" : "79fd6517cfc5231110465d642e6aae928ae55c0553f39985b9eadc56d6d9c134",
-    "runId" : "2025-12-26T07:17:34.005134700Z",
-    "mode" : "EDIT"
-  }
-}, {
-  "Test Case ID" : "PUT__MARK-004",
-  "Title" : "Mark attendance with missing employeeId",
-  "Description" : "Verify marking attendance with missing employeeId returns 400 with error message",
-  "Pre-Conditions" : "None",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body missing employeeId", "Verify response status is 400", "Verify response body contains message 'employeeId and absent required to enter'" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark",
-    "method" : "PUT",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "absent" : true
-    }
-  },
-  "Expected Result" : "Response status is 400 and response body contains message 'employeeId and absent required to enter'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "PUT:/mark",
-    "hash" : "79fd6517cfc5231110465d642e6aae928ae55c0553f39985b9eadc56d6d9c134",
-    "runId" : "2025-12-26T07:17:34.005134700Z",
-    "mode" : "EDIT"
-  }
-}, {
-  "Test Case ID" : "PUT__MARK-005",
-  "Title" : "Mark attendance with date provided",
-  "Description" : "Verify marking attendance with valid employeeId, absent and date returns 200 and attendance data with given date",
-  "Pre-Conditions" : "Employee with given employeeId exists",
-  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body containing employeeId, absent and date", "Verify response status is 200", "Verify response body contains attendance data with given date" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark",
-    "method" : "PUT",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : {
-      "employeeId" : 1,
-      "absent" : true,
-      "date" : "2024-06-01"
-    }
-  },
-  "Expected Result" : "Response status is 200 and response body contains attendance data with date 2024-06-01",
-  "Priority" : "Medium",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "PUT:/mark",
-    "hash" : "79fd6517cfc5231110465d642e6aae928ae55c0553f39985b9eadc56d6d9c134",
-    "runId" : "2025-12-26T07:17:34.005134700Z",
-    "mode" : "EDIT"
-  }
-}, {
-  "Test Case ID" : "POST__MARK_BATCH-001",
-  "Title" : "Mark batch attendance with empty payload",
-  "Description" : "Verify response when sending empty list as payload",
-  "Pre-Conditions" : "Attendance service and repository are available",
-  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with empty list as body", "Verify response status is 400 Bad Request", "Verify response body contains message 'payload is empty'" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark-batch",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : [ ]
-  },
-  "Expected Result" : "Response status 400 Bad Request with message 'payload is empty'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/mark-batch",
-    "hash" : "3cca32265b98642a048232daacb361ae95aa355e650b01554a9f5bc7077732aa",
-    "runId" : "2025-12-26T07:17:34.005134700Z",
-    "mode" : "EDIT"
-  }
-}, {
-  "Test Case ID" : "POST__MARK_BATCH-002",
-  "Title" : "Mark batch attendance with valid payload",
-  "Description" : "Verify marking batch attendance with valid list of attendance records",
-  "Pre-Conditions" : "Attendance service and repository are available",
-  "Test Steps" : [ "Prepare a list of valid attendance DTOs with employeeId and absent fields", "Send POST request to /api/attendance/mark-batch with the list as body", "Verify response status is 200 OK", "Verify response contains savedCount equal to number of valid records", "Verify response contains presentCount and absentCount matching input data", "Verify invalidEntries list is empty" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark-batch",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : [ {
-      "employeeId" : 1,
-      "absent" : false,
-      "date" : null
-    }, {
-      "employeeId" : 2,
-      "absent" : true,
-      "date" : null
-    } ]
-  },
-  "Expected Result" : "Response status 200 OK with savedCount 2, presentCount 1, absentCount 1, invalidEntries empty",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/mark-batch",
-    "hash" : "3cca32265b98642a048232daacb361ae95aa355e650b01554a9f5bc7077732aa",
-    "runId" : "2025-12-26T07:17:34.005134700Z",
-    "mode" : "EDIT"
-  }
-}, {
-  "Test Case ID" : "POST__MARK_BATCH-003",
-  "Title" : "Mark batch attendance with some invalid entries",
-  "Description" : "Verify batch attendance marking when some entries have missing employeeId or absent",
-  "Pre-Conditions" : "Attendance service and repository are available",
-  "Test Steps" : [ "Prepare a list of attendance DTOs where some have null employeeId or absent", "Send POST request to /api/attendance/mark-batch with the list as body", "Verify response status is 200 OK", "Verify response savedCount equals number of valid entries", "Verify invalidEntries list contains employeeIds of invalid entries with employeeId", "Verify presentCount and absentCount match valid entries" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark-batch",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : [ {
-      "employeeId" : 1,
-      "absent" : false,
-      "date" : null
-    }, {
-      "employeeId" : null,
-      "absent" : true,
-      "date" : null
-    }, {
-      "employeeId" : 3,
-      "absent" : null,
-      "date" : null
-    }, {
-      "employeeId" : 4,
-      "absent" : true,
-      "date" : null
-    } ]
-  },
-  "Expected Result" : "Response status 200 OK with savedCount 2, presentCount 1, absentCount 1, invalidEntries contains [3]",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/mark-batch",
-    "hash" : "3cca32265b98642a048232daacb361ae95aa355e650b01554a9f5bc7077732aa",
-    "runId" : "2025-12-26T07:17:34.005134700Z",
-    "mode" : "EDIT"
-  }
-}, {
-  "Test Case ID" : "POST__MARK_BATCH-004",
-  "Title" : "Mark batch attendance with null payload",
-  "Description" : "Verify response when sending null as payload",
-  "Pre-Conditions" : "Attendance service and repository are available",
-  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with null body", "Verify response status is 400 Bad Request", "Verify response body contains message 'payload is empty'" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark-batch",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : null
-  },
-  "Expected Result" : "Response status 400 Bad Request with message 'payload is empty'",
-  "Priority" : "High",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/mark-batch",
-    "hash" : "3cca32265b98642a048232daacb361ae95aa355e650b01554a9f5bc7077732aa",
-    "runId" : "2025-12-26T07:17:34.005134700Z",
-    "mode" : "EDIT"
-  }
-}, {
-  "Test Case ID" : "POST__MARK_BATCH-005",
-  "Title" : "Mark batch attendance with all invalid entries",
-  "Description" : "Verify response when all entries in batch are invalid",
-  "Pre-Conditions" : "Attendance service and repository are available",
-  "Test Steps" : [ "Prepare a list of attendance DTOs all missing employeeId or absent", "Send POST request to /api/attendance/mark-batch with the list as body", "Verify response status is 200 OK", "Verify savedCount is 0", "Verify presentCount and absentCount are 0", "Verify invalidEntries contains employeeIds of entries with employeeId" ],
-  "Input" : {
-    "endpoint" : "/api/attendance/mark-batch",
-    "method" : "POST",
-    "pathParams" : { },
-    "queryParams" : { },
-    "body" : [ {
-      "employeeId" : null,
-      "absent" : true,
-      "date" : null
-    }, {
-      "employeeId" : 5,
-      "absent" : null,
-      "date" : null
-    }, {
-      "employeeId" : null,
-      "absent" : null,
-      "date" : null
-    } ]
-  },
-  "Expected Result" : "Response status 200 OK with savedCount 0, presentCount 0, absentCount 0, invalidEntries contains [5]",
-  "Priority" : "Medium",
-  "Type" : "Functional",
-  "_meta" : {
-    "endpoint" : "POST:/mark-batch",
-    "hash" : "3cca32265b98642a048232daacb361ae95aa355e650b01554a9f5bc7077732aa",
-    "runId" : "2025-12-26T07:17:34.005134700Z",
-    "mode" : "EDIT"
-  }
-}, {
   "Test Case ID" : "GET__DIFF-001",
   "Title" : "Verify GET /diff returns 200",
   "Description" : "Verify that GET request to /diff endpoint returns HTTP status 200",
@@ -954,6 +687,273 @@
     "endpoint" : "GET:/diff",
     "hash" : "917b43ed3146fe74ff9a1a8a0ab0fd30b92116a3864e0baacf0109ab591ea851",
     "runId" : "2025-12-26T14:31:40.293763100Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "PUT__MARK-001",
+  "Title" : "Mark attendance with null request body",
+  "Description" : "Verify marking attendance with null request body returns 400 with error message",
+  "Pre-Conditions" : "None",
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with null body", "Verify response status is 400", "Verify response body contains message 'employeeId and absent required'" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark",
+    "method" : "PUT",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status is 400 and response body contains message 'employeeId and absent required'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "PUT:/mark",
+    "hash" : "8b052a42caa9bef66b521d3665cbe787b819a9011e1ff23d04bb694e95a5b882",
+    "runId" : "2025-12-27T09:21:12.253023400Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "PUT__MARK-002",
+  "Title" : "Mark attendance with valid employeeId and absent",
+  "Description" : "Verify marking attendance with valid employeeId and absent fields returns 200 and attendance data",
+  "Pre-Conditions" : "Employee with given employeeId exists",
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body containing valid employeeId and absent", "Verify response status is 200", "Verify response body contains attendance data with employeeId and absent" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark",
+    "method" : "PUT",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : {
+      "employeeId" : 1,
+      "absent" : false
+    }
+  },
+  "Expected Result" : "Response status is 200 and response body contains attendance data with employeeId 1 and absent false",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "PUT:/mark",
+    "hash" : "8b052a42caa9bef66b521d3665cbe787b819a9011e1ff23d04bb694e95a5b882",
+    "runId" : "2025-12-27T09:21:12.253023400Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "PUT__MARK-003",
+  "Title" : "Mark attendance with missing absent field",
+  "Description" : "Verify marking attendance with missing absent field returns 400 with error message",
+  "Pre-Conditions" : "None",
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body missing absent field", "Verify response status is 400", "Verify response body contains message 'employeeId and absent required'" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark",
+    "method" : "PUT",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : {
+      "employeeId" : 1
+    }
+  },
+  "Expected Result" : "Response status is 400 and response body contains message 'employeeId and absent required'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "PUT:/mark",
+    "hash" : "8b052a42caa9bef66b521d3665cbe787b819a9011e1ff23d04bb694e95a5b882",
+    "runId" : "2025-12-27T09:21:12.253023400Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "PUT__MARK-004",
+  "Title" : "Mark attendance with missing employeeId",
+  "Description" : "Verify marking attendance with missing employeeId returns 400 with error message",
+  "Pre-Conditions" : "None",
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body missing employeeId", "Verify response status is 400", "Verify response body contains message 'employeeId and absent required'" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark",
+    "method" : "PUT",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : {
+      "absent" : true
+    }
+  },
+  "Expected Result" : "Response status is 400 and response body contains message 'employeeId and absent required'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "PUT:/mark",
+    "hash" : "8b052a42caa9bef66b521d3665cbe787b819a9011e1ff23d04bb694e95a5b882",
+    "runId" : "2025-12-27T09:21:12.253023400Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "PUT__MARK-005",
+  "Title" : "Mark attendance with date provided",
+  "Description" : "Verify marking attendance with valid employeeId, absent and date returns 200 and attendance data with given date",
+  "Pre-Conditions" : "Employee with given employeeId exists",
+  "Test Steps" : [ "Send PUT request to /api/attendance/mark with body containing employeeId, absent and date", "Verify response status is 200", "Verify response body contains attendance data with given date" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark",
+    "method" : "PUT",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : {
+      "employeeId" : 1,
+      "absent" : true,
+      "date" : "2024-06-01"
+    }
+  },
+  "Expected Result" : "Response status is 200 and response body contains attendance data with date 2024-06-01",
+  "Priority" : "Medium",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "PUT:/mark",
+    "hash" : "8b052a42caa9bef66b521d3665cbe787b819a9011e1ff23d04bb694e95a5b882",
+    "runId" : "2025-12-27T09:21:12.253023400Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "POST__MARK_BATCH-001",
+  "Title" : "Mark batch attendance with empty payload",
+  "Description" : "Verify response when sending empty list as payload",
+  "Pre-Conditions" : "Attendance service and repository are available",
+  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with empty list as body", "Verify response status is 400 Bad Request", "Verify response body contains message 'payload is empty'" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark-batch",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : [ ]
+  },
+  "Expected Result" : "Response status 400 Bad Request with message 'payload is empty'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/mark-batch",
+    "hash" : "27189b9f1e3c952fe309e4f76065a37361874ecfdc017cd22891f5a42dd6f869",
+    "runId" : "2025-12-27T09:21:12.253023400Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "POST__MARK_BATCH-002",
+  "Title" : "Mark batch attendance with valid payload",
+  "Description" : "Verify marking batch attendance with valid list of attendance records",
+  "Pre-Conditions" : "Attendance service and repository are available",
+  "Test Steps" : [ "Prepare a list of valid attendance DTOs with employeeId and absent fields", "Send POST request to /api/attendance/mark-batch with the list as body", "Verify response status is 200 OK", "Verify response contains savedCount equal to number of valid records", "Verify response contains presentCount and absentCount matching input data", "Verify invalidEntries list is empty" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark-batch",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : [ {
+      "employeeId" : 1,
+      "absent" : false,
+      "date" : null
+    }, {
+      "employeeId" : 2,
+      "absent" : true,
+      "date" : null
+    } ]
+  },
+  "Expected Result" : "Response status 200 OK with savedCount 2, presentCount 1, absentCount 1, invalidEntries empty",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/mark-batch",
+    "hash" : "27189b9f1e3c952fe309e4f76065a37361874ecfdc017cd22891f5a42dd6f869",
+    "runId" : "2025-12-27T09:21:12.253023400Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "POST__MARK_BATCH-003",
+  "Title" : "Mark batch attendance with some invalid entries",
+  "Description" : "Verify batch attendance marking when some entries have missing employeeId or absent",
+  "Pre-Conditions" : "Attendance service and repository are available",
+  "Test Steps" : [ "Prepare a list of attendance DTOs where some have null employeeId or absent", "Send POST request to /api/attendance/mark-batch with the list as body", "Verify response status is 200 OK", "Verify response savedCount equals number of valid entries", "Verify invalidEntries list contains employeeIds of invalid entries with employeeId", "Verify presentCount and absentCount match valid entries" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark-batch",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : [ {
+      "employeeId" : 1,
+      "absent" : false,
+      "date" : null
+    }, {
+      "employeeId" : null,
+      "absent" : true,
+      "date" : null
+    }, {
+      "employeeId" : 3,
+      "absent" : null,
+      "date" : null
+    }, {
+      "employeeId" : 4,
+      "absent" : true,
+      "date" : null
+    } ]
+  },
+  "Expected Result" : "Response status 200 OK with savedCount 2, presentCount 1, absentCount 1, invalidEntries contains [3]",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/mark-batch",
+    "hash" : "27189b9f1e3c952fe309e4f76065a37361874ecfdc017cd22891f5a42dd6f869",
+    "runId" : "2025-12-27T09:21:12.253023400Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "POST__MARK_BATCH-004",
+  "Title" : "Mark batch attendance with null payload",
+  "Description" : "Verify response when sending null as payload",
+  "Pre-Conditions" : "Attendance service and repository are available",
+  "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with null body", "Verify response status is 400 Bad Request", "Verify response body contains message 'payload is empty'" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark-batch",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : null
+  },
+  "Expected Result" : "Response status 400 Bad Request with message 'payload is empty'",
+  "Priority" : "High",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/mark-batch",
+    "hash" : "27189b9f1e3c952fe309e4f76065a37361874ecfdc017cd22891f5a42dd6f869",
+    "runId" : "2025-12-27T09:21:12.253023400Z",
+    "mode" : "EDIT"
+  }
+}, {
+  "Test Case ID" : "POST__MARK_BATCH-005",
+  "Title" : "Mark batch attendance with all invalid entries",
+  "Description" : "Verify response when all entries in batch are invalid",
+  "Pre-Conditions" : "Attendance service and repository are available",
+  "Test Steps" : [ "Prepare a list of attendance DTOs all missing employeeId or absent", "Send POST request to /api/attendance/mark-batch with the list as body", "Verify response status is 200 OK", "Verify savedCount is 0", "Verify presentCount and absentCount are 0", "Verify invalidEntries contains employeeIds of entries with employeeId" ],
+  "Input" : {
+    "endpoint" : "/api/attendance/mark-batch",
+    "method" : "POST",
+    "pathParams" : { },
+    "queryParams" : { },
+    "body" : [ {
+      "employeeId" : null,
+      "absent" : true,
+      "date" : null
+    }, {
+      "employeeId" : 5,
+      "absent" : null,
+      "date" : null
+    }, {
+      "employeeId" : null,
+      "absent" : null,
+      "date" : null
+    } ]
+  },
+  "Expected Result" : "Response status 200 OK with savedCount 0, presentCount 0, absentCount 0, invalidEntries contains [5]",
+  "Priority" : "Medium",
+  "Type" : "Functional",
+  "_meta" : {
+    "endpoint" : "POST:/mark-batch",
+    "hash" : "27189b9f1e3c952fe309e4f76065a37361874ecfdc017cd22891f5a42dd6f869",
+    "runId" : "2025-12-27T09:21:12.253023400Z",
     "mode" : "EDIT"
   }
 } ]
