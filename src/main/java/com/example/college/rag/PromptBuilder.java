@@ -44,6 +44,7 @@ public class PromptBuilder {
             - "Test Steps" (array of strings)
             - "Input" (object: endpoint, method, pathParams, queryParams, body)
             - "Expected Result"
+            - "Expected Status"
             - "Priority"
             - "Type"
 
@@ -102,6 +103,7 @@ public class PromptBuilder {
             - "Test Steps" (array of strings)
             - "Input" (object: endpoint, method, pathParams, queryParams, body)
             - "Expected Result"
+            - "Expected Status"
             - "Priority"
             - "Type"
             

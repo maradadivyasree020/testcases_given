@@ -24,10 +24,11 @@ public class ApiSpec {
         }
 
         // Body
-        Object body = null;
-        if (input.has("body") && !input.get("body").isNull()) {
-            body = input.get("body");
-        }
+        // Object body = null;
+        // if (input.has("body") && !input.get("body").isNull()) {
+        //     body = input.get("body");
+        // }
+        JsonNode body = tc.get("Input").get("body"); // keep as JsonNode
 
         // Query params
         Map<String, String> queryParams = new HashMap<>();
@@ -50,7 +51,7 @@ public class ApiSpec {
             });
         }
 
-        int expectedStatus = inferExpectedStatus(tc);
+        int expectedStatus = tc.has("Expected Status")? tc.get("Expected Status").asInt(): -1;
 
         return new ExecutableSpec(
             method,
@@ -68,18 +69,18 @@ public class ApiSpec {
             : null;
     }
 
-    private static int inferExpectedStatus(JsonNode tc) {
-        if (tc.has("ExpectedStatus")) {
-            return tc.get("ExpectedStatus").asInt();
-        }
+    // private static int inferExpectedStatus(JsonNode tc) {
+    //     if (tc.has("ExpectedStatus")) {
+    //         return tc.get("ExpectedStatus").asInt();
+    //     }
 
-        if (tc.has("Expected Result")) {
-            String s = tc.get("Expected Result").asText();
-            if (s.contains("200")) return 200;
-            if (s.contains("400")) return 400;
-            if (s.contains("404")) return 404;
-            if (s.contains("500")) return 500;
-        }
-        return 200;
-    }
+    //     if (tc.has("Expected Result")) {
+    //         String s = tc.get("Expected Result").asText();
+    //         if (s.contains("200")) return 200;
+    //         if (s.contains("400")) return 400;
+    //         if (s.contains("404")) return 404;
+    //         if (s.contains("500")) return 500;
+    //     }
+    //     return 200;
+    // }
 }

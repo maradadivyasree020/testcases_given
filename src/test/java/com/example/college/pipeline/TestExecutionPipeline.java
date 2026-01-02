@@ -60,52 +60,50 @@ public class TestExecutionPipeline {
             boolean hasPathVars = spec.endpoint.contains("{");
 
 
-    if (!hasPathVars) {
-        // No {id} in URL → no path params needed
-        request = switch (spec.method.toUpperCase()) {
-            case "POST" -> post(spec.endpoint);
-            case "PUT" -> put(spec.endpoint);
-            case "DELETE" -> delete(spec.endpoint);
-            default -> get(spec.endpoint);
-        };
-    } else {
-        // Endpoint has path variables → must validate pathParams
-        if (spec.pathParams == null || spec.pathParams.isEmpty()) {
-            return new TestResult(
-                id,
-                title,
-                spec.expectedStatus,
-                -1,
-                "FAIL",
-                "Missing path parameters for endpoint"
-            );
-        }
+            if (!hasPathVars) {
+            // No {id} in URL → no path params needed
+                request = switch (spec.method.toUpperCase()) {
+                    case "POST" -> post(spec.endpoint);
+                    case "PUT" -> put(spec.endpoint);
+                    case "DELETE" -> delete(spec.endpoint);
+                    default -> get(spec.endpoint);
+                };
+            } 
+            else {
+            // Endpoint has path variables → must validate pathParams
+                if (spec.pathParams == null || spec.pathParams.isEmpty()) {
+                    return new TestResult(
+                        id,
+                        title,
+                        spec.expectedStatus,
+                        -1,
+                        "FAIL",
+                        "Missing path parameters for endpoint"
+                    );
+                }
+                for (Object v : spec.pathParams.values()) {
+                    if (v == null) {
+                        return new TestResult(
+                            id,
+                            title,
+                            spec.expectedStatus,
+                            -1,
+                            "FAIL",
+                            "Path variable is null, cannot expand URI"
+                        );
+                    }
+                }
 
-        for (Object v : spec.pathParams.values()) {
-            if (v == null) {
-                return new TestResult(
-                    id,
-                    title,
-                    spec.expectedStatus,
-                    -1,
-                    "FAIL",
-                    "Path variable is null, cannot expand URI"
-                );
+                Object[] uriVars = spec.pathParams.values().toArray();
+
+                request = switch (spec.method.toUpperCase()) {
+                    case "POST" -> post(spec.endpoint, uriVars);
+                    case "PUT" -> put(spec.endpoint, uriVars);
+                    case "DELETE" -> delete(spec.endpoint, uriVars);
+                    default -> get(spec.endpoint, uriVars);
+                };
             }
-        }
-
-        Object[] uriVars = spec.pathParams.values().toArray();
-
-        request = switch (spec.method.toUpperCase()) {
-            case "POST" -> post(spec.endpoint, uriVars);
-            case "PUT" -> put(spec.endpoint, uriVars);
-            case "DELETE" -> delete(spec.endpoint, uriVars);
-            default -> get(spec.endpoint, uriVars);
-        };
-    }
-
-
-            // Query params
+                // Query params
             if (spec.queryParams != null) {
                 for (Map.Entry<String, String> e : spec.queryParams.entrySet()) {
                     request.param(e.getKey(), e.getValue());
@@ -115,11 +113,17 @@ public class TestExecutionPipeline {
             // Body
             if (spec.body != null) {
                 request.contentType(MediaType.APPLICATION_JSON)
-                       .content(MAPPER.writeValueAsString(spec.body));
-            }
+                    .content(MAPPER.writeValueAsString(spec.body));
+            } 
+            System.out.println(spec.method + " " + spec.endpoint + " " + spec.pathParams);
 
             MvcResult result = mockMvc.perform(request).andReturn();
             int actualStatus = result.getResponse().getStatus();
+
+            System.out.println("Resolved URI  : " +
+    result.getRequest().getRequestURI());
+
+
 
             return new TestResult(
                 id,
@@ -131,8 +135,8 @@ public class TestExecutionPipeline {
                     ? "Executed successfully"
                     : "Expected " + spec.expectedStatus + " but got " + actualStatus
             );
-
-        } catch (Exception e) {
+        } 
+        catch (Exception e) {
             return new TestResult(
                 id,
                 title,

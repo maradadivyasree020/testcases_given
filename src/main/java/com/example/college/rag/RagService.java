@@ -49,6 +49,9 @@ public class RagService {
     private void ingestFileSafe(Path file) {
         try {
             String code = Files.readString(file);
+            if (file.equals("TestCaseController")) {
+                    return; // skip endpoint generation
+                }
             List<String> chunks = codeChunker.chunk(code);
 
             for (int i = 0; i < chunks.size(); i++) {

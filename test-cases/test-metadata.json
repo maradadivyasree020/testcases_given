@@ -1,12 +1,9 @@
 {
-  "PUT:/mark" : "8b052a42caa9bef66b521d3665cbe787b819a9011e1ff23d04bb694e95a5b882",
-  "POST:/mark-batch" : "27189b9f1e3c952fe309e4f76065a37361874ecfdc017cd22891f5a42dd6f869",
-  "GET:/employe" : "813279c18aa129aca6f5afac93d49fc136a5dec628dad61410d67b4828d41c93",
-  "GET:/employe/{id}" : "512f1afd7444df14dd6cf5c3854fe764b4ff3f186c0abe002e88f44a7dc3726d",
-  "POST:/employee" : "575787417f7222eb3f551ee706ecd0a5e5a7e588b7414543aefe182a6775dd5a",
+  "PUT:/mark" : "62c20ab8f8b90a217a32fae2e88cc4fa7873b255af132c6e0ca24ef334e16006",
+  "POST:/mark-batch" : "afca4dd6df9ea3ad782d1e2233939d9ea5db69b5493d95e45e88d3223c266670",
+  "GET:/employee" : "9cda37c150e6ac9d29a6a4580f5053f49ba5520ce4317eea736e751ea922878b",
+  "GET:/employee/{id}" : "4d16807efebe196171249f9b76f8ff77b64adec2d8c3a44debfd4ec53daa1f09",
+  "POST:/employee" : "1a774a6a812d45264aa0863fb6534f0cb42dcabb3a63bcf885c0b25b09ed96fa",
   "PUT:/employee/{id}" : "af5e3988e13581bfd86a4ed4516735a0d354e83d3f9fa2218bbc046f0864efa6",
-  "DELETE:/employee/{id}" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623",
-  "GET:/all" : "f0d8724a7f0070a0354b55037b865b91b736c7a3a830d9a6b6298402234426bd",
-  "GET:/diff" : "917b43ed3146fe74ff9a1a8a0ab0fd30b92116a3864e0baacf0109ab591ea851",
-  "POST:/run" : "09c5e7b303fe3264f582f98f313cd9e199e3bf86dc2e51f46828baf23da13ad3"
+  "DELETE:/employee/{id}" : "36bb56a2f241311bf3dab8d0b9d5537108bb6718a321643812146335b9dc1623"
 }

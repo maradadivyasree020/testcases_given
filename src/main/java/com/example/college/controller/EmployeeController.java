@@ -28,7 +28,7 @@ public class EmployeeController {
     // ----------------------------
     // GET /api/employe  -> list all employees
     // ----------------------------
-    @GetMapping("/employe")
+    @GetMapping("/employee")
     public ResponseEntity<List<EmployeeModel>> getEmployees() {
         List<EmployeeModel> list = repo.findAll();
         return ResponseEntity.ok(list);
@@ -37,7 +37,7 @@ public class EmployeeController {
     // ----------------------------
     // GET /api/employe/{id}  -> get single employee by id
     // ----------------------------
-    @GetMapping("/employe/{id}")
+    @GetMapping("/employee/{id}")
     public ResponseEntity<?> getEmployee(@PathVariable Long id) {
         if (id == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "id is required"));
@@ -59,7 +59,8 @@ public class EmployeeController {
         // Basic validation: require name and role (adjust according to your model)
         if (employee == null
                 || employee.getName() == null || employee.getName().strip().isEmpty()
-                || employee.getRole() == null || employee.getRole().strip().isEmpty()) {
+                || employee.getRole() == null || employee.getRole().strip().isEmpty()
+                || employee.getId() == null ) {
             return ResponseEntity.badRequest().body(Map.of("message", "name and role are required to enter"));
         }
 
