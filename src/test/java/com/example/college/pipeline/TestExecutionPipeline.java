@@ -115,9 +115,9 @@ public class TestExecutionPipeline {
                 request.contentType(MediaType.APPLICATION_JSON)
                     .content(MAPPER.writeValueAsString(spec.body));
             } 
-            System.out.println(spec.method + " " + spec.endpoint + " " + spec.pathParams);
 
-            MvcResult result = mockMvc.perform(request).andReturn();
+            MvcResult result = mockMvc.perform(request)
+        .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print()).andReturn();
             int actualStatus = result.getResponse().getStatus();
 
             System.out.println("Resolved URI  : " +

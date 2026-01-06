@@ -38,6 +38,7 @@ public class PromptBuilder {
 
             EACH TEST CASE MUST CONTAIN:
             - "Test Case ID"
+            - "Controller Name"
             - "Title"
             - "Description"
             - "Pre-Conditions"
@@ -97,6 +98,7 @@ public class PromptBuilder {
 
             EACH TEST CASE MUST CONTAIN:
             - "Test Case ID"
+            - "Controller Name"
             - "Title"
             - "Description"
             - "Pre-Conditions"

@@ -86,26 +86,25 @@ public class GenerateTestsFromJson {
 
             Files.writeString(metaFile,MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(meta));
 
-            ArrayNode diffReport = MAPPER.createArrayNode();
-
             System.out.println("\n DONE");
 
             Path diffFile = outDir.resolve("diff.json");
 
             Files.writeString(diffFile,MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(DIFF_REPORT),StandardOpenOption.CREATE,StandardOpenOption.TRUNCATE_EXISTING);
 
-            System.out.println("diff.json written with "
-                    + DIFF_REPORT.size() + " change(s)");
+            System.out.println("diff.json written with "+ DIFF_REPORT.size() + " change(s)");
 
+            ArrayNode updatedDiff = buildUpdatedDiff(DIFF_REPORT);
+            Path updatedDiffFile = outDir.resolve("updated-diff.json");
             if (DIFF_REPORT.size() > 0) {
-                ArrayNode updatedDiff = buildUpdatedDiff(DIFF_REPORT);
-
-                Path updatedDiffFile = outDir.resolve("updated-diff.json");
                 Files.writeString(updatedDiffFile,MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(updatedDiff));
-
                 System.out.println("updated-diff.json written with "+ updatedDiff.size() + " entry(s)");
             }
-        } 
+            else {
+                Files.writeString(updatedDiffFile,"[]",StandardOpenOption.CREATE,StandardOpenOption.TRUNCATE_EXISTING);
+                System.out.println(updatedDiff.size()+"updated-diff.json cleared (no changes)");
+            } 
+        }
         catch (Exception e) {
             e.printStackTrace();
         }
