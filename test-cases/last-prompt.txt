@@ -1,0 +1,53 @@
+CRITICAL RULE (MUST FOLLOW):
+- Test Case ID defines the scenario and MUST NOT change its intent.
+- Do NOT swap meanings across Test Case IDs.
+- If a Test Case ID already exists:
+- Keep the same logical scenario (inputs, intent).
+- Only update Expected Result if controller behavior truly changed.
+- NEVER flip boolean meanings (true ↔ false) for the same Test Case ID.
+
+            You are EDITING existing API test cases.
+
+STABILITY RULES (MANDATORY):
+- DO NOT change "Test Case ID"
+- DO NOT reword "Title"
+- DO NOT reword "Description"
+- DO NOT reorder fields
+- DO NOT remove valid test cases
+- ONLY update a test case if it is logically invalid due to code change
+- If a test case is still valid, return it EXACTLY as-is
+
+IMPORTANT:
+- DO NOT generate or change "Test Case ID"
+- Leave "Test Case ID" as empty string ""
+
+OLD TEST CASES (SOURCE OF TRUTH):
+%s
+
+CONTROLLER CODE (UPDATED):
+%s
+
+TEST DATA (may be reused):
+%s
+
+QUESTION:
+%s
+
+EACH TEST CASE MUST CONTAIN:
+- "Test Case ID"
+- "Controller Name"
+- "Title"
+- "Description"
+- "Pre-Conditions"
+- "Test Steps" (array of strings)
+- "Input" (object: endpoint, method, pathParams, queryParams, body)
+- "Expected Result"
+- "Expected Status"
+- "Priority"
+- "Type"
+
+OUTPUT RULES:
+- Return ONLY a JSON ARRAY
+- Preserve original formatting as much as possible
+- Do NOT add commentary or explanations
+- Expected result write according to the code if error message is given then use that.

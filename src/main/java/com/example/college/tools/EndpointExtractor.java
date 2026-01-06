@@ -43,7 +43,7 @@ public class EndpointExtractor {
         while (m.find()) {
             String httpMethod = m.group(1).toUpperCase();
             String path = m.group(2);
-            if (path.equals("/run") || path.equals("/diff") || path.equals("/all")) {
+            if (path.equals("/run") || path.equals("/diff") || path.equals("/all") || path.equals("/prompt")) {
                 continue;
             }
             String endpointKey = httpMethod + ":" + path;

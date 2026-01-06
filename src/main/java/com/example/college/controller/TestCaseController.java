@@ -1,11 +1,13 @@
 package com.example.college.controller;
 
+import com.example.college.rag.PromptBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.*;
 
@@ -89,4 +91,31 @@ public class TestCaseController {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
+    @GetMapping("/prompt")
+    public ResponseEntity<String> getLastPrompt() {
+
+        Path promptFile = root().resolve("test-cases/last-prompt.txt");
+
+        System.out.println("Prompt file path = " + promptFile.toAbsolutePath());
+        
+        try {
+            if (!Files.exists(promptFile)) {
+                return ResponseEntity.ok("No prompt generated yet");
+            }
+
+            String prompt = Files.readString(promptFile);
+
+            if (prompt.isBlank()) {
+                return ResponseEntity.ok("No prompt generated yet");
+            }
+
+            return ResponseEntity.ok(prompt);
+
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError()
+                    .body("Failed to read prompt file");
+        }
+    }
+
 }

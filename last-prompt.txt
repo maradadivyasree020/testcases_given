@@ -1,0 +1,355 @@
+CRITICAL RULE (MUST FOLLOW):
+- Test Case ID defines the scenario and MUST NOT change its intent.
+- Do NOT swap meanings across Test Case IDs.
+- If a Test Case ID already exists:
+- Keep the same logical scenario (inputs, intent).
+- Only update Expected Result if controller behavior truly changed.
+- NEVER flip boolean meanings (true ↔ false) for the same Test Case ID.
+
+            You are EDITING existing API test cases.
+
+STABILITY RULES (MANDATORY):
+- DO NOT change "Test Case ID"
+- DO NOT reword "Title"
+- DO NOT reword "Description"
+- DO NOT reorder fields
+- DO NOT remove valid test cases
+- ONLY update a test case if it is logically invalid due to code change
+- If a test case is still valid, return it EXACTLY as-is
+
+IMPORTANT:
+- DO NOT generate or change "Test Case ID"
+- Leave "Test Case ID" as empty string ""
+
+OLD TEST CASES (SOURCE OF TRUTH):
+[{"Test Case ID":"PUT__MARK-001","Controller Name":"AttendanceController","Title":"Mark attendance with valid employeeId and absent","Description":"Verify marking attendance with valid employeeId and absent fields returns 200 and attendance data","Pre-Conditions":"Employee with given employeeId exists","Test Steps":["Send PUT request to /api/attendance/mark with body containing valid employeeId and absent","Verify response status is 200","Verify response body contains attendance data with employeeId, date, and absent"],"Input":{"endpoint":"/api/attendance/mark","method":"PUT","pathParams":{},"queryParams":{},"body":{"employeeId":1,"absent":true}},"Expected Result":"Response status 200 with attendance data containing employeeId=1 and absent=true","Expected Status":200,"Priority":"High","Type":"Functional","_meta":{"endpoint":"PUT:/mark","hash":"62c20ab8f8b90a217a32fae2e88cc4fa7873b255af132c6e0ca24ef334e16006","runId":"2026-01-06T05:04:26.597648100Z","mode":"EDIT"}},{"Test Case ID":"PUT__MARK-002","Controller Name":"AttendanceController","Title":"Mark attendance with valid employeeId, absent and date","Description":"Verify marking attendance with valid employeeId, absent and date returns 200 and attendance data","Pre-Conditions":"Employee with given employeeId exists","Test Steps":["Send PUT request to /api/attendance/mark with body containing valid employeeId, absent and date","Verify response status is 200","Verify response body contains attendance data with employeeId, date, and absent"],"Input":{"endpoint":"/api/attendance/mark","method":"PUT","pathParams":{},"queryParams":{},"body":{"employeeId":1,"absent":false,"date":"2024-06-01"}},"Expected Result":"Response status 200 with attendance data containing employeeId=1, absent=false and date=2024-06-01","Expected Status":200,"Priority":"High","Type":"Functional","_meta":{"endpoint":"PUT:/mark","hash":"62c20ab8f8b90a217a32fae2e88cc4fa7873b255af132c6e0ca24ef334e16006","runId":"2026-01-06T05:04:26.597648100Z","mode":"EDIT"}},{"Test Case ID":"PUT__MARK-003","Controller Name":"AttendanceController","Title":"Mark attendance with null request body","Description":"Verify marking attendance with null request body returns 400 with error message","Pre-Conditions":"None","Test Steps":["Send PUT request to /api/attendance/mark with null body","Verify response status is 400","Verify response body contains message 'employeeId and absent required'"],"Input":{"endpoint":"/api/attendance/mark","method":"PUT","pathParams":{},"queryParams":{},"body":null},"Expected Result":"Response status 400 with message 'employeeId and absent required'","Expected Status":400,"Priority":"High","Type":"Functional","_meta":{"endpoint":"PUT:/mark","hash":"62c20ab8f8b90a217a32fae2e88cc4fa7873b255af132c6e0ca24ef334e16006","runId":"2026-01-06T05:04:26.597648100Z","mode":"EDIT"}},{"Test Case ID":"PUT__MARK-004","Controller Name":"AttendanceController","Title":"Mark attendance with missing employeeId","Description":"Verify marking attendance with missing employeeId returns 400 with error message","Pre-Conditions":"None","Test Steps":["Send PUT request to /api/attendance/mark with body missing employeeId","Verify response status is 400","Verify response body contains message 'employeeId and absent required'"],"Input":{"endpoint":"/api/attendance/mark","method":"PUT","pathParams":{},"queryParams":{},"body":{"absent":true}},"Expected Result":"Response status 400 with message 'employeeId and absent required'","Expected Status":400,"Priority":"High","Type":"Functional","_meta":{"endpoint":"PUT:/mark","hash":"62c20ab8f8b90a217a32fae2e88cc4fa7873b255af132c6e0ca24ef334e16006","runId":"2026-01-06T05:04:26.597648100Z","mode":"EDIT"}},{"Test Case ID":"PUT__MARK-005","Controller Name":"AttendanceController","Title":"Mark attendance with missing absent field","Description":"Verify marking attendance with missing absent field returns 400 with error message","Pre-Conditions":"None","Test Steps":["Send PUT request to /api/attendance/mark with body missing absent field","Verify response status is 400","Verify response body contains message 'employeeId and absent required'"],"Input":{"endpoint":"/api/attendance/mark","method":"PUT","pathParams":{},"queryParams":{},"body":{"employeeId":1}},"Expected Result":"Response status 400 with message 'employeeId and absent required'","Expected Status":400,"Priority":"High","Type":"Functional","_meta":{"endpoint":"PUT:/mark","hash":"62c20ab8f8b90a217a32fae2e88cc4fa7873b255af132c6e0ca24ef334e16006","runId":"2026-01-06T05:04:26.597648100Z","mode":"EDIT"}}]
+
+CONTROLLER CODE (UPDATED):
+// File: C:\Users\maradas\Downloads\testcase_analysis\src\main\java\com\example\college\controller\AttendanceController.java
+package com.example.college.controller;
+
+import com.example.college.model.AttendanceModel;
+import com.example.college.repository.AttendanceRepo;
+import com.example.college.service.AttendanceService;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.*;
+
+@RestController
+@RequestMapping("/api/attendance")
+@CrossOrigin(origins = "http://localhost:5173")
+public class AttendanceController {
+
+    private final AttendanceRepo repo;
+    private final AttendanceService attendanceService;
+
+    public AttendanceController(AttendanceRepo repo, AttendanceService attendanceService) {
+        this.repo = repo;
+        this.attendanceService = attendanceService;
+    }
+
+    // -----------------------------
+    // DTO
+    // -----------------------------
+    public static class AttendanceDTO {
+        private Long employeeId;
+        private Boolean absent;
+        private LocalDate date;
+
+        public AttendanceDTO() {}
+
+        public Long getEmployeeId() { return employeeId; }
+        public void setEmployeeId(Long employeeId) { this.employeeId = employeeId; }
+
+        public Boolean getAbsent() { return absent; }
+        public void setAbsent(Boolean absent) { this.absent = absent; }
+
+        public LocalDate getDate() { return date; }
+        public void setDate(LocalDate date) { this.date = date; }
+    }
+
+
+    // ==========================================================
+    // PUT /mark  → Mark Single Attendance
+    // ==========================================================
+    @PutMapping("/mark")
+    public ResponseEntity<?> markSingle(@RequestBody AttendanceDTO dto) {
+
+        // Validation — consistent style
+        if (dto == null || dto.getEmployeeId() == null || dto.getAbsent() == null) {
+            return ResponseEntity.badRequest().body(
+                Map.of("message", "employeeId and absent required TO ENTER")
+            );
+        }
+
+        LocalDate markDate = dto.getDate() == null ? LocalDate.now() : dto.getDate();
+
+        AttendanceModel result =
+                attendanceService.markSingleAttendance(dto.getEmployeeId(), markDate, dto.getAbsent());
+
+        return ResponseEntity.ok(result);
+    }
+
+
+    // ==========================================================
+    // POST /mark-batch  → Mark Batch Attendance
+    // ==========================================================
+    @PostMapping("/mark-batch")
+    @Transactional
+    public ResponseEntity<Map<String, Object>> markBatch(@RequestBody List<AttendanceDTO> payload) {
+
+        // Validation
+        if (payload == null || payload.isEmpty()) {
+            return ResponseEntity.badRequest().body(
+                Map.of("message", "payload is empty")
+
+
+// File: C:\Users\maradas\Downloads\testcase_analysis\src\main\java\com\example\college\tools\GenerateTestsFromJson.java
+
+                meta.put(epKey, newHash);
+            }
+
+            Files.writeString(testFile,MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(allTests));
+
+            Files.writeString(metaFile,MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(meta));
+
+            System.out.println("\n DONE");
+
+            Path diffFile = outDir.resolve("diff.json");
+
+            Files.writeString(diffFile,MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(DIFF_REPORT),StandardOpenOption.CREATE,StandardOpenOption.TRUNCATE_EXISTING);
+
+            System.out.println("diff.json written with "+ DIFF_REPORT.size() + " change(s)");
+
+            ArrayNode updatedDiff = buildUpdatedDiff(DIFF_REPORT);
+            Path updatedDiffFile = outDir.resolve("updated-diff.json");
+            if (DIFF_REPORT.size() > 0) {
+                Files.writeString(updatedDiffFile,MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(updatedDiff));
+                System.out.println("updated-diff.json written with "+ updatedDiff.size() + " entry(s)");
+            }
+            else {
+                Files.writeString(updatedDiffFile,"[]",StandardOpenOption.CREATE,StandardOpenOption.TRUNCATE_EXISTING);
+                System.out.println(updatedDiff.size()+"updated-diff.json cleared (no changes)");
+            } 
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ---------------- HELPERS ----------------
+
+    static JsonNode stripMeta(JsonNode tc) {
+        ObjectNode copy = tc.deepCopy();
+        copy.remove("_meta");
+        return copy;
+    }
+
+    static ArrayNode generate(RagService rag, String ep, String data) {
+        String out = rag.generateTestCasesForQuestion(ep, data);
+        return parse(out);
+    }
+
+    static ArrayNode edit(RagService rag, ArrayNode old, String ep) {
+        String out = rag.editExistingTests(old.toString(), ep, null);
+        return parse(out);
+    }
+
+    // Stable IDs: endpoint + index
+    static void assignStableIds(ArrayNode arr, String ep) {
+        int i = 1;
+        for (JsonNode n : arr) {
+            ((ObjectNode) n).put(
+                "Test Case ID",
+                ep.replaceAll("[^a-zA-Z0-9]", "_").toUpperCase()
+                    + "-" + String.format("%03d", i++)
+            );
+        }
+    }
+
+    static void tag(ArrayNode arr, String ep, String hash, String runId, String mode) {
+        for (JsonNode n : arr) {
+            ObjectNode m = MAPPER.createObjectNode();
+            m.put("endpoint", ep);
+            m.put("hash", hash);
+            m.put("runId", runId);
+            m.put("mode", mode);
+            ((ObjectNode) n).set("_meta", m);
+        }
+    }
+
+    static void removeOld(ArrayNode all, String ep) {
+        ArrayNode keep = MAPPER.createArrayNode();
+        for (JsonNode t : all) {
+            if (!ep.equals(t.path("_meta").path("endpoint").asText())) {
+                keep.add(t);
+            }
+        }
+
+
+// File: C:\Users\maradas\Downloads\testcase_analysis\src\main\java\com\example\college\tools\EmbeddingClient.java
+}
+
+
+// File: C:\Users\maradas\Downloads\testcase_analysis\src\main\java\com\example\college\service\AttendanceService.java
+package com.example.college.service;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.college.model.AttendanceModel;
+import com.example.college.model.EmployeeModel;
+import com.example.college.repository.AttendanceRepo;
+import com.example.college.repository.EmployeeRepo;
+
+@Service
+public class AttendanceService {
+    private final AttendanceRepo attendanceRepo;
+    private final EmployeeRepo employeeRepo;
+
+    public AttendanceService(AttendanceRepo attendanceRepo, EmployeeRepo employeeRepo) {
+        this.attendanceRepo = attendanceRepo;
+        this.employeeRepo = employeeRepo;
+    }
+
+    @Transactional
+    public AttendanceModel markSingleAttendance(Long employeeId, LocalDate date, Boolean absent) {
+        LocalDate markDate = (date == null ? LocalDate.now() : date);
+
+        // find existing attendance
+        Optional<AttendanceModel> existingOpt = attendanceRepo.findByEmployeeIdAndDate(employeeId, markDate);
+
+        AttendanceModel saved;
+        Boolean previousAbsent = null;
+
+        if (existingOpt.isPresent()) {
+            AttendanceModel existing = existingOpt.get();
+            previousAbsent = existing.getAbsent();
+            existing.setAbsent(absent);
+            saved = attendanceRepo.save(existing);
+        } else {
+            AttendanceModel created = new AttendanceModel(employeeId, markDate, absent);
+            saved = attendanceRepo.save(created);
+        }
+
+        // update employee counters — ensure employee id types align (see note below)
+        Optional<EmployeeModel> eOpt = employeeRepo.findById(employeeId); // EmployeeRepo should use Long id
+
+        if (eOpt.isPresent()) {
+            EmployeeModel employee = eOpt.get();
+
+            if (employee.getTotalPresent() == null) employee.setTotalPresent(0);
+            if (employee.getTotalAbsent() == null) employee.setTotalAbsent(0);
+
+            if (previousAbsent == null) {
+                if (absent) employee.setTotalAbsent(employee.getTotalAbsent() + 1);
+                else employee.setTotalPresent(employee.getTotalPresent() + 1);
+            } else if (!previousAbsent.equals(absent)) {
+                if (previousAbsent) {
+                    // was absent, now present
+                    employee.setTotalAbsent(employee.getTotalAbsent() - 1);
+                    employee.setTotalPresent(employee.getTotalPresent() + 1);
+                } else {
+                    // was present, now absent
+                    employee.setTotalPresent(employee.getTotalPresent() - 1);
+                    employee.setTotalAbsent(employee.getTotalAbsent() + 1);
+                }
+            }
+
+            employee.setLastAttendanceDate(markDate);
+            employeeRepo.save(employee);
+        }
+
+        return saved;
+    }
+}
+
+
+// File: C:\Users\maradas\Downloads\testcase_analysis\src\main\java\com\example\college\controller\EmployeeController.java
+    // ----------------------------
+    @PutMapping("/employee/{id}")
+public ResponseEntity<?> updateEmployee(
+        @PathVariable Long id,
+        @RequestBody EmployeeModel updatedEmployee) {
+
+    if (id == null) {
+        return ResponseEntity.badRequest().body(Map.of("message", "id is required"));
+    }
+
+    if (updatedEmployee == null) {
+        return ResponseEntity.badRequest().body(Map.of("message", "request body is required"));
+    }
+
+    Optional<EmployeeModel> opt = repo.findById(id);
+    if (opt.isEmpty()) {
+        return ResponseEntity.status(404).body(Map.of("message", "employee not found"));
+    }
+
+    EmployeeModel existing = opt.get();
+    if (updatedEmployee.getName() != null) existing.setName(updatedEmployee.getName());
+    if (updatedEmployee.getRole() != null) existing.setRole(updatedEmployee.getRole());
+    if (updatedEmployee.getAbsent() != null) existing.setAbsent(updatedEmployee.getAbsent());
+    // add more fields if needed
+
+    EmployeeModel saved = repo.save(existing);
+    return ResponseEntity.ok(saved);
+}
+
+
+    // ----------------------------
+    // DELETE /api/employee/{id}  -> delete employee
+    // ----------------------------
+    @DeleteMapping("/employee/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        if (id == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "id is required"));
+        }
+
+        boolean exists = repo.existsById(id);
+        if (!exists) {
+            return ResponseEntity.status(404).body(Map.of("message", "employee not found"));
+        }
+
+        repo.deleteById(id);
+        return ResponseEntity.noContent().build(); // 204
+    }
+}
+
+
+// File: C:\Users\maradas\Downloads\testcase_analysis\src\main\java\com\example\college\config\SecurityConfig.java
+
+
+
+
+
+TEST DATA (may be reused):
+null
+
+QUESTION:
+PUT:/mark
+
+EACH TEST CASE MUST CONTAIN:
+- "Test Case ID"
+- "Controller Name"
+- "Title"
+- "Description"
+- "Pre-Conditions"
+- "Test Steps" (array of strings)
+- "Input" (object: endpoint, method, pathParams, queryParams, body)
+- "Expected Result"
+- "Expected Status"
+- "Priority"
+- "Type"
+
+OUTPUT RULES:
+- Return ONLY a JSON ARRAY
+- Preserve original formatting as much as possible
+- Do NOT add commentary or explanations
+- Expected result write according to the code if error message is given then use that.

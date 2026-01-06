@@ -1,15 +1,29 @@
 package com.example.college.rag;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 
+// import com.itextpdf.text.pdf.parser.Path;
+
 public class PromptBuilder {
+
+    private static volatile String LAST_PROMPT;
+
+    public static String getLastPrompt() {
+        System.out.println(LAST_PROMPT);
+        return LAST_PROMPT;
+    }
 
     public String buildGeneratePrompt(String ctx,String question,String testDataJson) {
 
         String testDataSection =(testDataJson == null || testDataJson.isBlank())? "No explicit test data provided.":testDataJson;
 
-        return """
+        String prompt = """
             You are a senior Java QA engineer.
 
             TASK:
@@ -54,13 +68,31 @@ public class PromptBuilder {
 
             QUESTION:
             %s
-            """
-            .formatted(testDataSection, ctx, question);
+            """;
+            try {
+                Path TEST_CASES_DIR =
+                    Paths.get("").toAbsolutePath().resolve("test-cases");
+
+                Path promptFile = TEST_CASES_DIR.resolve("last-prompt.txt");
+
+                System.out.println("Writing prompt to: " + promptFile.toAbsolutePath());
+
+                Files.writeString(
+                    promptFile,
+                    prompt,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING
+                );
+            } 
+            catch (IOException e) {
+                throw new RuntimeException("Failed to write prompt file", e);
+            }
+            return prompt.formatted(testDataSection, ctx, question);
     }
 
     public String buildEditPrompt(String oldTestsJson,String ctx,String testDataJson,String question) {
 
-        return """
+        String prompt = """
             CRITICAL RULE (MUST FOLLOW):
             - Test Case ID defines the scenario and MUST NOT change its intent.
             - Do NOT swap meanings across Test Case IDs.
@@ -114,7 +146,24 @@ public class PromptBuilder {
             - Preserve original formatting as much as possible
             - Do NOT add commentary or explanations
             - Expected result write according to the code if error message is given then use that.
-            """
-            .formatted(oldTestsJson, ctx, testDataJson, question);
+            """;
+            try {
+                Path TEST_CASES_DIR =Paths.get("").toAbsolutePath().resolve("test-cases");
+
+                Path promptFile = TEST_CASES_DIR.resolve("last-prompt.txt");
+
+                System.out.println("Writing prompt to: " + promptFile.toAbsolutePath());
+
+                Files.writeString(
+                    promptFile,
+                    prompt,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING
+                );
+            } 
+            catch (IOException e) {
+                throw new RuntimeException("Failed to write prompt file", e);
+            }
+            return prompt.formatted(oldTestsJson, ctx, testDataJson, question);
     }
 }
