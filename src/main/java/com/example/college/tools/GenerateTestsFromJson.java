@@ -1,6 +1,7 @@
 package com.example.college.tools;
 
 import com.example.college.rag.RagService;
+import com.example.college.tools.EndpointExtractor.EndpointInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -40,7 +41,38 @@ public class GenerateTestsFromJson {
             // Extract endpoints
             Map<String, EndpointExtractor.EndpointInfo> endpoints = EndpointExtractor.extractEndpoints(src);
 
-            for (EndpointExtractor.EndpointInfo ep : endpoints.values()) {
+            List<EndpointInfo> orderedEndpoints = new ArrayList<>(endpoints.values());
+
+            // Map<String, Integer> CONTROLLER_ORDER = Map.of("EmployeeController", 1,"AttendanceController", 2);
+            
+
+            orderedEndpoints.sort(
+                Comparator
+                    //  Controller order
+                    .comparing((EndpointExtractor.EndpointInfo e) -> {
+                        if (e.controllerCode.contains("AttendanceController")) return 1;
+                        if (e.controllerCode.contains("EmployeeController")) return 2;
+                        return 99; // others last
+                    })
+
+                    // HTTP method order: POST → GET → PUT → DELETE
+                    .thenComparing(e -> {
+                        String method = e.endpointKey.split(":")[0];
+                        return Map.of(
+                            "POST", 1,
+                            "GET", 2,
+                            "PUT", 3,
+                            "DELETE", 4
+                        ).getOrDefault(method, 99);
+                    })
+
+                    // Stable path order
+                    .thenComparing(e -> e.endpointKey)
+            );
+
+
+            for (EndpointExtractor.EndpointInfo ep : orderedEndpoints) {
+
                 String epKey = ep.endpointKey;       // GET:/employee/{id}
                 // String epCode = ep.getValue();
 
@@ -82,6 +114,8 @@ public class GenerateTestsFromJson {
                 meta.put(epKey, newHash);
             }
 
+            sortAllTests(allTests);
+
             Files.writeString(testFile,MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(allTests));
 
             Files.writeString(metaFile,MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(meta));
@@ -110,7 +144,43 @@ public class GenerateTestsFromJson {
         }
     }
 
+
     // ---------------- HELPERS ----------------
+
+    static void sortAllTests(ArrayNode allTests) {
+        List<JsonNode> list = new ArrayList<>();
+        allTests.forEach(list::add);
+
+        list.sort(
+            Comparator
+                // Controller order
+                .comparing((JsonNode n) -> {
+                    String controller = n.path("Controller Name").asText();
+                    if (controller.equals("AttendanceController")) return 2;
+                    if (controller.equals("EmployeeController")) return 1;
+                    return 99;
+                })
+
+                // HTTP method order: POST → GET → PUT → DELETE
+                .thenComparing(n -> {
+                    String method = n.path("Input").path("method").asText();
+                    return Map.of(
+                        "POST", 1,
+                        "GET", 2,
+                        "PUT", 3,
+                        "DELETE", 4
+                    ).getOrDefault(method, 99);
+                })
+
+                // Stable endpoint + test id ordering
+                .thenComparing(n -> n.path("_meta").path("endpoint").asText())
+                .thenComparing(n -> n.path("Test Case ID").asText())
+        );
+
+        allTests.removeAll();
+        list.forEach(allTests::add);
+    }
+
 
     static JsonNode stripMeta(JsonNode tc) {
         ObjectNode copy = tc.deepCopy();
