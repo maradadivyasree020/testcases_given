@@ -1,6 +1,7 @@
 package com.example.college.tools;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -18,6 +19,20 @@ public class EndpointExtractor {
             "(public|private|protected)\\s+[^{]+\\{",
             Pattern.MULTILINE
     );
+
+    private static final Set<String> IGNORED_PATHS = loadIgnoredPaths();
+
+    private static Set<String> loadIgnoredPaths() {
+        Properties p = loadProps("config/dependencies.properties");
+        String v = p.getProperty("paths", "");
+
+        Set<String> set = new HashSet<>();
+        for (String s : v.split(",")) {
+            set.add(s.trim());   
+        }
+        return set;
+    }
+
 
     public static Map<String, EndpointInfo> extractEndpoints(Path srcRoot) throws IOException {
         Map<String, EndpointInfo> endpoints = new LinkedHashMap<>();
@@ -43,9 +58,12 @@ public class EndpointExtractor {
         while (m.find()) {
             String httpMethod = m.group(1).toUpperCase();
             String path = m.group(2);
-            if (path.equals("/run") || path.equals("/diff") || path.equals("/all") || path.equals("/prompt")) {
-                continue;
-            }
+            // if (path.equals("/run") || path.equals("/diff") || path.equals("/all") || path.equals("/prompt")) {
+            //     continue;
+            // }
+            if (IGNORED_PATHS.contains(path))
+            continue;
+
             String endpointKey = httpMethod + ":" + path;
 
             int searchFrom = m.end();
@@ -77,32 +95,71 @@ public class EndpointExtractor {
         }
     }
 
-    private static Set<String> extractDependencies(String controllerCode) {
-    Set<String> deps = new HashSet<>();
+    private static Properties loadProps(String path) {
+        try (InputStream is =
+            EndpointExtractor.class
+                .getClassLoader()
+                .getResourceAsStream(path)) {
 
-    // --- Service fields ---
-    if (controllerCode.matches("(?s).*AttendanceService\\s+\\w+.*"))
-        deps.add("AttendanceService");
+            if (is == null)
+                throw new RuntimeException("Missing config: " + path);
 
-    if (controllerCode.matches("(?s).*EmployeeService\\s+\\w+.*"))
-        deps.add("EmployeeService");
+            Properties p = new Properties();
+            p.load(is);
+            return p;
 
-    // --- Repo fields ---
-    if (controllerCode.matches("(?s).*AttendanceRepo\\s+\\w+.*"))
-        deps.add("AttendanceRepo");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-    if (controllerCode.matches("(?s).*EmployeeRepo\\s+\\w+.*"))
-        deps.add("EmployeeRepo");
+    // private static Set<String> extractDependencies(String controllerCode) {
+    //     Set<String> deps = new HashSet<>();
 
-    // --- Models ---
-    if (controllerCode.contains("AttendanceModel"))
-        deps.add("AttendanceModel");
+    //     // --- Service fields ---
+    //     if (controllerCode.matches("(?s).*AttendanceService\\s+\\w+.*"))
+    //         deps.add("AttendanceService");
 
-    if (controllerCode.contains("EmployeeModel"))
-        deps.add("EmployeeModel");
+    //     if (controllerCode.matches("(?s).*EmployeeService\\s+\\w+.*"))
+    //         deps.add("EmployeeService");
 
-    return deps;
-}
+    //     // --- Repo fields ---
+    //     if (controllerCode.matches("(?s).*AttendanceRepo\\s+\\w+.*"))
+    //         deps.add("AttendanceRepo");
+
+    //     if (controllerCode.matches("(?s).*EmployeeRepo\\s+\\w+.*"))
+    //         deps.add("EmployeeRepo");
+
+    //     // --- Models ---
+    //     if (controllerCode.contains("AttendanceModel"))
+    //         deps.add("AttendanceModel");
+
+    //     if (controllerCode.contains("EmployeeModel"))
+    //         deps.add("EmployeeModel");
+
+    //     return deps;
+    // }
+
+    private static final Map<String, Set<String>> DEPENDENCIES = loadDependencies();
+
+    private static Map<String, Set<String>> loadDependencies() {
+        Properties p = loadProps("config/dependencies.properties");
+        Map<String, Set<String>> map = new HashMap<>();
+
+        for (String key : p.stringPropertyNames()) {
+            map.put(key, Set.of(p.getProperty(key).split(",")));
+        }
+        return map;
+    }
+
+    private static Set<String> extractDependencies(String code) {
+        Set<String> out = new HashSet<>();
+        DEPENDENCIES.values().forEach(set ->
+            set.forEach(d -> { if (code.contains(d)) out.add(d); })
+        );
+        return out;
+    }
+
 
     // ===============================
     // DATA HOLDER

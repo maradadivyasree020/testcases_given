@@ -41,7 +41,6 @@ public class RagService {
     public void ingestJavaSources(Path root) throws IOException {
         try (var stream = Files.walk(root)) {
             stream.filter(p -> p.toString().endsWith(".java"))
-                  .filter(p -> !p.getFileName().toString().equals("TestCaseController.java"))
                   .forEach(this::ingestFileSafe);
         }
     }
@@ -50,8 +49,8 @@ public class RagService {
         try {
             String code = Files.readString(file);
             if (file.equals("TestCaseController")) {
-                    return; // skip endpoint generation
-                }
+                return; // skip endpoint generation
+            }
             List<String> chunks = codeChunker.chunk(code);
 
             for (int i = 0; i < chunks.size(); i++) {
