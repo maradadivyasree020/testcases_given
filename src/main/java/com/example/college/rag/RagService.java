@@ -41,6 +41,7 @@ public class RagService {
     public void ingestJavaSources(Path root) throws IOException {
         try (var stream = Files.walk(root)) {
             stream.filter(p -> p.toString().endsWith(".java"))
+                  .filter(p -> !p.getFileName().toString().equals("TestCaseController.java"))
                   .forEach(this::ingestFileSafe);
         }
     }

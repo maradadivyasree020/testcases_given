@@ -14,10 +14,6 @@ public class PromptBuilder {
 
     private static volatile String LAST_PROMPT;
 
-    public static String getLastPrompt() {
-        System.out.println(LAST_PROMPT);
-        return LAST_PROMPT;
-    }
 
     public String buildGeneratePrompt(String ctx,String question,String testDataJson) {
 
@@ -27,7 +23,7 @@ public class PromptBuilder {
             You are a senior Java QA engineer.
 
             TASK:
-            Generate API FUNCTIONAL test cases.
+            1. Generate API FUNCTIONAL test cases.
 
             IMPORTANT STABILITY RULES:
             - Use CLEAR, DIRECT, NON-CREATIVE language.
@@ -63,30 +59,13 @@ public class PromptBuilder {
             - "Priority"
             - "Type"
 
+
             CONTROLLER CODE:
             %s
 
             QUESTION:
             %s
             """;
-            try {
-                Path TEST_CASES_DIR =
-                    Paths.get("").toAbsolutePath().resolve("test-cases");
-
-                Path promptFile = TEST_CASES_DIR.resolve("last-prompt.txt");
-
-                System.out.println("Writing prompt to: " + promptFile.toAbsolutePath());
-
-                Files.writeString(
-                    promptFile,
-                    prompt,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING
-                );
-            } 
-            catch (IOException e) {
-                throw new RuntimeException("Failed to write prompt file", e);
-            }
             return prompt.formatted(testDataSection, ctx, question);
     }
 
@@ -146,24 +125,8 @@ public class PromptBuilder {
             - Preserve original formatting as much as possible
             - Do NOT add commentary or explanations
             - Expected result write according to the code if error message is given then use that.
+
             """;
-            try {
-                Path TEST_CASES_DIR =Paths.get("").toAbsolutePath().resolve("test-cases");
-
-                Path promptFile = TEST_CASES_DIR.resolve("last-prompt.txt");
-
-                System.out.println("Writing prompt to: " + promptFile.toAbsolutePath());
-
-                Files.writeString(
-                    promptFile,
-                    prompt,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING
-                );
-            } 
-            catch (IOException e) {
-                throw new RuntimeException("Failed to write prompt file", e);
-            }
             return prompt.formatted(oldTestsJson, ctx, testDataJson, question);
     }
 }
