@@ -57,7 +57,8 @@ jobs:
       - name: Execute test cases and generate PDF
         run: |
           echo "Running test execution pipeline"
-          mvn test -Dtest=JsonDrivenTestRunnerTest
+          mvn test -Dspring.profiles.active=test -Dtest=JsonDrivenTestRunnerTest
+
 
       # ---------------------------
       # 6️⃣ Upload results.pdf
