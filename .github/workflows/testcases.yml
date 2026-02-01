@@ -48,11 +48,17 @@ jobs:
       - name: Generate test cases (CI only)
         if: steps.diff.outputs.changed == 'true'
         run: |
-            echo "Generating test files in pipeline"
+            echo "Generating test files"
             mkdir -p test-cases
             mvn -q -DskipTests exec:java
+
+            # Verify files exist
+            ls -l
+
+            # Move into folder
             mv all-tests.json test-cases/all-tests.json
             mv diff.json test-cases/diff.json
+
 
       # ---------------------------
       # 5️⃣ Execute tests + generate PDF
