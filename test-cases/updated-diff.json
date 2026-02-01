@@ -1,0 +1,1001 @@
+[ {
+  "endpoint" : "AttendanceController:POST:/mark-batch",
+  "changeType" : "NEW",
+  "testCaseId" : "ATTENDANCECONTROLLER_POST__MARK_BATCH-003",
+  "new" : {
+    "Test Case ID" : "ATTENDANCECONTROLLER_POST__MARK_BATCH-003",
+    "Controller Name" : "AttendanceController",
+    "Title" : "Mark batch attendance with null payload",
+    "Description" : "Send null as payload to mark batch attendance",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Send POST request to /api/attendance/mark-batch with null body", "Verify response status and error message" ],
+    "Input" : {
+      "endpoint" : "/api/attendance/mark-batch",
+      "method" : "POST",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : null
+    },
+    "Expected Result" : "Response contains message 'payload is empty'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "AttendanceController:POST:/mark-batch",
+      "hash" : "afca4dd6df9ea3ad782d1e2233939d9ea5db69b5493d95e45e88d3223c266670",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "AttendanceController:POST:/mark-batch",
+  "changeType" : "NEW",
+  "testCaseId" : "ATTENDANCECONTROLLER_POST__MARK_BATCH-004",
+  "new" : {
+    "Test Case ID" : "ATTENDANCECONTROLLER_POST__MARK_BATCH-004",
+    "Controller Name" : "AttendanceController",
+    "Title" : "Mark batch attendance with some invalid entries",
+    "Description" : "Send a list with some AttendanceDTO objects missing employeeId or absent",
+    "Pre-Conditions" : "Employees exist for valid employeeIds",
+    "Test Steps" : [ "Prepare a list of AttendanceDTO objects where some have null employeeId or absent", "Send POST request to /api/attendance/mark-batch with the list as JSON body", "Verify response status and invalidEntries list" ],
+    "Input" : {
+      "endpoint" : "/api/attendance/mark-batch",
+      "method" : "POST",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : [ {
+        "employeeId" : 1,
+        "absent" : true,
+        "date" : "2024-06-01"
+      }, {
+        "employeeId" : null,
+        "absent" : false,
+        "date" : "2024-06-01"
+      }, {
+        "employeeId" : 3,
+        "absent" : null,
+        "date" : "2024-06-01"
+      }, {
+        "employeeId" : 4,
+        "absent" : false,
+        "date" : "2024-06-01"
+      } ]
+    },
+    "Expected Result" : "Response contains savedCount 2, presentCount 1, absentCount 1, invalidEntries list with employeeId 3, and savedRecords list with 2 records",
+    "Expected Status" : 200,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "AttendanceController:POST:/mark-batch",
+      "hash" : "afca4dd6df9ea3ad782d1e2233939d9ea5db69b5493d95e45e88d3223c266670",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "AttendanceController:POST:/mark-batch",
+  "changeType" : "NEW",
+  "testCaseId" : "ATTENDANCECONTROLLER_POST__MARK_BATCH-005",
+  "new" : {
+    "Test Case ID" : "ATTENDANCECONTROLLER_POST__MARK_BATCH-005",
+    "Controller Name" : "AttendanceController",
+    "Title" : "Mark batch attendance with missing date uses current date",
+    "Description" : "Send AttendanceDTO objects without date to verify current date is used",
+    "Pre-Conditions" : "Employees exist for given employeeIds",
+    "Test Steps" : [ "Prepare a list of AttendanceDTO objects with employeeId and absent but no date", "Send POST request to /api/attendance/mark-batch with the list as JSON body", "Verify response status and that savedRecords have current date" ],
+    "Input" : {
+      "endpoint" : "/api/attendance/mark-batch",
+      "method" : "POST",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : [ {
+        "employeeId" : 5,
+        "absent" : true
+      }, {
+        "employeeId" : 6,
+        "absent" : false
+      } ]
+    },
+    "Expected Result" : "Response contains savedCount 2, presentCount 1, absentCount 1, invalidEntries empty list, and savedRecords with current date",
+    "Expected Status" : 200,
+    "Priority" : "Medium",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "AttendanceController:POST:/mark-batch",
+      "hash" : "afca4dd6df9ea3ad782d1e2233939d9ea5db69b5493d95e45e88d3223c266670",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "AttendanceController:POST:/mark-batch",
+  "changeType" : "NEW",
+  "testCaseId" : "ATTENDANCECONTROLLER_POST__MARK_BATCH-001",
+  "new" : {
+    "Test Case ID" : "ATTENDANCECONTROLLER_POST__MARK_BATCH-001",
+    "Controller Name" : "AttendanceController",
+    "Title" : "Mark batch attendance with valid payload",
+    "Description" : "Send a valid list of attendance records to mark batch attendance",
+    "Pre-Conditions" : "Employees exist for given employeeIds",
+    "Test Steps" : [ "Prepare a list of AttendanceDTO objects with valid employeeId, absent, and optional date", "Send POST request to /api/attendance/mark-batch with the list as JSON body", "Verify response status and body" ],
+    "Input" : {
+      "endpoint" : "/api/attendance/mark-batch",
+      "method" : "POST",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : [ {
+        "employeeId" : 1,
+        "absent" : true,
+        "date" : "2024-06-01"
+      }, {
+        "employeeId" : 2,
+        "absent" : false,
+        "date" : "2024-06-01"
+      } ]
+    },
+    "Expected Result" : "Response contains savedCount 2, presentCount 1, absentCount 1, invalidEntries empty list, and savedRecords list with 2 records",
+    "Expected Status" : 200,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "AttendanceController:POST:/mark-batch",
+      "hash" : "afca4dd6df9ea3ad782d1e2233939d9ea5db69b5493d95e45e88d3223c266670",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "AttendanceController:POST:/mark-batch",
+  "changeType" : "NEW",
+  "testCaseId" : "ATTENDANCECONTROLLER_POST__MARK_BATCH-002",
+  "new" : {
+    "Test Case ID" : "ATTENDANCECONTROLLER_POST__MARK_BATCH-002",
+    "Controller Name" : "AttendanceController",
+    "Title" : "Mark batch attendance with empty payload",
+    "Description" : "Send an empty list to mark batch attendance",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Prepare an empty list", "Send POST request to /api/attendance/mark-batch with empty list as JSON body", "Verify response status and error message" ],
+    "Input" : {
+      "endpoint" : "/api/attendance/mark-batch",
+      "method" : "POST",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : [ ]
+    },
+    "Expected Result" : "Response contains message 'payload is empty'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "AttendanceController:POST:/mark-batch",
+      "hash" : "afca4dd6df9ea3ad782d1e2233939d9ea5db69b5493d95e45e88d3223c266670",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "AttendanceController:PUT:/mark",
+  "changeType" : "NEW",
+  "testCaseId" : "ATTENDANCECONTROLLER_PUT__MARK-001",
+  "new" : {
+    "Test Case ID" : "ATTENDANCECONTROLLER_PUT__MARK-001",
+    "Controller Name" : "AttendanceController",
+    "Title" : "Mark attendance with valid employeeId and absent",
+    "Description" : "Mark attendance for a single employee with valid employeeId and absent status",
+    "Pre-Conditions" : "Employee with given employeeId exists",
+    "Test Steps" : [ "Send PUT request to /api/attendance/mark with valid employeeId and absent in body", "Verify response status and body" ],
+    "Input" : {
+      "endpoint" : "/api/attendance/mark",
+      "method" : "PUT",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : {
+        "employeeId" : 1,
+        "absent" : true
+      }
+    },
+    "Expected Result" : "Response status is 200 OK and attendance record is returned with employeeId and absent status",
+    "Expected Status" : 200,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "AttendanceController:PUT:/mark",
+      "hash" : "62c20ab8f8b90a217a32fae2e88cc4fa7873b255af132c6e0ca24ef334e16006",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "AttendanceController:PUT:/mark",
+  "changeType" : "NEW",
+  "testCaseId" : "ATTENDANCECONTROLLER_PUT__MARK-002",
+  "new" : {
+    "Test Case ID" : "ATTENDANCECONTROLLER_PUT__MARK-002",
+    "Controller Name" : "AttendanceController",
+    "Title" : "Mark attendance with valid employeeId and absent false",
+    "Description" : "Mark attendance for a single employee with valid employeeId and absent false",
+    "Pre-Conditions" : "Employee with given employeeId exists",
+    "Test Steps" : [ "Send PUT request to /api/attendance/mark with valid employeeId and absent false in body", "Verify response status and body" ],
+    "Input" : {
+      "endpoint" : "/api/attendance/mark",
+      "method" : "PUT",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : {
+        "employeeId" : 1,
+        "absent" : false
+      }
+    },
+    "Expected Result" : "Response status is 200 OK and attendance record is returned with employeeId and absent false",
+    "Expected Status" : 200,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "AttendanceController:PUT:/mark",
+      "hash" : "62c20ab8f8b90a217a32fae2e88cc4fa7873b255af132c6e0ca24ef334e16006",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "AttendanceController:PUT:/mark",
+  "changeType" : "NEW",
+  "testCaseId" : "ATTENDANCECONTROLLER_PUT__MARK-003",
+  "new" : {
+    "Test Case ID" : "ATTENDANCECONTROLLER_PUT__MARK-003",
+    "Controller Name" : "AttendanceController",
+    "Title" : "Mark attendance with null request body",
+    "Description" : "Send PUT request to mark attendance with null request body",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Send PUT request to /api/attendance/mark with null body", "Verify response status and error message" ],
+    "Input" : {
+      "endpoint" : "/api/attendance/mark",
+      "method" : "PUT",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : null
+    },
+    "Expected Result" : "Response status is 400 Bad Request with message 'employeeId and absent required'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "AttendanceController:PUT:/mark",
+      "hash" : "62c20ab8f8b90a217a32fae2e88cc4fa7873b255af132c6e0ca24ef334e16006",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "AttendanceController:PUT:/mark",
+  "changeType" : "NEW",
+  "testCaseId" : "ATTENDANCECONTROLLER_PUT__MARK-004",
+  "new" : {
+    "Test Case ID" : "ATTENDANCECONTROLLER_PUT__MARK-004",
+    "Controller Name" : "AttendanceController",
+    "Title" : "Mark attendance with missing employeeId",
+    "Description" : "Send PUT request to mark attendance with absent but missing employeeId",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Send PUT request to /api/attendance/mark with body missing employeeId", "Verify response status and error message" ],
+    "Input" : {
+      "endpoint" : "/api/attendance/mark",
+      "method" : "PUT",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : {
+        "absent" : true
+      }
+    },
+    "Expected Result" : "Response status is 400 Bad Request with message 'employeeId and absent required'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "AttendanceController:PUT:/mark",
+      "hash" : "62c20ab8f8b90a217a32fae2e88cc4fa7873b255af132c6e0ca24ef334e16006",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "AttendanceController:PUT:/mark",
+  "changeType" : "NEW",
+  "testCaseId" : "ATTENDANCECONTROLLER_PUT__MARK-005",
+  "new" : {
+    "Test Case ID" : "ATTENDANCECONTROLLER_PUT__MARK-005",
+    "Controller Name" : "AttendanceController",
+    "Title" : "Mark attendance with missing absent field",
+    "Description" : "Send PUT request to mark attendance with employeeId but missing absent field",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Send PUT request to /api/attendance/mark with body missing absent", "Verify response status and error message" ],
+    "Input" : {
+      "endpoint" : "/api/attendance/mark",
+      "method" : "PUT",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : {
+        "employeeId" : 1
+      }
+    },
+    "Expected Result" : "Response status is 400 Bad Request with message 'employeeId and absent required'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "AttendanceController:PUT:/mark",
+      "hash" : "62c20ab8f8b90a217a32fae2e88cc4fa7873b255af132c6e0ca24ef334e16006",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "AttendanceController:PUT:/mark",
+  "changeType" : "NEW",
+  "testCaseId" : "ATTENDANCECONTROLLER_PUT__MARK-006",
+  "new" : {
+    "Test Case ID" : "ATTENDANCECONTROLLER_PUT__MARK-006",
+    "Controller Name" : "AttendanceController",
+    "Title" : "Mark attendance with null date uses current date",
+    "Description" : "Send PUT request to mark attendance with null date and verify current date is used",
+    "Pre-Conditions" : "Employee with given employeeId exists",
+    "Test Steps" : [ "Send PUT request to /api/attendance/mark with employeeId and absent, date is null or missing", "Verify response status is 200 OK", "Verify attendance record date is current date" ],
+    "Input" : {
+      "endpoint" : "/api/attendance/mark",
+      "method" : "PUT",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : {
+        "employeeId" : 1,
+        "absent" : false,
+        "date" : null
+      }
+    },
+    "Expected Result" : "Response status is 200 OK and attendance record date is current date",
+    "Expected Status" : 200,
+    "Priority" : "Medium",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "AttendanceController:PUT:/mark",
+      "hash" : "62c20ab8f8b90a217a32fae2e88cc4fa7873b255af132c6e0ca24ef334e16006",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:DELETE:/employee/{id}",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_DELETE__EMPLOYEE__ID_-001",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_DELETE__EMPLOYEE__ID_-001",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Delete employee with valid id",
+    "Description" : "Verify deleting an existing employee by valid id returns 204 status",
+    "Pre-Conditions" : "Employee with given id exists in the database",
+    "Test Steps" : [ "Send DELETE request to /api/employee/{id} with valid existing employee id" ],
+    "Input" : {
+      "endpoint" : "/api/employee/{id}",
+      "method" : "DELETE",
+      "pathParams" : {
+        "id" : 1
+      },
+      "queryParams" : { },
+      "body" : null
+    },
+    "Expected Result" : "Response status is 204 No Content and employee is deleted",
+    "Expected Status" : 204,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:DELETE:/employee/{id}",
+      "hash" : "85241d4186b6bc11bba4d8a82d8e000d3c5d8ca8ed9393dc8f8633c104c0b9cc",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:DELETE:/employee/{id}",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_DELETE__EMPLOYEE__ID_-002",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_DELETE__EMPLOYEE__ID_-002",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Delete employee with non-existing id",
+    "Description" : "Verify deleting an employee with non-existing id returns 404 status with error message",
+    "Pre-Conditions" : "No employee exists with the given id",
+    "Test Steps" : [ "Send DELETE request to /api/employee/{id} with non-existing employee id" ],
+    "Input" : {
+      "endpoint" : "/api/employee/{id}",
+      "method" : "DELETE",
+      "pathParams" : {
+        "id" : 9999
+      },
+      "queryParams" : { },
+      "body" : null
+    },
+    "Expected Result" : "Response status is 404 Not Found with message 'employee not found'",
+    "Expected Status" : 404,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:DELETE:/employee/{id}",
+      "hash" : "85241d4186b6bc11bba4d8a82d8e000d3c5d8ca8ed9393dc8f8633c104c0b9cc",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:DELETE:/employee/{id}",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_DELETE__EMPLOYEE__ID_-003",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_DELETE__EMPLOYEE__ID_-003",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Delete employee with null id",
+    "Description" : "Verify deleting an employee with null id returns 400 status with error message",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Send DELETE request to /api/employee/{id} with id as null or missing" ],
+    "Input" : {
+      "endpoint" : "/api/employee/{id}",
+      "method" : "DELETE",
+      "pathParams" : {
+        "id" : null
+      },
+      "queryParams" : { },
+      "body" : null
+    },
+    "Expected Result" : "Response status is 400 Bad Request with message 'id is required'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:DELETE:/employee/{id}",
+      "hash" : "85241d4186b6bc11bba4d8a82d8e000d3c5d8ca8ed9393dc8f8633c104c0b9cc",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:GET:/employee",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_GET__EMPLOYEE-001",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_GET__EMPLOYEE-001",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Get all employees successfully",
+    "Description" : "Verify that GET /api/employee returns a list of all employees",
+    "Pre-Conditions" : "At least one employee exists in the repository",
+    "Test Steps" : [ "Send GET request to /api/employee", "Receive response" ],
+    "Input" : {
+      "endpoint" : "/api/employee",
+      "method" : "GET",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : null
+    },
+    "Expected Result" : "Response contains list of employees",
+    "Expected Status" : 200,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:GET:/employee",
+      "hash" : "64abae4ed4d60157e53abb3eb75b09e7aaee0673459a71679cb4f4fd88d843df",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:GET:/employee",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_GET__EMPLOYEE-002",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_GET__EMPLOYEE-002",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Get all employees when no employees exist",
+    "Description" : "Verify that GET /api/employee returns an empty list when no employees exist",
+    "Pre-Conditions" : "No employees exist in the repository",
+    "Test Steps" : [ "Send GET request to /api/employee", "Receive response" ],
+    "Input" : {
+      "endpoint" : "/api/employee",
+      "method" : "GET",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : null
+    },
+    "Expected Result" : "Response contains empty list",
+    "Expected Status" : 200,
+    "Priority" : "Medium",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:GET:/employee",
+      "hash" : "64abae4ed4d60157e53abb3eb75b09e7aaee0673459a71679cb4f4fd88d843df",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:GET:/employee/{id}",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_GET__EMPLOYEE__ID_-003",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_GET__EMPLOYEE__ID_-003",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Get employee with null id",
+    "Description" : "Verify that GET /api/employee/{id} returns 400 when id is null",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Send GET request to /api/employee/{id} with id as null or missing" ],
+    "Input" : {
+      "endpoint" : "/api/employee/{id}",
+      "method" : "GET",
+      "pathParams" : {
+        "id" : null
+      },
+      "queryParams" : { },
+      "body" : null
+    },
+    "Expected Result" : "Response body contains message 'id is required'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:GET:/employee/{id}",
+      "hash" : "443919fe96d976b7f0d2c379be7e3eca192df52a85ee9143040b2d4e59207830",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:GET:/employee/{id}",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_GET__EMPLOYEE__ID_-002",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_GET__EMPLOYEE__ID_-002",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Get employee by non-existing id",
+    "Description" : "Verify that GET /api/employee/{id} returns 404 when employee id does not exist",
+    "Pre-Conditions" : "No employee with given id exists in the database",
+    "Test Steps" : [ "Send GET request to /api/employee/{id} with non-existing employee id" ],
+    "Input" : {
+      "endpoint" : "/api/employee/{id}",
+      "method" : "GET",
+      "pathParams" : {
+        "id" : 9999
+      },
+      "queryParams" : { },
+      "body" : null
+    },
+    "Expected Result" : "Response body contains message 'employee not found'",
+    "Expected Status" : 404,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:GET:/employee/{id}",
+      "hash" : "443919fe96d976b7f0d2c379be7e3eca192df52a85ee9143040b2d4e59207830",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:GET:/employee/{id}",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_GET__EMPLOYEE__ID_-001",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_GET__EMPLOYEE__ID_-001",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Get employee by valid id",
+    "Description" : "Verify that GET /api/employee/{id} returns employee details when a valid id is provided",
+    "Pre-Conditions" : "Employee with given id exists in the database",
+    "Test Steps" : [ "Send GET request to /api/employee/{id} with valid existing employee id" ],
+    "Input" : {
+      "endpoint" : "/api/employee/{id}",
+      "method" : "GET",
+      "pathParams" : {
+        "id" : 1
+      },
+      "queryParams" : { },
+      "body" : null
+    },
+    "Expected Result" : "Response contains employee details with id 1",
+    "Expected Status" : 200,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:GET:/employee/{id}",
+      "hash" : "443919fe96d976b7f0d2c379be7e3eca192df52a85ee9143040b2d4e59207830",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:POST:/employee",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-001",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-001",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Create employee with valid data",
+    "Description" : "Verify creating an employee with valid id, name, and role returns created status and employee data",
+    "Pre-Conditions" : "Employee id does not exist in the system",
+    "Test Steps" : [ "Send POST request to /api/employee with valid employee JSON body containing id, name, and role" ],
+    "Input" : {
+      "endpoint" : "/api/employee",
+      "method" : "POST",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : {
+        "id" : 1,
+        "name" : "John Doe",
+        "role" : "Developer"
+      }
+    },
+    "Expected Result" : "Response status is 201 Created with body containing saved employee data including id, name, and role",
+    "Expected Status" : 201,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:POST:/employee",
+      "hash" : "60cbd486c57662ee095a2f77431722a83351cfc41beb165fc5e606b35cd77c53",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:POST:/employee",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-005",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-005",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Create employee with missing role",
+    "Description" : "Verify creating an employee without role returns bad request with error message",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Send POST request to /api/employee with employee JSON body containing id and name but missing role" ],
+    "Input" : {
+      "endpoint" : "/api/employee",
+      "method" : "POST",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : {
+        "id" : 1,
+        "name" : "John Doe"
+      }
+    },
+    "Expected Result" : "Response status is 400 Bad Request with message 'name and role are required to enter'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:POST:/employee",
+      "hash" : "60cbd486c57662ee095a2f77431722a83351cfc41beb165fc5e606b35cd77c53",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:POST:/employee",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-004",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-004",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Create employee with empty name",
+    "Description" : "Verify creating an employee with empty name returns bad request with error message",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Send POST request to /api/employee with employee JSON body containing id and role and name as empty string" ],
+    "Input" : {
+      "endpoint" : "/api/employee",
+      "method" : "POST",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : {
+        "id" : 1,
+        "name" : " ",
+        "role" : "Developer"
+      }
+    },
+    "Expected Result" : "Response status is 400 Bad Request with message 'name and role are required to enter'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:POST:/employee",
+      "hash" : "60cbd486c57662ee095a2f77431722a83351cfc41beb165fc5e606b35cd77c53",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:POST:/employee",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-003",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-003",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Create employee with missing name",
+    "Description" : "Verify creating an employee without name returns bad request with error message",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Send POST request to /api/employee with employee JSON body containing id and role but missing name" ],
+    "Input" : {
+      "endpoint" : "/api/employee",
+      "method" : "POST",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : {
+        "id" : 1,
+        "role" : "Developer"
+      }
+    },
+    "Expected Result" : "Response status is 400 Bad Request with message 'name and role are required to enter'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:POST:/employee",
+      "hash" : "60cbd486c57662ee095a2f77431722a83351cfc41beb165fc5e606b35cd77c53",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:POST:/employee",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-002",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-002",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Create employee with missing id",
+    "Description" : "Verify creating an employee without id returns bad request with error message",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Send POST request to /api/employee with employee JSON body missing id but with name and role" ],
+    "Input" : {
+      "endpoint" : "/api/employee",
+      "method" : "POST",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : {
+        "name" : "John Doe",
+        "role" : "Developer"
+      }
+    },
+    "Expected Result" : "Response status is 400 Bad Request with message 'name and role are required to enter'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:POST:/employee",
+      "hash" : "60cbd486c57662ee095a2f77431722a83351cfc41beb165fc5e606b35cd77c53",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:POST:/employee",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-007",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-007",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Create employee with null body",
+    "Description" : "Verify creating an employee with null request body returns bad request with error message",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Send POST request to /api/employee with null body" ],
+    "Input" : {
+      "endpoint" : "/api/employee",
+      "method" : "POST",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : null
+    },
+    "Expected Result" : "Response status is 400 Bad Request with message 'name and role are required to enter'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:POST:/employee",
+      "hash" : "60cbd486c57662ee095a2f77431722a83351cfc41beb165fc5e606b35cd77c53",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:POST:/employee",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-006",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_POST__EMPLOYEE-006",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Create employee with empty role",
+    "Description" : "Verify creating an employee with empty role returns bad request with error message",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Send POST request to /api/employee with employee JSON body containing id and name and role as empty string" ],
+    "Input" : {
+      "endpoint" : "/api/employee",
+      "method" : "POST",
+      "pathParams" : { },
+      "queryParams" : { },
+      "body" : {
+        "id" : 1,
+        "name" : "John Doe",
+        "role" : " "
+      }
+    },
+    "Expected Result" : "Response status is 400 Bad Request with message 'name and role are required to enter'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:POST:/employee",
+      "hash" : "60cbd486c57662ee095a2f77431722a83351cfc41beb165fc5e606b35cd77c53",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:PUT:/employee/{id}",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_PUT__EMPLOYEE__ID_-005",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_PUT__EMPLOYEE__ID_-005",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Update employee with partial fields in request body",
+    "Description" : "Verify updating employee with partial fields updates only those fields and returns status 200",
+    "Pre-Conditions" : "Employee with given id exists in the repository",
+    "Test Steps" : [ "Send PUT request to /api/employee/{id} with valid id and partial employee data in request body" ],
+    "Input" : {
+      "endpoint" : "/api/employee/{id}",
+      "method" : "PUT",
+      "pathParams" : {
+        "id" : 1
+      },
+      "queryParams" : { },
+      "body" : {
+        "role" : "Manager"
+      }
+    },
+    "Expected Result" : "Response status is 200 OK and response body contains employee data with updated role and unchanged other fields",
+    "Expected Status" : 200,
+    "Priority" : "Medium",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:PUT:/employee/{id}",
+      "hash" : "176049e77de373eabf9a5d6448159b10f722a7e011e0190f46dc1c907051c486",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:PUT:/employee/{id}",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_PUT__EMPLOYEE__ID_-003",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_PUT__EMPLOYEE__ID_-003",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Update employee with null request body",
+    "Description" : "Verify updating employee with null request body returns status 400 with error message",
+    "Pre-Conditions" : "Employee with given id exists in the repository",
+    "Test Steps" : [ "Send PUT request to /api/employee/{id} with valid id and null request body" ],
+    "Input" : {
+      "endpoint" : "/api/employee/{id}",
+      "method" : "PUT",
+      "pathParams" : {
+        "id" : 1
+      },
+      "queryParams" : { },
+      "body" : null
+    },
+    "Expected Result" : "Response status is 400 Bad Request and response body contains message 'request body is required'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:PUT:/employee/{id}",
+      "hash" : "176049e77de373eabf9a5d6448159b10f722a7e011e0190f46dc1c907051c486",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:PUT:/employee/{id}",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_PUT__EMPLOYEE__ID_-004",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_PUT__EMPLOYEE__ID_-004",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Update employee with non-existing id",
+    "Description" : "Verify updating employee with id that does not exist returns status 404 with error message",
+    "Pre-Conditions" : "No employee with given id exists in the repository",
+    "Test Steps" : [ "Send PUT request to /api/employee/{id} with non-existing id and valid request body" ],
+    "Input" : {
+      "endpoint" : "/api/employee/{id}",
+      "method" : "PUT",
+      "pathParams" : {
+        "id" : 9999
+      },
+      "queryParams" : { },
+      "body" : {
+        "name" : "John Doe",
+        "role" : "Developer",
+        "absent" : false
+      }
+    },
+    "Expected Result" : "Response status is 404 Not Found and response body contains message 'employee not found'",
+    "Expected Status" : 404,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:PUT:/employee/{id}",
+      "hash" : "176049e77de373eabf9a5d6448159b10f722a7e011e0190f46dc1c907051c486",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:PUT:/employee/{id}",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_PUT__EMPLOYEE__ID_-001",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_PUT__EMPLOYEE__ID_-001",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Update employee with valid id and valid body",
+    "Description" : "Verify updating an existing employee with valid id and valid request body updates the employee and returns status 200",
+    "Pre-Conditions" : "Employee with given id exists in the repository",
+    "Test Steps" : [ "Send PUT request to /api/employee/{id} with valid id and valid employee data in request body" ],
+    "Input" : {
+      "endpoint" : "/api/employee/{id}",
+      "method" : "PUT",
+      "pathParams" : {
+        "id" : 1
+      },
+      "queryParams" : { },
+      "body" : {
+        "name" : "John Doe",
+        "role" : "Developer",
+        "absent" : false
+      }
+    },
+    "Expected Result" : "Response status is 200 OK and response body contains updated employee data",
+    "Expected Status" : 200,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:PUT:/employee/{id}",
+      "hash" : "176049e77de373eabf9a5d6448159b10f722a7e011e0190f46dc1c907051c486",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+}, {
+  "endpoint" : "EmployeeController:PUT:/employee/{id}",
+  "changeType" : "NEW",
+  "testCaseId" : "EMPLOYEECONTROLLER_PUT__EMPLOYEE__ID_-002",
+  "new" : {
+    "Test Case ID" : "EMPLOYEECONTROLLER_PUT__EMPLOYEE__ID_-002",
+    "Controller Name" : "EmployeeController",
+    "Title" : "Update employee with null id",
+    "Description" : "Verify updating employee with null id returns status 400 with error message",
+    "Pre-Conditions" : "None",
+    "Test Steps" : [ "Send PUT request to /api/employee/{id} with id as null" ],
+    "Input" : {
+      "endpoint" : "/api/employee/{id}",
+      "method" : "PUT",
+      "pathParams" : {
+        "id" : null
+      },
+      "queryParams" : { },
+      "body" : {
+        "name" : "John Doe",
+        "role" : "Developer",
+        "absent" : false
+      }
+    },
+    "Expected Result" : "Response status is 400 Bad Request and response body contains message 'id is required'",
+    "Expected Status" : 400,
+    "Priority" : "High",
+    "Type" : "Functional",
+    "_meta" : {
+      "endpoint" : "EmployeeController:PUT:/employee/{id}",
+      "hash" : "176049e77de373eabf9a5d6448159b10f722a7e011e0190f46dc1c907051c486",
+      "runId" : "2026-02-01T16:21:20.906308200Z",
+      "mode" : "GENERATE"
+    }
+  }
+} ]
