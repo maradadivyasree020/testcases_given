@@ -1,9 +1,0 @@
-{
-  "AttendanceController:POST:/mark-batch" : "afca4dd6df9ea3ad782d1e2233939d9ea5db69b5493d95e45e88d3223c266670",
-  "AttendanceController:PUT:/mark" : "62c20ab8f8b90a217a32fae2e88cc4fa7873b255af132c6e0ca24ef334e16006",
-  "EmployeeController:DELETE:/employee/{id}" : "85241d4186b6bc11bba4d8a82d8e000d3c5d8ca8ed9393dc8f8633c104c0b9cc",
-  "EmployeeController:GET:/employee" : "64abae4ed4d60157e53abb3eb75b09e7aaee0673459a71679cb4f4fd88d843df",
-  "EmployeeController:GET:/employee/{id}" : "443919fe96d976b7f0d2c379be7e3eca192df52a85ee9143040b2d4e59207830",
-  "EmployeeController:POST:/employee" : "60cbd486c57662ee095a2f77431722a83351cfc41beb165fc5e606b35cd77c53",
-  "EmployeeController:PUT:/employee/{id}" : "176049e77de373eabf9a5d6448159b10f722a7e011e0190f46dc1c907051c486"
-}
