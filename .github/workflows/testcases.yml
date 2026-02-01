@@ -45,11 +45,14 @@ jobs:
       # ---------------------------
       # 4️⃣ Generate test cases (ONLY IF CHANGED)
       # ---------------------------
-      - name: Generate test cases
+      - name: Generate test cases (CI only)
         if: steps.diff.outputs.changed == 'true'
         run: |
-          echo "Backend logic changed → Generating all-tests.json"
-          mvn -q -DskipTests exec:java
+            echo "Generating test files in pipeline"
+            mkdir -p test-cases
+            mvn -q -DskipTests exec:java
+            mv all-tests.json test-cases/all-tests.json
+            mv diff.json test-cases/diff.json
 
       # ---------------------------
       # 5️⃣ Execute tests + generate PDF
