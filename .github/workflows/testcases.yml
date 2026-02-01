@@ -45,19 +45,30 @@ jobs:
       # ---------------------------
       # 4️⃣ Generate test cases (ONLY IF CHANGED)
       # ---------------------------
-      - name: Generate test cases (CI only)
-        if: steps.diff.outputs.changed == 'true'
+    #   - name: Generate test cases (CI only)
+    #     if: steps.diff.outputs.changed == 'true'
+    #     run: |
+    #         echo "Generating test files"
+    #         mkdir -p test-cases
+    #         mvn -q -DskipTests exec:java
+
+    #         # Verify files exist
+    #         ls -l
+
+    #         # Move into folder
+    #         mv all-tests.json test-cases/all-tests.json
+    #         mv diff.json test-cases/diff.json
+      - name: Generate test cases (DEBUG)
         run: |
-            echo "Generating test files"
+            pwd
+            ls -l
             mkdir -p test-cases
             mvn -q -DskipTests exec:java
+            echo "---- AFTER GENERATION ----"
+            find . -name "all-tests.json"
+            find . -name "diff.json"
 
-            # Verify files exist
-            ls -l
 
-            # Move into folder
-            mv all-tests.json test-cases/all-tests.json
-            mv diff.json test-cases/diff.json
 
 
       # ---------------------------
@@ -66,6 +77,7 @@ jobs:
       - name: Execute test cases and generate PDF
         run: |
           echo "Running test execution pipeline"
+          cd 
           mvn test -Dspring.profiles.active=test -Dtest=JsonDrivenTestRunnerTest
 
 
