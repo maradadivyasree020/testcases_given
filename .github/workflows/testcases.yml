@@ -63,8 +63,15 @@ jobs:
       # ---------------------------
       # 6️⃣ Upload results.pdf
       # ---------------------------
+      - name: Upload Json Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results.json
+          path: test-cases/results.json
+
       - name: Upload Test Execution Report
         uses: actions/upload-artifact@v4
         with:
           name: test-results-pdf
           path: test-cases/results.pdf
+
