@@ -18,8 +18,9 @@ public class ApiSpec {
 
         String method = getText(input, "method");
         String endpoint = getText(input, "endpoint");
+        String fullPath = tc.get("Input").get("endpoint").asText();
 
-        if (method == null || endpoint == null) {
+        if (method == null || endpoint == null || fullPath == null) {
             throw new IllegalArgumentException("Input.method or Input.endpoint missing");
         }
 
@@ -56,6 +57,7 @@ public class ApiSpec {
         return new ExecutableSpec(
             method,
             endpoint,
+            fullPath,
             body,
             queryParams.isEmpty() ? null : queryParams,
             pathParams.isEmpty() ? null : pathParams,
