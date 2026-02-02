@@ -67,7 +67,7 @@ jobs:
         run: |
           pwd
           ls -R
-          cat test-cases/results.json      
+          cat test-cases/test-results.json      
 
       - name: Upload Json Results
         uses: actions/upload-artifact@v4
