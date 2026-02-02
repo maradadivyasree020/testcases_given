@@ -72,8 +72,8 @@ jobs:
       - name: Upload Json Results
         uses: actions/upload-artifact@v4
         with:
-          name: results.json
-          path: test-cases/results.json
+          name: test-results.json
+          path: test-cases/test-results.json
 
       - name: Upload Test Execution Report
         uses: actions/upload-artifact@v4
